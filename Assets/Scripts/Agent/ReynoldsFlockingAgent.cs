@@ -51,6 +51,8 @@ public class ReynoldsFlockingAgent : Agent
     private float mapSize = 5.0f;
 
     private ParameterManager manager;
+
+    private PatternCreator forceField;
     #endregion
 
     #region MonoBehaviour callbacks
@@ -58,6 +60,8 @@ public class ReynoldsFlockingAgent : Agent
     void Start()
     {
         manager = FindObjectOfType<ParameterManager>();
+        forceField = FindObjectOfType<PatternCreator>();
+
         detectedAgents = new List<GameObject>();
         InitializeAgent(true);
 
@@ -81,6 +85,7 @@ public class ReynoldsFlockingAgent : Agent
         Cohesion();
         Separation();
         Alignment();
+        EnvironmentalForce();
 
     }
 
@@ -208,6 +213,15 @@ public class ReynoldsFlockingAgent : Agent
         float k = frictionIntensity;
         Vector3 force = this.speed;
         force *= -k;
+        addForce(force);
+    }
+
+    private void EnvironmentalForce()
+    {
+        Vector2 temp = new Vector2(transform.position.x, transform.position.z);
+        temp = forceField.GetEnvironmentalForce(temp);
+        Vector3 force = new Vector3(temp.x, 0.0f, temp.y);
+        force *= 100;
         addForce(force);
     }
 

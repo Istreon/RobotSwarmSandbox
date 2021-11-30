@@ -37,7 +37,7 @@ public class MetricsAnalyzer : MonoBehaviour
 
 
             //Debug.Log(TotalDistance());
-            Debug.Log(DistanceWeightDistributionQuality());
+            //Debug.Log(DistanceWeightDistributionQuality());
             //Debug.Log(AggregationQuality());
             //Debug.Log(MeanSquareDistanceFromCenterOfMass());
             //Debug.Log(ExpectedClusterSize());
