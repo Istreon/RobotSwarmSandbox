@@ -45,8 +45,8 @@ public class PatternCreator : MonoBehaviour
             Vector3 mousePos = Input.mousePosition;
             {
                 Ray temp = mainCamera.ScreenPointToRay(new Vector3(mousePos.x, mousePos.y, mainCamera.nearClipPlane));
-                
-                float scale=temp.origin.y/ temp.direction.y;
+
+                float scale = temp.origin.y / temp.direction.y;
 
                 Vector3 res = temp.GetPoint(-scale);
 
@@ -54,10 +54,10 @@ public class PatternCreator : MonoBehaviour
                 res.x = Mathf.Round(res.x * 100f) / 100f;
                 res.z = Mathf.Round(res.z * 100f) / 100f;
 
-                
+
                 Vector2 vertex = new Vector2(res.x, res.z);
 
-                if(patternVertices.Count>0)
+                if (patternVertices.Count > 0)
                 {
                     Vector2 lastVertex = patternVertices[patternVertices.Count - 1];
                     if (lastVertex.x != vertex.x || lastVertex.y != vertex.y)
@@ -65,27 +65,39 @@ public class PatternCreator : MonoBehaviour
                         patternVertices.Add(vertex);
                         Debug.Log(vertex);
                     }
-                } else
+                }
+                else
                 {
                     patternVertices.Add(vertex);
                     Debug.Log(vertex);
                 }
 
-                
-                
+
+
             }
-        } else
+        }
+        else
         {
             if (isDrawing)
             {
                 isDrawing = false;
                 Debug.Log("I finished!");
                 Debug.Log(patternVertices.Count);
+                ClearRenderer();
                 DrawPattern();
                 CalculateVectorFieldState();
                 CalculateVectorField();
                 SmoothingVectorField();
                 DrawVectorField();
+            }
+        }
+
+        if (Input.GetButton("Fire2"))
+        {
+            if (!isDrawing)
+            {
+                ClearRenderer();
+                ClearVectorField();
             }
         }
     }
@@ -142,10 +154,9 @@ public class PatternCreator : MonoBehaviour
 
     private void SmoothingVectorField()
     {
-        int iterationNb = 20;
+        int iterationNb = cutNumber;
         for(int k=0; k<iterationNb; k++)
         {
-            Debug.Log("OK");
             for (int i = 0; i < cutNumber; i++)
             {
                 for (int j = 0; j < cutNumber; j++)
@@ -166,6 +177,19 @@ public class PatternCreator : MonoBehaviour
                         }
                     }
                 }
+            }
+        }
+    }
+
+
+    private void ClearVectorField()
+    {
+        for (int i = 0; i < cutNumber; i++)
+        {
+            for (int j = 0; j < cutNumber; j++)
+            {
+                vectorFieldState[i, j] = false;
+                vectorField[i, j] = Vector2.zero;
             }
         }
     }
@@ -245,6 +269,8 @@ public class PatternCreator : MonoBehaviour
                 lineRenderer.SetPosition(2, new Vector3(x, 0.1f, y + 0.01f)); //x,y and z position of the starting point of the line
                 lineRenderer.SetPosition(3, new Vector3(x, 0.1f, y)); //x,y and z position of the starting point of the line
 
+                patternRenderer.Add(lineRenderer);
+
             }
         }
     }
@@ -269,6 +295,7 @@ public class PatternCreator : MonoBehaviour
 
                 lineRenderer.SetPosition(0, new Vector3(x, 0.1f, y)); //x,y and z position of the starting point of the line
                 lineRenderer.SetPosition(1, new Vector3(x + vectorField[i, j].x / 20.0f, 0.1f, y + vectorField[i, j].y / 20.0f)); ; //x,y and z position of the starting point of the line
+                patternRenderer.Add(lineRenderer);
             }
         }
     }
@@ -291,6 +318,18 @@ public class PatternCreator : MonoBehaviour
         lineRenderer.SetPosition(count, new Vector3(patternVertices[0].x, 0.1f, patternVertices[0].y)); //x,y and z position of the starting point of the line
         patternRenderer.Add(lineRenderer);
     }
+
+
+    private void ClearRenderer()
+    {
+        foreach(LineRenderer l in patternRenderer)
+        {
+            GameObject.Destroy(l);
+        }
+        patternRenderer.Clear();
+    }
+
+
 
 
 
