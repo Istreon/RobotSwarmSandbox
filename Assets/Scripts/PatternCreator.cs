@@ -84,11 +84,11 @@ public class PatternCreator : MonoBehaviour
                 Debug.Log("I finished!");
                 Debug.Log(patternVertices.Count);
                 ClearRenderer();
-                DrawPattern();
+                //DrawPattern();
                 CalculateVectorFieldState();
                 CalculateVectorField();
                 SmoothingVectorField();
-                DrawVectorField();
+                //DrawVectorField();
             }
         }
 

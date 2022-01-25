@@ -114,3 +114,6 @@ MonoBehaviour:
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1
+  randomMovementIntensity: 20
+  frictionIntensity: 0.1
+  maxSpeed: 1

@@ -102,7 +102,9 @@ public class ReynoldsFlockingAgent : Agent
         this.transform.position += this.speed * Time.deltaTime;
         this.transform.position = new Vector3(this.transform.position.x,0.1f, this.transform.position.z);
         //Loop position if it go further than map size limit
-        StayInInfiniteArea();
+        //StayInInfiniteArea();
+        //Stay in the finite area if it go further than map size limit
+        StayInFiniteArea();
 
         //Update agent speed based on acceleration and time passed since last change
         this.speed += this.acceleration * Time.deltaTime;
@@ -127,7 +129,8 @@ public class ReynoldsFlockingAgent : Agent
         foreach(GameObject o in detectedAgents)
         {
             count += 1;
-            g += NearestPositionInInfiniteArea(o.transform.position);
+            //g += NearestPositionInInfiniteArea(o.transform.position);
+            g += o.transform.position;
         }
         if(count>0)
         {
@@ -150,7 +153,8 @@ public class ReynoldsFlockingAgent : Agent
         foreach (GameObject o in detectedAgents)
         {
             count += 1;
-            Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
+            //Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
+            Vector3 force = this.transform.position - o.transform.position;
             force.Normalize();
 
             totalForce += force;
@@ -289,6 +293,42 @@ public class ReynoldsFlockingAgent : Agent
         if (this.transform.position.z > mapSize) temp.z -= mapSize;
         if (this.transform.position.z < 0.0f) temp.z += mapSize;
 
+        this.transform.position = temp;
+    }
+
+    private void StayInFiniteArea()
+    {
+        float x=0.0f;
+        float z=0.0f;
+        Vector3 temp = this.transform.position;
+        if (this.transform.position.x > mapSize)
+        {
+            temp.x = mapSize;
+            x = -1;
+            speed.x = 0.0f;
+        }
+        if (this.transform.position.x < 0.0f)
+        {
+            temp.x = 0.0f;
+            x = 1;
+            speed.x = 0.0f;
+        }
+
+        if (this.transform.position.z > mapSize)
+        {
+            temp.z = mapSize;
+            z = -1;
+            speed.z = 0.0f;
+        }
+        if (this.transform.position.z < 0.0f)
+        {
+            temp.z = 0.0f;
+            z = 1;
+            speed.z = 0.0f;
+        }
+        Vector3 rebond = new Vector3(x, 0.0f, z);
+        rebond *= 50;
+        addForce(rebond);
         this.transform.position = temp;
     }
 

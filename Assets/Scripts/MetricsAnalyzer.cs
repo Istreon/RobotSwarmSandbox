@@ -30,7 +30,7 @@ public class MetricsAnalyzer : MonoBehaviour
         }
 
         time += Time.deltaTime;
-        if(time>=1.0f)
+        if (time >= 1.0f)
         {
             UpdateCenterOfMassValue();
             UpdateClusters();
@@ -49,6 +49,8 @@ public class MetricsAnalyzer : MonoBehaviour
             //Debug.Log(RescaledSpeed(AverageSpeed()));
             //Debug.Log(RescaledSpeed(LargestClusterAverageSpeed()));
             //Debug.Log(AverageOrientation());
+            //Debug.Log(BBR());
+            Debug.Log(Order());
             time = 0.0f;
         }
     }
@@ -73,7 +75,7 @@ public class MetricsAnalyzer : MonoBehaviour
         //Create a clone of the agents list, to manipulate it
         List<GameObject> agentsClone = new List<GameObject>(agents);
 
-        while (agentsClone.Count>0)
+        while (agentsClone.Count > 0)
         {
             //Add first agent in the new cluster
             List<GameObject> newCluster = new List<GameObject>();
@@ -84,10 +86,10 @@ public class MetricsAnalyzer : MonoBehaviour
             int i = 0;
             while (i < newCluster.Count)
             {
-                List<GameObject> temp=newCluster[i].GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
-                foreach(GameObject g in temp)
+                List<GameObject> temp = newCluster[i].GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+                foreach (GameObject g in temp)
                 {
-                    if(!newCluster.Contains(g))
+                    if (!newCluster.Contains(g))
                     {
                         bool res = agentsClone.Remove(g);
                         if (res) newCluster.Add(g);
@@ -144,11 +146,11 @@ public class MetricsAnalyzer : MonoBehaviour
     {
         float total = 0;
         int i, j;
-        for(i=0; i<agents.Count; i++)
+        for (i = 0; i < agents.Count; i++)
         {
             for (j = i; j < agents.Count; j++)
             {
-                if(i!=j) total += Vector3.Distance(agents[i].transform.position, agents[j].transform.position);
+                if (i != j) total += Vector3.Distance(agents[i].transform.position, agents[j].transform.position);
             }
         }
         return total;
@@ -165,7 +167,7 @@ public class MetricsAnalyzer : MonoBehaviour
                 if (i != j) total += Vector3.Distance(agents[i].transform.position, agents[j].transform.position);
             }
         }
-        float awd = total/ (agents.Count * (agents.Count - 1));
+        float awd = total / (agents.Count * (agents.Count - 1));
 
         float t = awd + 1.0f;
         float fw = 1.0f - (1.0f / Mathf.Sqrt(t));
@@ -197,7 +199,7 @@ public class MetricsAnalyzer : MonoBehaviour
         foreach (GameObject g in agents)
         {
             float val = Vector3.Distance(g.transform.position, centerOfMass);
-            res += val*val;
+            res += val * val;
         }
 
         res /= agents.Count;
@@ -208,9 +210,9 @@ public class MetricsAnalyzer : MonoBehaviour
     private float AverageSpeed()
     {
         float averageSpeed = 0.0f;
-        foreach(GameObject g in agents)
+        foreach (GameObject g in agents)
         {
-           Vector3 speed= g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 speed = g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
             averageSpeed += speed.magnitude;
         }
 
@@ -223,7 +225,7 @@ public class MetricsAnalyzer : MonoBehaviour
     {
         //Get largest Cluster
         int max = 0;
-        List<GameObject> largestCluster=new List<GameObject>();
+        List<GameObject> largestCluster = new List<GameObject>();
         foreach (List<GameObject> l in clusters)
         {
             if (l.Count > max)
@@ -233,7 +235,7 @@ public class MetricsAnalyzer : MonoBehaviour
             }
         }
 
-        if(largestCluster!=null || largestCluster.Count!=0)
+        if (largestCluster != null || largestCluster.Count != 0)
         {
             //Get average speed of the largest cluster
             float averageSpeed = 0.0f;
@@ -267,7 +269,7 @@ public class MetricsAnalyzer : MonoBehaviour
         {
             averageOrientation += g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
         }
-        return (Mathf.Atan2(averageOrientation.z, averageOrientation.x)/Mathf.PI)*180;
+        return (Mathf.Atan2(averageOrientation.z, averageOrientation.x) / Mathf.PI) * 180;
     }
 
 
@@ -275,17 +277,45 @@ public class MetricsAnalyzer : MonoBehaviour
     {
         int n = agents.Count;
 
-        int i, j;
-        for(i=0; i<n; i++)
+        Vector3 b = Vector3.zero;
+        int i;
+        for (i = 0; i < n; i++)
         {
-            for(j=0; j<n; j++)
-            {
-                Vector3 speedi=agents[i].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
-                Vector3 speedj=agents[j].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
-                
-            }
+            Vector3 speed = agents[i].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 orientation = speed.normalized;
+            b += orientation;
         }
-        return 0.0f;
+
+        float psi = Vector3.Magnitude(b) / ((float)n);
+        return psi;
+    }
+
+    private float BBR() //BoundingBoxRatio
+    {
+        float bbr = 0.0f;
+        if(agents.Count>0)
+        {
+            float xMin = agents[0].transform.position.x;
+            float xMax = agents[0].transform.position.x;
+            float zMin = agents[0].transform.position.z;
+            float zMax = agents[0].transform.position.z;
+            int n = agents.Count;
+
+            int i;
+            for (i = 0; i < n; i++)
+            {
+                float xTemp = agents[i].transform.position.x;
+                float zTemp = agents[i].transform.position.z;
+                if (xTemp > xMax) xMax = xTemp;
+                else if (xTemp < xMin) xMin = xTemp;
+
+                if (zTemp > zMax) zMax = zTemp;
+                else if (zTemp < zMin) zMin = zTemp;
+            }
+
+            bbr = ((xMax - xMin) * (zMax - zMin)) / (manager.GetMaxPosition() * manager.GetMaxPosition());
+        }
+        return bbr;
     }
     #endregion
 }

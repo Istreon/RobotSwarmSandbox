@@ -705,7 +705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
-  numberOfAgents: 50
+  numberOfAgents: 40
   maxPosition: 5
 --- !u!4 &1638191335
 Transform:

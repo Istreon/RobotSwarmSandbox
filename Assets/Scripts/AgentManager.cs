@@ -38,4 +38,9 @@ public class AgentManager : MonoBehaviour
     {
         return agents;
     }
+
+    public float GetMaxPosition()
+    {
+        return maxPosition;
+    }
 }
