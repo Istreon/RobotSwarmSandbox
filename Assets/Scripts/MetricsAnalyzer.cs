@@ -1,60 +1,174 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 public class MetricsAnalyzer : MonoBehaviour
 {
     private float time = 0.0f;
+    private float totalTime = 0.0f;
+
+    private string fileName;
     private List<GameObject> agents;
     AgentManager manager;
+    ParameterManager parameterManager;
 
 
     private List<List<GameObject>> clusters;
 
 
+    StringBuilder sb = new StringBuilder();
 
     private Vector3 centerOfMass = Vector3.zero;
+    private Vector3 savedCenterOfMassPosition = Vector3.zero;
+
+
     // Start is called before the first frame update
     void Start()
     {
         manager = FindObjectOfType<AgentManager>();
         if (manager == null) Debug.LogError("AgentManager is missing in the scene", this);
+
+        parameterManager = FindObjectOfType<ParameterManager>();
+        if (parameterManager == null) Debug.LogError("AgentManager is missing in the scene", this);
+
+
+        fileName = "log_" + System.DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".csv";
+
+        //Logs
+        AddHeaderLogLine();
     }
 
+
+
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (agents == null)
         {
             agents = manager.GetAgents();
         }
+        UpdateCenterOfMassValue();
+        UpdateClusters();
+
+
 
         time += Time.deltaTime;
-        if (time >= 1.0f)
+        totalTime += Time.deltaTime;
+
+        if (time >= 0.5f)
         {
-            UpdateCenterOfMassValue();
-            UpdateClusters();
-
-
-            //Debug.Log(TotalDistance());
-            //Debug.Log(DistanceWeightDistributionQuality());
-            //Debug.Log(AggregationQuality());
-            //Debug.Log(MeanSquareDistanceFromCenterOfMass());
-            //Debug.Log(ExpectedClusterSize());
-            //Debug.Log(LargestAggregateSize());
-            //Debug.Log(LargestAggregateSizeRatio());
-            //Debug.Log(AggregateNumber());
-            //Debug.Log(AverageSpeed());
-            //Debug.Log(LargestClusterAverageSpeed());
-            //Debug.Log(RescaledSpeed(AverageSpeed()));
-            //Debug.Log(RescaledSpeed(LargestClusterAverageSpeed()));
-            //Debug.Log(AverageOrientation());
-            //Debug.Log(BBR());
-            Debug.Log(Order());
+            //Logs
+            AddLogLine();
+            WriteLogLines();
             time = 0.0f;
+
+
+            //Update saved position
+            foreach (GameObject g in agents)
+            {
+                g.GetComponent<ReynoldsFlockingAgent>().SavePosition();
+            }
+            savedCenterOfMassPosition = centerOfMass;
         }
+
+        //Debug.Log(TotalDistance());
+        //Debug.Log(DistanceWeightDistributionQuality());
+        //Debug.Log(AggregationQuality());
+        //Debug.Log(MeanSquareDistanceFromCenterOfMass());
+        //Debug.Log(ExpectedClusterSize());
+        //Debug.Log(LargestAggregateSize());
+        //Debug.Log(LargestAggregateSizeRatio());
+        //Debug.Log(AggregateNumber());
+        //Debug.Log(AverageSpeed());
+        //Debug.Log(LargestClusterAverageSpeed());
+        //Debug.Log(RescaledSpeed(AverageSpeed()));
+        //Debug.Log(RescaledSpeed(LargestClusterAverageSpeed()));
+        //Debug.Log(AverageOrientation());
+        //Debug.Log(BBR());
+        //Debug.Log(Order());
+        }
+
+    private void AddHeaderLogLine()
+    {
+        //Time stamp
+        string line = "Time stamp";
+        //Space
+        line += ";TotalDistance";
+        line += ";DistanceWeightDistributionQuality";
+        line += ";MeanSquareDistanceFromCenterOfMass";
+        line += ";BBR";
+        line += ";Effective group motion";
+        //Cluster
+        line += ";ExpectedClusterSize";
+        line += ";LargestAggregateSize";
+        line += ";LargestAggregateSizeRatio";
+        line += ";AggregateNumber";
+        //Speed
+        line += ";AverageSpeed";
+        line += ";RescaledSpeed(AverageSpeed)";
+        line += ";RescaledSpeed(LargestClusterAverageSpeed)";
+        //Orientation
+        line += ";AverageOrientation";
+        line += ";Order";
+
+        //Parameters
+        line += ";Cohesion intensity";
+        line += ";Alignement intensity";
+        line += ";Separation intensity";
+        line += ";Random movement intensity";
+        line += ";Friction intensity";
+        line += ";Max speed intensity";
+
+        line += "\r";
+
+        sb.Append(line);
     }
 
+    private void AddLogLine()
+    {
+        //Time stamp
+        string line = totalTime.ToString();
+
+        //Space
+        line += ";" + TotalDistance().ToString();
+        line += ";" + DistanceWeightDistributionQuality().ToString();
+        line += ";" + MeanSquareDistanceFromCenterOfMass().ToString();
+        line += ";" + BBR().ToString();
+        line += ";" + EffectiveGroupMotion().ToString();
+        //Cluster
+        line += ";" + ExpectedClusterSize().ToString();
+        line += ";" + LargestAggregateSize().ToString();
+        line += ";" + LargestAggregateSizeRatio().ToString();
+        line += ";" + AggregateNumber().ToString();
+        //Speed
+        line += ";" + AverageSpeed().ToString();
+        line += ";" + RescaledSpeed(AverageSpeed()).ToString();
+        line += ";" + RescaledSpeed(LargestClusterAverageSpeed()).ToString();
+        //Orientation
+        line += ";" + AverageOrientation().ToString();
+        line += ";" + Order().ToString();
+
+        //Parameters
+        line += ";" + parameterManager.GetCohesionIntensity().ToString();
+        line += ";" + parameterManager.GetAlignmentIntensity().ToString();
+        line += ";" + parameterManager.GetSeparationIntensity().ToString();
+        line += ";" + parameterManager.GetRandomMovementIntensity().ToString();
+        line += ";" + parameterManager.GetFrictionIntensity().ToString();
+        line += ";" + parameterManager.GetMaxSpeed().ToString();
+
+        line += "\r";
+
+        sb.Append(line);
+    }
+
+    private void WriteLogLines()
+    {
+        File.AppendAllText(Application.dataPath + "/Logs/" + fileName, sb.ToString());
+        sb.Clear();
+    }
 
     private void UpdateCenterOfMassValue()
     {
@@ -189,6 +303,23 @@ public class MetricsAnalyzer : MonoBehaviour
         res /= agents.Count;
 
         return res;
+    }
+
+    private float EffectiveGroupMotion()
+    {
+        float distCM = Vector3.Distance(centerOfMass, savedCenterOfMassPosition);
+
+        float meanDist = 0.0f;
+        foreach (GameObject g in agents)
+        {
+            Vector3 temp = g.GetComponent<ReynoldsFlockingAgent>().GetSavedPosition();
+            meanDist += Vector3.Distance(temp, g.transform.position);
+        }
+
+        meanDist /= agents.Count;
+
+        if (meanDist == 0.0f) return 0.0f; //Protect from division by 0
+        else return (distCM / meanDist);
     }
 
 

@@ -73,6 +73,9 @@ public class ReynoldsFlockingAgent : Agent
     private AgentManager agentManager;
 
     private PatternCreator forceField;
+
+
+    private Vector3 savedPosition;
     #endregion
 
     #region MonoBehaviour callbacks
@@ -106,6 +109,8 @@ public class ReynoldsFlockingAgent : Agent
 
         feelerCollider = feeler.AddComponent<SphereCollider>();
         feelerCollider.isTrigger = true;
+
+        savedPosition = this.transform.position;
     }
 
     // Update is called once per frame
@@ -439,12 +444,23 @@ public class ReynoldsFlockingAgent : Agent
 
     public List<GameObject> GetNeighbors()
     {
-        return detectedAgents;
+        if (detectedAgents == null) return new List<GameObject>();
+        else return detectedAgents;
     }
 
     public float GetMaxSpeed()
     {
         return maxSpeed;
+    }
+
+    public Vector3 GetSavedPosition()
+    {
+        return savedPosition;
+    }
+
+    public void SavePosition()
+    {
+        savedPosition = this.transform.position;
     }
     #endregion
 

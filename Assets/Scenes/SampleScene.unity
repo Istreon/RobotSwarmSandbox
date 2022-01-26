@@ -706,9 +706,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
   mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
-  numberOfAgents: 1
+  numberOfAgents: 40
   mapSizeX: 5
-  mapSizeZ: 11.96
+  mapSizeZ: 5
 --- !u!4 &1638191335
 Transform:
   m_ObjectHideFlags: 0
@@ -741,6 +741,7 @@ MonoBehaviour:
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1
+  avoidingObstaclesIntensity: 0
   randomMovementIntensity: 9.4
   frictionIntensity: 0.1
   maxSpeed: 0.04
