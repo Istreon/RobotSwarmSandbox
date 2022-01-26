@@ -329,7 +329,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &887855764
 Transform:
   m_ObjectHideFlags: 0
@@ -705,8 +705,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
-  numberOfAgents: 40
-  maxPosition: 5
+  mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
+  numberOfAgents: 1
+  mapSizeX: 5
+  mapSizeZ: 11.96
 --- !u!4 &1638191335
 Transform:
   m_ObjectHideFlags: 0
@@ -735,6 +737,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldOfViewSize: 1.03
+  feelerDistance: 0.5
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1

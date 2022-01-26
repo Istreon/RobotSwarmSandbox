@@ -11,6 +11,15 @@ public class ParameterManager : MonoBehaviour
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
 
+    [Header("Feeler")]
+    [SerializeField]
+    [Range(0.0f, 2.0f)]
+    [Tooltip("This is the distance of the feeler from the agent.")]
+    private float feelerDistance = 0.5f;
+    [Range(0.0f, 0.5f)]
+    [Tooltip("This is the size of the feeler radius.")]
+    private float feelerSize = 0.1f;
+
     [Header("Intensity parameters")]
     [SerializeField]
     [Range(0.0f, 20.0f)]
@@ -22,6 +31,9 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 20.0f)]
     private float separationIntensity = 1.0f;
     [SerializeField]
+    [Range(0.0f, 20.0f)]
+    private float avoidingObstaclesIntensity = 1.0f;
+    [SerializeField]
     [Range(0.0f, 50.0f)]
     private float randomMovementIntensity = 20.0f;
     [SerializeField]
@@ -31,6 +43,21 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 2.0f)]
     private float maxSpeed = 1.0f;
 
+
+    public float GetFieldOfViewSize()
+    {
+        return fieldOfViewSize;
+    }
+
+    public float GetFeelerDistance()
+    {
+        return feelerDistance;
+    }
+
+    public float GetFeelerSize()
+    {
+        return feelerSize;
+    }
 
     public float GetSeparationIntensity()
     {
@@ -47,9 +74,9 @@ public class ParameterManager : MonoBehaviour
         return cohesionIntensity;
     }
 
-    public float GetFieldOfViewSize()
+    public float GetAvoidingObstaclesIntensity()
     {
-        return fieldOfViewSize;
+        return avoidingObstaclesIntensity;
     }
 
     public float GetRandomMovementIntensity()

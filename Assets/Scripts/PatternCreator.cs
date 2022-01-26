@@ -10,11 +10,13 @@ public class PatternCreator : MonoBehaviour
 
     List<LineRenderer> patternRenderer;
 
+    private AgentManager agentManager;
 
     private bool isDrawing = false;
 
 
-    private float MapSize = 5.0f;
+    private float mapSizeX = 5.0f;
+    private float mapSizeZ = 5.0f;
     private int cutNumber = 50;
 
     private bool[,] vectorFieldState;
@@ -22,6 +24,10 @@ public class PatternCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        agentManager = FindObjectOfType<AgentManager>();
+        mapSizeX = agentManager.GetMapSizeX();
+        mapSizeZ = agentManager.GetMapSizeZ();
+
         mainCamera = FindObjectOfType<Camera>();
         patternRenderer = new List<LineRenderer>();
 
@@ -104,13 +110,14 @@ public class PatternCreator : MonoBehaviour
 
     private void CalculateVectorFieldState()
     {
-        float step = MapSize / cutNumber;
+        float stepX = mapSizeX / cutNumber;
+        float stepY = mapSizeZ / cutNumber;
         for (int i = 0; i < cutNumber; i++)
         {
             for (int j = 0; j < cutNumber; j++)
             {
-                float x = step * i;
-                float y = step * j;
+                float x = stepX * i;
+                float y = stepY * j;
 
                 Vector2 lineOneA = new Vector2(x, y);
                 Vector2 lineOneB = new Vector2(-10, 10);
@@ -248,13 +255,14 @@ public class PatternCreator : MonoBehaviour
 
     private void DrawVectorFieldState()
     {
-        float step = MapSize / cutNumber;
+        float stepX = mapSizeX / cutNumber;
+        float stepY = mapSizeZ / cutNumber;
         for (int i = 0; i < cutNumber; i++)
         {
             for (int j = 0; j < cutNumber; j++)
             {
-                float x = step * i;
-                float y = step * j;
+                float x = stepX * i;
+                float y = stepY * j;
 
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
                 if(vectorFieldState[i,j]) lineRenderer.material.color = Color.red;
@@ -277,13 +285,14 @@ public class PatternCreator : MonoBehaviour
 
     private void DrawVectorField()
     {
-        float step = MapSize / cutNumber;
+        float stepX = mapSizeX / cutNumber;
+        float stepY = mapSizeZ / cutNumber;
         for (int i = 0; i < cutNumber; i++)
         {
             for (int j = 0; j < cutNumber; j++)
             {
-                float x = step * i;
-                float y = step * j;
+                float x = stepX * i;
+                float y = stepY * j;
 
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
                 if (vectorFieldState[i, j]) lineRenderer.material.color = Color.red;
@@ -342,9 +351,10 @@ public class PatternCreator : MonoBehaviour
 
     public Vector2 GetEnvironmentalForce(Vector2 position)
     {
-        float step = MapSize / cutNumber;
-        int x = (int)(position.x / step);
-        int y = (int)(position.y / step);
+        float stepX = mapSizeX / cutNumber;
+        float stepY = mapSizeZ / cutNumber;
+        int x = (int)(position.x / stepX);
+        int y = (int)(position.y / stepY);
 
         return vectorField[x, y];
     }

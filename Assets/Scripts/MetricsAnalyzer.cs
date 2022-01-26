@@ -313,7 +313,7 @@ public class MetricsAnalyzer : MonoBehaviour
                 else if (zTemp < zMin) zMin = zTemp;
             }
 
-            bbr = ((xMax - xMin) * (zMax - zMin)) / (manager.GetMaxPosition() * manager.GetMaxPosition());
+            bbr = ((xMax - xMin) * (zMax - zMin)) / (manager.GetMapSizeX() * manager.GetMapSizeZ());
         }
         return bbr;
     }
