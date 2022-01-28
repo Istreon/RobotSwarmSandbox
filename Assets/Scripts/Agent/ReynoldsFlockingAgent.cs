@@ -14,7 +14,9 @@ public class ReynoldsFlockingAgent : Agent
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
 
-    [Header("Feeler parameter")]
+    [Header("Feeler parameters")]
+    [SerializeField]
+    private bool feelerEnable = true;
     [SerializeField]
     [Range(0.0f, 2.0f)]
     [Tooltip("This is the distance of the feeler from the agent.")]
@@ -37,7 +39,10 @@ public class ReynoldsFlockingAgent : Agent
     [Range(0.0f, 20.0f)]
     private float avoidingObstaclesIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 50.0f)]
+    [Range(0.0f, 30.0f)]
+    private float moveForwardIntensity = 1.0f;
+    [SerializeField]
+    [Range(0.0f, 30.0f)]
     private float randomMovementIntensity = 20.0f;
     [SerializeField]
     [Range(0.0f, 1.0f)]
@@ -118,13 +123,13 @@ public class ReynoldsFlockingAgent : Agent
     {
         UpdateParameters();
         getAgentsInFieldOfView();
-        getObstacles();
+        if (feelerEnable) getObstacles();
         RandomMovement();
         Friction();
         Cohesion();
         Separation();
         Alignment();
-        AvoidingObstacles();
+        if(feelerEnable) AvoidingObstacles();
         EnvironmentalForce();
 
     }
@@ -283,6 +288,16 @@ public class ReynoldsFlockingAgent : Agent
         }
     }
 
+    private void MoveForward()
+    {
+        Vector3 force = speed.normalized;
+
+        //Modification de la puissance de cette force
+        force *= moveForwardIntensity;
+
+        addForce(force);   
+    }
+
     private void Friction()
     {
         float k = frictionIntensity;
@@ -307,8 +322,15 @@ public class ReynoldsFlockingAgent : Agent
 
     private void UpdateFeeler()
     {
-        feeler.transform.position = this.transform.position + (speed.normalized * feelerDistance);
-        feelerCollider.radius = feelerSize;
+        if (feelerEnable)
+        {
+            feeler.transform.position = this.transform.position + (speed.normalized * feelerDistance);
+            feelerCollider.radius = feelerSize;
+        } else
+        {
+            feeler.SetActive(false);
+        }
+
     }
 
     private void getAgentsInFieldOfView()
@@ -427,9 +449,11 @@ public class ReynoldsFlockingAgent : Agent
         separationIntensity = this.parameterManager.GetSeparationIntensity();
         avoidingObstaclesIntensity = this.parameterManager.GetAvoidingObstaclesIntensity();
         fieldOfViewSize = this.parameterManager.GetFieldOfViewSize();
+        moveForwardIntensity = this.parameterManager.GetMoveForwardIntensity();
         randomMovementIntensity = this.parameterManager.GetRandomMovementIntensity();
         frictionIntensity = this.parameterManager.GetFrictionIntensity();
         maxSpeed = this.parameterManager.GetMaxSpeed();
+        feelerEnable = this.parameterManager.IsFeelerEnable();
         feelerDistance = this.parameterManager.GetFeelerDistance();
         feelerSize = this.parameterManager.GetFeelerSize();
     }

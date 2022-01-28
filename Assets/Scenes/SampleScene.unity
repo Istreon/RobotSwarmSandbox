@@ -737,7 +737,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldOfViewSize: 1.03
+  feelerEnable: 0
   feelerDistance: 0.5
+  feelerSize: 0.1
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1

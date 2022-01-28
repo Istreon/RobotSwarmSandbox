@@ -11,11 +11,14 @@ public class ParameterManager : MonoBehaviour
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
 
-    [Header("Feeler")]
+    [Header("Feeler parameters")]
+    [SerializeField]
+    private bool feelerEnable = true;
     [SerializeField]
     [Range(0.0f, 2.0f)]
     [Tooltip("This is the distance of the feeler from the agent.")]
     private float feelerDistance = 0.5f;
+    [SerializeField]
     [Range(0.0f, 0.5f)]
     [Tooltip("This is the size of the feeler radius.")]
     private float feelerSize = 0.1f;
@@ -34,7 +37,10 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 20.0f)]
     private float avoidingObstaclesIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 50.0f)]
+    [Range(0.0f, 30.0f)]
+    private float moveForwardIntensity = 1.0f;
+    [SerializeField]
+    [Range(0.0f, 30.0f)]
     private float randomMovementIntensity = 20.0f;
     [SerializeField]
     [Range(0.0f, 1.0f)]
@@ -49,6 +55,10 @@ public class ParameterManager : MonoBehaviour
         return fieldOfViewSize;
     }
 
+    public bool IsFeelerEnable()
+    {
+        return feelerEnable;
+    }
     public float GetFeelerDistance()
     {
         return feelerDistance;
@@ -77,6 +87,11 @@ public class ParameterManager : MonoBehaviour
     public float GetAvoidingObstaclesIntensity()
     {
         return avoidingObstaclesIntensity;
+    }
+
+    public float GetMoveForwardIntensity()
+    {
+        return moveForwardIntensity;
     }
 
     public float GetRandomMovementIntensity()
