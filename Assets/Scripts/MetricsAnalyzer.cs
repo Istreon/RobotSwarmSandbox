@@ -53,6 +53,7 @@ public class MetricsAnalyzer : MonoBehaviour
         UpdateCenterOfMassValue();
         UpdateClusters();
 
+        Debug.Log(EffectiveGroupMotion());
 
 
         time += Time.deltaTime;
@@ -106,6 +107,7 @@ public class MetricsAnalyzer : MonoBehaviour
         line += ";LargestAggregateSize";
         line += ";LargestAggregateSizeRatio";
         line += ";AggregateNumber";
+        line += ";AverageNeighborhood";
         //Speed
         line += ";AverageSpeed";
         line += ";RescaledSpeed(AverageSpeed)";
@@ -119,6 +121,7 @@ public class MetricsAnalyzer : MonoBehaviour
         line += ";Alignement intensity";
         line += ";Separation intensity";
         line += ";Random movement intensity";
+        line += ";Move forward intensity";
         line += ";Friction intensity";
         line += ";Max speed intensity";
 
@@ -143,6 +146,7 @@ public class MetricsAnalyzer : MonoBehaviour
         line += ";" + LargestAggregateSize().ToString();
         line += ";" + LargestAggregateSizeRatio().ToString();
         line += ";" + AggregateNumber().ToString();
+        line += ";" + AverageNeighborhood().ToString();
         //Speed
         line += ";" + AverageSpeed().ToString();
         line += ";" + RescaledSpeed(AverageSpeed()).ToString();
@@ -156,6 +160,7 @@ public class MetricsAnalyzer : MonoBehaviour
         line += ";" + parameterManager.GetAlignmentIntensity().ToString();
         line += ";" + parameterManager.GetSeparationIntensity().ToString();
         line += ";" + parameterManager.GetRandomMovementIntensity().ToString();
+        line += ";" + parameterManager.GetMoveForwardIntensity().ToString();
         line += ";" + parameterManager.GetFrictionIntensity().ToString();
         line += ";" + parameterManager.GetMaxSpeed().ToString();
 
@@ -448,5 +453,25 @@ public class MetricsAnalyzer : MonoBehaviour
         }
         return bbr;
     }
+
+
+    private float AverageNeighborhood()
+    {
+        //Create a clone of the agents list, to manipulate it
+        List<GameObject> agentsClone = new List<GameObject>(agents);
+
+        float total = 0.0f;
+        foreach(GameObject o in agentsClone)
+        { 
+            List<GameObject> temp = o.GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+            total+=temp.Count;
+
+        }
+        total = total / agentsClone.Count;
+
+        return total;
+    }
+
+
     #endregion
 }

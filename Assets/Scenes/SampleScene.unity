@@ -740,11 +740,12 @@ MonoBehaviour:
   feelerEnable: 0
   feelerDistance: 0.5
   feelerSize: 0.1
-  cohesionIntensity: 1
-  alignmentIntensity: 1
-  separationIntensity: 1
+  cohesionIntensity: 0.4
+  alignmentIntensity: 0.4
+  separationIntensity: 0.4
   avoidingObstaclesIntensity: 0
-  randomMovementIntensity: 9.4
+  moveForwardIntensity: 0.4
+  randomMovementIntensity: 0
   frictionIntensity: 0.1
   maxSpeed: 0.04
 --- !u!114 &1638191337
