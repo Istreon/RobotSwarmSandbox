@@ -25,28 +25,28 @@ public class ParameterManager : MonoBehaviour
 
     [Header("Intensity parameters")]
     [SerializeField]
-    [Range(0.0f, 20.0f)]
+    [Range(0.0f, 5.0f)]
     private float cohesionIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 20.0f)]
+    [Range(0.0f, 5.0f)]
     private float alignmentIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 20.0f)]
+    [Range(0.0f, 5.0f)]
     private float separationIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 20.0f)]
     private float avoidingObstaclesIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 30.0f)]
+    [Range(0.0f, 5.0f)]
     private float moveForwardIntensity = 1.0f;
     [SerializeField]
-    [Range(0.0f, 30.0f)]
+    [Range(0.0f, 5.0f)]
     private float randomMovementIntensity = 20.0f;
     [SerializeField]
     [Range(0.0f, 1.0f)]
     private float frictionIntensity = 0.1f;
     [SerializeField]
-    [Range(0.0f, 2.0f)]
+    [Range(0.0f, 1.0f)]
     private float maxSpeed = 1.0f;
 
 

@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: d70b4040d7387dd418c49448344242b8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,9 +111,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldOfViewSize: 1
+  feelerEnable: 1
+  feelerDistance: 0.5
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1
+  avoidingObstaclesIntensity: 1
+  moveForwardIntensity: 1
   randomMovementIntensity: 20
   frictionIntensity: 0.1
   maxSpeed: 1

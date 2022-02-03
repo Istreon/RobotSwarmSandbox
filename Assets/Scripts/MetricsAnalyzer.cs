@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MetricsAnalyzer : MonoBehaviour
 {
+    [SerializeField]
+    private Slider sliderEGM;
+
+    [SerializeField]
+    private Slider sliderOrder;
+
+    [SerializeField]
+    private Slider sliderDist;
+
     private float time = 0.0f;
     private float totalTime = 0.0f;
 
@@ -53,14 +63,17 @@ public class MetricsAnalyzer : MonoBehaviour
         UpdateCenterOfMassValue();
         UpdateClusters();
 
-        Debug.Log(EffectiveGroupMotion());
-
-
         time += Time.deltaTime;
         totalTime += Time.deltaTime;
 
+        sliderEGM.value = EffectiveGroupMotion();
+        sliderDist.value = DistanceWeightDistributionQuality();
+        sliderOrder.value = Order();
+
         if (time >= 0.5f)
         {
+
+
             //Logs
             AddLogLine();
             WriteLogLines();
