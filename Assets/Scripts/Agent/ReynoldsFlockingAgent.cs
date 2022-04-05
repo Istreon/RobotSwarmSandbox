@@ -97,23 +97,23 @@ public class ReynoldsFlockingAgent : Agent
         detectedAgents = new List<GameObject>();
         InitializeAgent(true);
 
-        fieldOfView = new GameObject();
+        /*fieldOfView = new GameObject();
         fieldOfView.AddComponent<VisionZone>();
         fieldOfView.transform.parent = this.transform;
         fieldOfView.transform.localPosition = Vector3.zero;
 
 
         fieldOfViewCollider = fieldOfView.AddComponent<SphereCollider>();
-        fieldOfViewCollider.isTrigger = true;
+        fieldOfViewCollider.isTrigger = true;*/
 
 
-        feeler = new GameObject();
+        /*feeler = new GameObject();
         feeler.AddComponent<Feeler>();
         feeler.transform.parent = this.transform;
         feeler.transform.localPosition = Vector3.forward * feelerDistance;
 
         feelerCollider = feeler.AddComponent<SphereCollider>();
-        feelerCollider.isTrigger = true;
+        feelerCollider.isTrigger = true;*/
 
         savedPosition = this.transform.position;
     }
@@ -123,13 +123,14 @@ public class ReynoldsFlockingAgent : Agent
     {
         UpdateParameters();
         getAgentsInFieldOfView();
-        if (feelerEnable) getObstacles();
+        //if (feelerEnable) getObstacles();
         RandomMovement();
+        MoveForward();
         Friction();
         Cohesion();
         Separation();
         Alignment();
-        if(feelerEnable) AvoidingObstacles();
+        //if(feelerEnable) AvoidingObstacles();
         EnvironmentalForce();
 
     }
@@ -138,7 +139,7 @@ public class ReynoldsFlockingAgent : Agent
     {
         updateAgent();
         UpdateFieldOfViewSize();
-        UpdateFeeler();
+        //UpdateFeeler();
     }
     #endregion
 
@@ -335,11 +336,23 @@ public class ReynoldsFlockingAgent : Agent
 
     private void getAgentsInFieldOfView()
     {
-        detectedAgents = fieldOfView.GetComponent<VisionZone>().getAgentsInsideZone();
+
+        List<GameObject> agents=agentManager.GetAgents();
+        detectedAgents = new List<GameObject>();
+
+        foreach(GameObject g in agents)
+        {
+            if(Vector3.Distance(g.transform.position,this.transform.position)<=fieldOfViewSize)
+            {
+                detectedAgents.Add(g);
+            }
+        }
+
+        /*detectedAgents = fieldOfView.GetComponent<VisionZone>().getAgentsInsideZone();
         if(detectedAgents==null)
         {
             detectedAgents = new List<GameObject>();
-        }
+        }*/
     }
 
     private void getObstacles()
