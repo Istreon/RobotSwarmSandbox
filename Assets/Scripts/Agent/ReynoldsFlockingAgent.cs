@@ -56,12 +56,12 @@ public class ReynoldsFlockingAgent : Agent
 
     #region Private fields
     //Field of view
-    private GameObject fieldOfView;
-    private SphereCollider fieldOfViewCollider;
+    //private GameObject fieldOfView;
+    //private SphereCollider fieldOfViewCollider;
 
     //Feeler
-    private GameObject feeler;
-    private SphereCollider feelerCollider;
+    //private GameObject feeler;
+    //private SphereCollider feelerCollider;
 
     private Vector3 acceleration=Vector3.zero;
     private Vector3 speed=Vector3.zero;
@@ -138,7 +138,7 @@ public class ReynoldsFlockingAgent : Agent
     private void LateUpdate()
     {
         updateAgent();
-        UpdateFieldOfViewSize();
+        //UpdateFieldOfViewSize();
         //UpdateFeeler();
     }
     #endregion
@@ -242,7 +242,7 @@ public class ReynoldsFlockingAgent : Agent
         }
     }
 
-    private void AvoidingObstacles()
+    /*private void AvoidingObstacles()
     {
         foreach (GameObject o in detectedObstacles)
         {
@@ -270,7 +270,7 @@ public class ReynoldsFlockingAgent : Agent
 
 
         }
-    }
+    }*/
 
     private void RandomMovement()
     {
@@ -316,7 +316,7 @@ public class ReynoldsFlockingAgent : Agent
         addForce(force);
     }
 
-    private void UpdateFieldOfViewSize()
+    /*private void UpdateFieldOfViewSize()
     {
         fieldOfViewCollider.radius = fieldOfViewSize;
     }
@@ -332,7 +332,7 @@ public class ReynoldsFlockingAgent : Agent
             feeler.SetActive(false);
         }
 
-    }
+    }*/
 
     private void getAgentsInFieldOfView()
     {
@@ -342,7 +342,8 @@ public class ReynoldsFlockingAgent : Agent
 
         foreach(GameObject g in agents)
         {
-            if(Vector3.Distance(g.transform.position,this.transform.position)<=fieldOfViewSize)
+            if (GameObject.ReferenceEquals(g, this.gameObject)) continue;
+            if (Vector3.Distance(g.transform.position,this.transform.position)<=fieldOfViewSize)
             {
                 detectedAgents.Add(g);
             }
@@ -355,14 +356,14 @@ public class ReynoldsFlockingAgent : Agent
         }*/
     }
 
-    private void getObstacles()
+    /*private void getObstacles()
     {
         detectedObstacles = feeler.GetComponent<Feeler>().getObstacles();
         if (detectedObstacles == null)
         {
             detectedObstacles = new List<GameObject>();
         }
-    }
+    }*/
 
     private void addForce(Vector3 force)
     {
@@ -476,6 +477,11 @@ public class ReynoldsFlockingAgent : Agent
     public Vector3 GetSpeed()
     {
         return speed;
+    }
+
+    public float GetFieldOfViewSize()
+    {
+        return fieldOfViewSize;
     }
 
 

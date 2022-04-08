@@ -88,6 +88,8 @@ public class MetricsAnalyzer : MonoBehaviour
             savedCenterOfMassPosition = centerOfMass;
         }
 
+        //Debug.Log(NumberOfAgentsIsolated());
+        Debug.Log(TowardsCenterOfMass());
         //Debug.Log(TotalDistance());
         //Debug.Log(DistanceWeightDistributionQuality());
         //Debug.Log(AggregationQuality());
@@ -103,7 +105,7 @@ public class MetricsAnalyzer : MonoBehaviour
         //Debug.Log(AverageOrientation());
         //Debug.Log(BBR());
         //Debug.Log(Order());
-        }
+    }
 
     private void AddHeaderLogLine()
     {
@@ -288,7 +290,7 @@ public class MetricsAnalyzer : MonoBehaviour
         return total;
     }
 
-    private float DistanceWeightDistributionQuality()
+    private float DistanceWeightDistributionQuality() //Il manque la densité
     {
         float total = 0;
         int i, j;
@@ -484,6 +486,44 @@ public class MetricsAnalyzer : MonoBehaviour
 
         return total;
     }
+
+    private int NumberOfAgentsIsolated()
+    {
+        //Create a clone of the agents list, to manipulate it
+        List<GameObject> agentsClone = new List<GameObject>(agents);
+
+        int total = 0;
+        foreach (GameObject o in agentsClone)
+        {
+            List<GameObject> temp = o.GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+            if (temp.Count == 0)
+            {
+                total ++;
+            }
+        }
+        
+        return total;
+    }
+
+
+    private float TowardsCenterOfMass()
+    {
+        int n = agents.Count;
+
+        float b = 0.0f;
+        int i;
+        for (i = 0; i < n; i++)
+        {
+            Vector3 speed = agents[i].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 temp = centerOfMass - agents[i].transform.position;
+            float angle=Vector3.Angle(speed, temp);
+            b += angle;
+        }
+        float res = 1-((b / n)/180);
+        return res;
+    }
+
+
 
 
     #endregion
