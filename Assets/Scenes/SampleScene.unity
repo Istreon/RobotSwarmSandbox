@@ -333,7 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
   mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
-  numberOfAgents: 40
+  numberOfAgents: 80
   mapSizeX: 5
   mapSizeZ: 5
 --- !u!4 &1638191335
@@ -367,11 +367,11 @@ MonoBehaviour:
   feelerEnable: 0
   feelerDistance: 0.5
   feelerSize: 0.1
-  cohesionIntensity: 1
-  alignmentIntensity: 1
+  cohesionIntensity: 1.5
+  alignmentIntensity: 2.2
   separationIntensity: 1
   avoidingObstaclesIntensity: 0
   moveForwardIntensity: 1
-  randomMovementIntensity: 0
-  frictionIntensity: 0.1
-  maxSpeed: 0.1
+  randomMovementIntensity: 1.57
+  frictionIntensity: 0.7
+  maxSpeed: 0.15
