@@ -166,22 +166,27 @@ public class CouzinFlockingAgent : MonoBehaviour
     private void Cohesion()
     {
         int count = 0;
-        Vector3 g = Vector3.zero;
+        Vector3 totalForce = Vector3.zero;
         foreach (GameObject o in detectedAgentsInAttractionZone)
         {
             count += 1;
             //g += NearestPositionInInfiniteArea(o.transform.position);
-            g += o.transform.position;
+
+            //Same than (cj-ci) / |(cj-ci)|
+            Vector3 force = o.transform.position - transform.position;
+            force.Normalize();
+
+            totalForce += force;
         }
         if (count > 0)
         {
-            g.y = 0.0f; //To stay in 2D
+            totalForce.y = 0.0f; //To stay in 2D
 
 
-            g /= count;
-            Vector3 force = g - transform.position;
-            force *= this.cohesionIntensity;
-            addForce(force);
+            //g /= count;
+            //Vector3 force = g - transform.position;
+            totalForce *= this.cohesionIntensity;
+            addForce(totalForce);
         }
     }
 
@@ -204,7 +209,7 @@ public class CouzinFlockingAgent : MonoBehaviour
         if (count > 0)
         {
             totalForce.y = 0.0f; //To stay in 2D
-            totalForce /= count;
+            //totalForce /= count;
             totalForce *= separationIntensity;
             addForce(totalForce);
         }
@@ -221,7 +226,7 @@ public class CouzinFlockingAgent : MonoBehaviour
             if (temp != null)
             {
                 count += 1;
-                vm += temp.GetSpeed();
+                vm += temp.GetSpeed().normalized;
             }
 
         }
@@ -229,7 +234,7 @@ public class CouzinFlockingAgent : MonoBehaviour
         if (count > 0)
         {
             vm.y = 0.0f; //To stay in 2D
-            vm /= count;
+            //vm /= count;
             vm *= alignmentIntensity;
 
             addForce(vm);
@@ -338,7 +343,7 @@ public class CouzinFlockingAgent : MonoBehaviour
 
 
 
-        float zone1= repulsionZoneSize;
+        float zone1 = repulsionZoneSize;
         float zone2 = repulsionZoneSize + alignmentZoneSize;
         float zone3 = repulsionZoneSize + alignmentZoneSize + attractionZoneSize;
 
