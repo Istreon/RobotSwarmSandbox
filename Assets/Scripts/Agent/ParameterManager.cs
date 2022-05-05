@@ -10,8 +10,20 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 5.0f)]
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    [Tooltip("This is the size of the radius.")]
+    private float attractionZoneSize = 0.3f;
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    [Tooltip("This is the size of the radius.")]
+    private float alignmentZoneSize = 0.3f;
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    [Tooltip("This is the size of the radius.")]
+    private float repulsionZoneSize = 0.3f;
 
-    [Header("Feeler parameters")]
+    /*[Header("Feeler parameters")]
     [SerializeField]
     private bool feelerEnable = true;
     [SerializeField]
@@ -21,7 +33,7 @@ public class ParameterManager : MonoBehaviour
     [SerializeField]
     [Range(0.0f, 0.5f)]
     [Tooltip("This is the size of the feeler radius.")]
-    private float feelerSize = 0.1f;
+    private float feelerSize = 0.1f;*/
 
     [Header("Intensity parameters")]
     [SerializeField]
@@ -55,7 +67,20 @@ public class ParameterManager : MonoBehaviour
         return fieldOfViewSize;
     }
 
-    public bool IsFeelerEnable()
+    public float GetAttractionZoneSize()
+    {
+        return attractionZoneSize;
+    }    
+    public float GetAlignmentZoneSize()
+    {
+        return alignmentZoneSize;
+    }    
+    public float GetRepulsionZoneSize()
+    {
+        return repulsionZoneSize;
+    }
+
+    /*public bool IsFeelerEnable()
     {
         return feelerEnable;
     }
@@ -67,7 +92,7 @@ public class ParameterManager : MonoBehaviour
     public float GetFeelerSize()
     {
         return feelerSize;
-    }
+    }*/
 
     public float GetSeparationIntensity()
     {

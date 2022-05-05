@@ -1492,7 +1492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22c2815aaa0a89468f5a83e30b196df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
+  prefab: {fileID: 4560293597888429263, guid: 97acce25987de8245bf2a958082873dd, type: 3}
   mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
   numberOfAgents: 40
   mapSizeX: 5
@@ -1525,9 +1525,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldOfViewSize: 1
-  feelerEnable: 0
-  feelerDistance: 0.5
-  feelerSize: 0.1
+  attractionZoneSize: 0.3
+  alignmentZoneSize: 0.3
+  repulsionZoneSize: 0.3
   cohesionIntensity: 1
   alignmentIntensity: 1
   separationIntensity: 1
@@ -1543,7 +1543,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1638191333}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5bf63974a74578d4b90a5891283c33e8, type: 3}
   m_Name: 

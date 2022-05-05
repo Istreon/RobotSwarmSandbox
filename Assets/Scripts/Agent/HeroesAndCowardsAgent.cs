@@ -5,7 +5,7 @@ using UnityEngine;
 //Behaviour based on Heroes and Cowards behaviour from : http://www.netlogoweb.org/launch#http://www.netlogoweb.org/assets/modelslib/IABM%20Textbook/chapter%202/Heroes%20and%20Cowards.nlogo
 
 [RequireComponent(typeof(MonaRobot))]
-public class HeroesAndCowardsAgent : Agent
+public class HeroesAndCowardsAgent : MonoBehaviour
 {
 
     enum AgentBehaviour
@@ -45,7 +45,6 @@ public class HeroesAndCowardsAgent : Agent
     // Start is called before the first frame update
     void Start()
     {
-        InitializeAgent(false);
         agentBody= this.GetComponent<Rigidbody>();
         visionZone = gameObject.AddComponent<SphereCollider>();
         visionZone.isTrigger = true;
@@ -80,7 +79,7 @@ public class HeroesAndCowardsAgent : Agent
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Agent>() != null)
+        if (other.GetComponent<HeroesAndCowardsAgent>() != null)
         {
             if (friend != null || enemy != null) return;
 

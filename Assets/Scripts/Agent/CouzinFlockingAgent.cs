@@ -2,19 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ReynoldsFlockingAgent : MonoBehaviour
+public class CouzinFlockingAgent : MonoBehaviour
 {
     #region Serialized Fields
 
-   
+
 
     [Header("Field of view size")]
     [SerializeField]
-    [Range(0.0f, 5.0f)]
+    [Range(0.0f, 1.0f)]
     [Tooltip("This is the size of the radius.")]
-    private float fieldOfViewSize = 1.0f;
+    private float attractionZoneSize = 0.3f;
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    [Tooltip("This is the size of the radius.")]
+    private float alignmentZoneSize = 0.3f;
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    [Tooltip("This is the size of the radius.")]
+    private float repulsionZoneSize = 0.3f;
 
-    /*[Header("Feeler parameters")]
+   /* [Header("Feeler parameters")]
     [SerializeField]
     private bool feelerEnable = true;
     [SerializeField]
@@ -28,16 +36,16 @@ public class ReynoldsFlockingAgent : MonoBehaviour
     [Header("Intensity parameters")]
     [SerializeField]
     [Range(0.0f, 20.0f)]
-    private float cohesionIntensity=1.0f;
+    private float cohesionIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 20.0f)]
     private float alignmentIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 20.0f)]
     private float separationIntensity = 1.0f;
-    [SerializeField]
-    [Range(0.0f, 20.0f)]
-    private float avoidingObstaclesIntensity = 1.0f;
+    //[SerializeField]
+    //[Range(0.0f, 20.0f)]
+    //private float avoidingObstaclesIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 30.0f)]
     private float moveForwardIntensity = 1.0f;
@@ -51,24 +59,19 @@ public class ReynoldsFlockingAgent : MonoBehaviour
     [Range(0.0f, 2.0f)]
     private float maxSpeed = 1.0f;
 
-
     #endregion
 
     #region Private fields
-    //Field of view
-    //private GameObject fieldOfView;
-    //private SphereCollider fieldOfViewCollider;
 
-    //Feeler
-    //private GameObject feeler;
-    //private SphereCollider feelerCollider;
-
-    private Vector3 acceleration=Vector3.zero;
-    private Vector3 speed=Vector3.zero;
+    private Vector3 acceleration = Vector3.zero;
+    private Vector3 speed = Vector3.zero;
 
     //private float mass = 1.0f;
 
     private List<GameObject> detectedAgents;
+    private List<GameObject> detectedAgentsInAttractionZone;
+    private List<GameObject> detectedAgentsInAlignmentZone;
+    private List<GameObject> detectedAgentsInRepulsionZone;
     private List<GameObject> detectedObstacles;
 
     private float mapSizeX = 5.0f;
@@ -95,26 +98,19 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         forceField = FindObjectOfType<PatternCreator>();
 
         detectedAgents = new List<GameObject>();
+        detectedAgentsInAttractionZone = new List<GameObject>();
+        detectedAgentsInAlignmentZone = new List<GameObject>();
+        detectedAgentsInRepulsionZone = new List<GameObject>();
 
-        /*fieldOfView = new GameObject();
-        fieldOfView.AddComponent<VisionZone>();
-        fieldOfView.transform.parent = this.transform;
-        fieldOfView.transform.localPosition = Vector3.zero;
+    /*feeler = new GameObject();
+    feeler.AddComponent<Feeler>();
+    feeler.transform.parent = this.transform;
+    feeler.transform.localPosition = Vector3.forward * feelerDistance;
 
+    feelerCollider = feeler.AddComponent<SphereCollider>();
+    feelerCollider.isTrigger = true;*/
 
-        fieldOfViewCollider = fieldOfView.AddComponent<SphereCollider>();
-        fieldOfViewCollider.isTrigger = true;*/
-
-
-        /*feeler = new GameObject();
-        feeler.AddComponent<Feeler>();
-        feeler.transform.parent = this.transform;
-        feeler.transform.localPosition = Vector3.forward * feelerDistance;
-
-        feelerCollider = feeler.AddComponent<SphereCollider>();
-        feelerCollider.isTrigger = true;*/
-
-        savedPosition = this.transform.position;
+    savedPosition = this.transform.position;
     }
 
     // Update is called once per frame
@@ -137,7 +133,6 @@ public class ReynoldsFlockingAgent : MonoBehaviour
     private void LateUpdate()
     {
         updateAgent();
-        //UpdateFieldOfViewSize();
         //UpdateFeeler();
     }
     #endregion
@@ -146,7 +141,7 @@ public class ReynoldsFlockingAgent : MonoBehaviour
     {
         //Update agent position based on speed and time passed since last change
         this.transform.position += this.speed * Time.deltaTime;
-        this.transform.position = new Vector3(this.transform.position.x,0.1f, this.transform.position.z);
+        this.transform.position = new Vector3(this.transform.position.x, 0.1f, this.transform.position.z);
         //Loop position if it go further than map size limit
         //StayInInfiniteArea();
         //Stay in the finite area if it go further than map size limit
@@ -172,13 +167,13 @@ public class ReynoldsFlockingAgent : MonoBehaviour
     {
         int count = 0;
         Vector3 g = Vector3.zero;
-        foreach(GameObject o in detectedAgents)
+        foreach (GameObject o in detectedAgentsInAttractionZone)
         {
             count += 1;
             //g += NearestPositionInInfiniteArea(o.transform.position);
             g += o.transform.position;
         }
-        if(count>0)
+        if (count > 0)
         {
             g.y = 0.0f; //To stay in 2D
 
@@ -196,7 +191,7 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         int count = 0;
         Vector3 totalForce = Vector3.zero;
 
-        foreach (GameObject o in detectedAgents)
+        foreach (GameObject o in detectedAgentsInRepulsionZone)
         {
             count += 1;
             //Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
@@ -220,15 +215,15 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         int count = 0;
         Vector3 vm = Vector3.zero;
 
-        foreach (GameObject o in detectedAgents)
+        foreach (GameObject o in detectedAgentsInAlignmentZone)
         {
-            ReynoldsFlockingAgent temp = o.GetComponent<ReynoldsFlockingAgent>();
-            if (temp!=null)
+            CouzinFlockingAgent temp = o.GetComponent<CouzinFlockingAgent>();
+            if (temp != null)
             {
                 count += 1;
                 vm += temp.GetSpeed();
             }
-            
+
         }
 
         if (count > 0)
@@ -278,11 +273,11 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         {
             float x = Random.value - 0.5f;
             float z = Random.value - 0.5f;
-            Vector3 force=new Vector3(x, 0.0f, z);
+            Vector3 force = new Vector3(x, 0.0f, z);
             force.Normalize();
 
             //Modification de la puissance de cette force
-            force*=randomMovementIntensity;
+            force *= randomMovementIntensity;
 
             addForce(force);
         }
@@ -295,7 +290,7 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         //Modification de la puissance de cette force
         force *= moveForwardIntensity;
 
-        addForce(force);   
+        addForce(force);
     }
 
     private void Friction()
@@ -335,24 +330,40 @@ public class ReynoldsFlockingAgent : MonoBehaviour
 
     private void getAgentsInFieldOfView()
     {
-
-        List<GameObject> agents=agentManager.GetAgents();
+        List<GameObject> agents = agentManager.GetAgents();
         detectedAgents = new List<GameObject>();
+        detectedAgentsInAttractionZone = new List<GameObject>();
+        detectedAgentsInAlignmentZone = new List<GameObject>();
+        detectedAgentsInRepulsionZone = new List<GameObject>();
 
-        foreach(GameObject g in agents)
+
+
+        float zone1= repulsionZoneSize;
+        float zone2 = repulsionZoneSize + alignmentZoneSize;
+        float zone3 = repulsionZoneSize + alignmentZoneSize + attractionZoneSize;
+
+        foreach (GameObject g in agents)
         {
             if (GameObject.ReferenceEquals(g, this.gameObject)) continue;
-            if (Vector3.Distance(g.transform.position,this.transform.position)<=fieldOfViewSize)
+            float distance = Vector3.Distance(g.transform.position, this.transform.position);
+            if (distance <= zone3)
             {
                 detectedAgents.Add(g);
+                if(distance>zone1)
+                {
+                    if(distance>zone2)
+                    {
+                        detectedAgentsInAttractionZone.Add(g);
+                    } else
+                    {
+                        detectedAgentsInAlignmentZone.Add(g);
+                    }
+                } else
+                {
+                    detectedAgentsInRepulsionZone.Add(g);
+                }
             }
         }
-
-        /*detectedAgents = fieldOfView.GetComponent<VisionZone>().getAgentsInsideZone();
-        if(detectedAgents==null)
-        {
-            detectedAgents = new List<GameObject>();
-        }*/
     }
 
     /*private void getObstacles()
@@ -419,8 +430,8 @@ public class ReynoldsFlockingAgent : MonoBehaviour
 
     private void StayInFiniteArea()
     {
-        float x=0.0f;
-        float z=0.0f;
+        float x = 0.0f;
+        float z = 0.0f;
         Vector3 temp = this.transform.position;
         if (this.transform.position.x > mapSizeX)
         {
@@ -457,18 +468,20 @@ public class ReynoldsFlockingAgent : MonoBehaviour
 
     private void UpdateParameters()
     {
+        attractionZoneSize = this.parameterManager.GetAttractionZoneSize();
+        alignmentZoneSize = this.parameterManager.GetAlignmentZoneSize();
+        repulsionZoneSize = this.parameterManager.GetRepulsionZoneSize();
         cohesionIntensity = this.parameterManager.GetCohesionIntensity();
         alignmentIntensity = this.parameterManager.GetAlignmentIntensity();
         separationIntensity = this.parameterManager.GetSeparationIntensity();
-        avoidingObstaclesIntensity = this.parameterManager.GetAvoidingObstaclesIntensity();
-        fieldOfViewSize = this.parameterManager.GetFieldOfViewSize();
+        //avoidingObstaclesIntensity = this.parameterManager.GetAvoidingObstaclesIntensity();
         moveForwardIntensity = this.parameterManager.GetMoveForwardIntensity();
         randomMovementIntensity = this.parameterManager.GetRandomMovementIntensity();
         frictionIntensity = this.parameterManager.GetFrictionIntensity();
         maxSpeed = this.parameterManager.GetMaxSpeed();
-        /*feelerEnable = this.parameterManager.IsFeelerEnable();
-        feelerDistance = this.parameterManager.GetFeelerDistance();
-        feelerSize = this.parameterManager.GetFeelerSize();*/
+        //feelerEnable = this.parameterManager.IsFeelerEnable();
+        //feelerDistance = this.parameterManager.GetFeelerDistance();
+        //feelerSize = this.parameterManager.GetFeelerSize();
     }
 
 
@@ -480,7 +493,7 @@ public class ReynoldsFlockingAgent : MonoBehaviour
 
     public float GetFieldOfViewSize()
     {
-        return fieldOfViewSize;
+        return (repulsionZoneSize + alignmentZoneSize + attractionZoneSize);
     }
 
 
@@ -505,6 +518,4 @@ public class ReynoldsFlockingAgent : MonoBehaviour
         savedPosition = this.transform.position;
     }
     #endregion
-
-
 }
