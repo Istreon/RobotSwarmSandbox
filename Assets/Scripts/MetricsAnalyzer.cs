@@ -83,7 +83,7 @@ public class MetricsAnalyzer : MonoBehaviour
             //Update saved position
             foreach (GameObject g in agents)
             {
-                g.GetComponent<ReynoldsFlockingAgent>().SavePosition();
+                g.GetComponent<Agent>().SavePosition();
             }
             savedCenterOfMassPosition = centerOfMass;
         }
@@ -220,7 +220,7 @@ public class MetricsAnalyzer : MonoBehaviour
             int i = 0;
             while (i < newCluster.Count)
             {
-                List<GameObject> temp = newCluster[i].GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+                List<GameObject> temp = newCluster[i].GetComponent<Agent>().GetNeighbors();
                 foreach (GameObject g in temp)
                 {
                     if (!newCluster.Contains(g))
@@ -332,7 +332,7 @@ public class MetricsAnalyzer : MonoBehaviour
         float meanDist = 0.0f;
         foreach (GameObject g in agents)
         {
-            Vector3 temp = g.GetComponent<ReynoldsFlockingAgent>().GetSavedPosition();
+            Vector3 temp = g.GetComponent<Agent>().GetSavedPosition();
             meanDist += Vector3.Distance(temp, g.transform.position);
         }
 
@@ -363,7 +363,7 @@ public class MetricsAnalyzer : MonoBehaviour
         float averageSpeed = 0.0f;
         foreach (GameObject g in agents)
         {
-            Vector3 speed = g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 speed = g.GetComponent<Agent>().GetSpeed();
             averageSpeed += speed.magnitude;
         }
 
@@ -392,7 +392,7 @@ public class MetricsAnalyzer : MonoBehaviour
             float averageSpeed = 0.0f;
             foreach (GameObject g in largestCluster)
             {
-                Vector3 speed = g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+                Vector3 speed = g.GetComponent<Agent>().GetSpeed();
                 averageSpeed += speed.magnitude;
             }
 
@@ -409,7 +409,7 @@ public class MetricsAnalyzer : MonoBehaviour
 
     private float RescaledSpeed(float speed)
     {
-        float res = speed / agents[0].GetComponent<ReynoldsFlockingAgent>().GetMaxSpeed();
+        float res = speed / agents[0].GetComponent<Agent>().GetMaxSpeed();
         return res;
     }
 
@@ -418,7 +418,7 @@ public class MetricsAnalyzer : MonoBehaviour
         Vector3 averageOrientation = Vector3.zero;
         foreach (GameObject g in agents)
         {
-            averageOrientation += g.GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            averageOrientation += g.GetComponent<Agent>().GetSpeed();
         }
         return (Mathf.Atan2(averageOrientation.z, averageOrientation.x) / Mathf.PI) * 180;
     }
@@ -432,7 +432,7 @@ public class MetricsAnalyzer : MonoBehaviour
         int i;
         for (i = 0; i < n; i++)
         {
-            Vector3 speed = agents[i].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 speed = agents[i].GetComponent<Agent>().GetSpeed();
             Vector3 orientation = speed.normalized;
             b += orientation;
         }
@@ -478,7 +478,7 @@ public class MetricsAnalyzer : MonoBehaviour
         float total = 0.0f;
         foreach(GameObject o in agentsClone)
         { 
-            List<GameObject> temp = o.GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+            List<GameObject> temp = o.GetComponent<Agent>().GetNeighbors();
             total+=temp.Count;
 
         }
@@ -495,7 +495,7 @@ public class MetricsAnalyzer : MonoBehaviour
         int total = 0;
         foreach (GameObject o in agentsClone)
         {
-            List<GameObject> temp = o.GetComponent<ReynoldsFlockingAgent>().GetNeighbors();
+            List<GameObject> temp = o.GetComponent<Agent>().GetNeighbors();
             if (temp.Count == 0)
             {
                 total ++;
@@ -514,7 +514,7 @@ public class MetricsAnalyzer : MonoBehaviour
         int i;
         for (i = 0; i < n; i++)
         {
-            Vector3 speed = agents[i].GetComponent<ReynoldsFlockingAgent>().GetSpeed();
+            Vector3 speed = agents[i].GetComponent<Agent>().GetSpeed();
             Vector3 temp = centerOfMass - agents[i].transform.position;
             float angle=Vector3.Angle(speed, temp);
             b += angle;
