@@ -10,6 +10,10 @@ public class Agent : MonoBehaviour
     [Range(0.0f, 5.0f)]
     [Tooltip("This is the size of the radius.")]
     protected float fieldOfViewSize = 1.0f;
+    [SerializeField]
+    [Range(0, 360)]
+    [Tooltip("This is the size of blind spot of the agent (in degrees)")]
+    protected float blindSpotSize = 30;
 
     [Header("Intensity parameters")]
     [SerializeField]
@@ -160,7 +164,13 @@ public class Agent : MonoBehaviour
             if (GameObject.ReferenceEquals(g, this.gameObject)) continue;
             if (Vector3.Distance(g.transform.position, this.transform.position) <= fieldOfViewSize)
             {
-                detectedAgents.Add(g);
+                Vector3 dir  = g.transform.position - this.transform.position;
+                float angle = Vector3.Angle(this.speed, dir);
+
+                if (angle <= 180 - (blindSpotSize / 2))
+                {
+                    detectedAgents.Add(g);
+                }
             }
         }
     }

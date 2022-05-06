@@ -212,19 +212,27 @@ public class CouzinFlockingAgent : Agent
             float distance = Vector3.Distance(g.transform.position, this.transform.position);
             if (distance <= zone3)
             {
-                detectedAgents.Add(g);
-                if(distance>zone1)
+                Vector3 dir = g.transform.position - this.transform.position;
+                float angle = Vector3.Angle(this.speed, dir);
+
+                if (angle <= 180 - (blindSpotSize / 2))
                 {
-                    if(distance>zone2)
+                    detectedAgents.Add(g);
+                    if (distance > zone1)
                     {
-                        detectedAgentsInAttractionZone.Add(g);
-                    } else
-                    {
-                        detectedAgentsInAlignmentZone.Add(g);
+                        if (distance > zone2)
+                        {
+                            detectedAgentsInAttractionZone.Add(g);
+                        }
+                        else
+                        {
+                            detectedAgentsInAlignmentZone.Add(g);
+                        }
                     }
-                } else
-                {
-                    detectedAgentsInRepulsionZone.Add(g);
+                    else
+                    {
+                        detectedAgentsInRepulsionZone.Add(g);
+                    }
                 }
             }
         }
@@ -234,6 +242,7 @@ public class CouzinFlockingAgent : Agent
 
     private void UpdateParameters()
     {
+        blindSpotSize = this.parameterManager.GetBlindSpotSize();
         attractionZoneSize = this.parameterManager.GetAttractionZoneSize();
         alignmentZoneSize = this.parameterManager.GetAlignmentZoneSize();
         repulsionZoneSize = this.parameterManager.GetRepulsionZoneSize();

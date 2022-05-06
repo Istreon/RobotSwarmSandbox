@@ -234,6 +234,7 @@ public class ReynoldsFlockingAgent : Agent
         separationIntensity = this.parameterManager.GetSeparationIntensity();
        // avoidingObstaclesIntensity = this.parameterManager.GetAvoidingObstaclesIntensity();
         fieldOfViewSize = this.parameterManager.GetFieldOfViewSize();
+        blindSpotSize = this.parameterManager.GetBlindSpotSize();
         moveForwardIntensity = this.parameterManager.GetMoveForwardIntensity();
         randomMovementIntensity = this.parameterManager.GetRandomMovementIntensity();
         frictionIntensity = this.parameterManager.GetFrictionIntensity();

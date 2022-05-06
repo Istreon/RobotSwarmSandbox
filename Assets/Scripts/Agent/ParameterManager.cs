@@ -11,6 +11,10 @@ public class ParameterManager : MonoBehaviour
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
     [SerializeField]
+    [Range(0, 360)]
+    [Tooltip("This is the size of blind spot of the agent (in degrees)")]
+    protected float blindSpotSize = 30;
+    [SerializeField]
     [Range(0.0f, 1.0f)]
     [Tooltip("This is the size of the radius.")]
     private float attractionZoneSize = 0.3f;
@@ -65,6 +69,11 @@ public class ParameterManager : MonoBehaviour
     public float GetFieldOfViewSize()
     {
         return fieldOfViewSize;
+    }
+
+    public float GetBlindSpotSize()
+    {
+        return blindSpotSize;
     }
 
     public float GetAttractionZoneSize()
