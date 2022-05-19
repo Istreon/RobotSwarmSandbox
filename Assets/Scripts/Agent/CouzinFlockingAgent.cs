@@ -172,7 +172,7 @@ public class CouzinFlockingAgent : Agent
 
         foreach (GameObject o in detectedAgentsInAlignmentZone)
         {
-            CouzinFlockingAgent temp = o.GetComponent<CouzinFlockingAgent>();
+            Agent temp = o.GetComponent<Agent>();
             if (temp != null)
             {
                 count += 1;

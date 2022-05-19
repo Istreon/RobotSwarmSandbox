@@ -147,7 +147,7 @@ public class ReynoldsFlockingAgent : Agent
 
         foreach (GameObject o in detectedAgents)
         {
-            ReynoldsFlockingAgent temp = o.GetComponent<ReynoldsFlockingAgent>();
+            Agent temp = o.GetComponent<Agent>();
             if (temp!=null)
             {
                 count += 1;

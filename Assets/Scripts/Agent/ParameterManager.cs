@@ -65,6 +65,11 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float maxSpeed = 1.0f;
 
+    [Header("Preservation of connectivity parameters")]
+    [SerializeField]
+    [Range(0.01f, 2.0f)]
+    private float distanceBetweenAgents = 1.0f;
+
 
     public float GetFieldOfViewSize()
     {
@@ -141,5 +146,10 @@ public class ParameterManager : MonoBehaviour
     public float GetMaxSpeed()
     {
         return maxSpeed;
+    }
+
+    public float GetDistanceBetweenAgents()
+    {
+        return distanceBetweenAgents;
     }
 }
