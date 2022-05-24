@@ -16,6 +16,9 @@ public class MetricsAnalyzer : MonoBehaviour
     [SerializeField]
     private Slider sliderDist;
 
+    [SerializeField]
+    private Slider sliderTowardCenterOfMass;
+
     private float time = 0.0f;
     private float totalTime = 0.0f;
 
@@ -69,6 +72,7 @@ public class MetricsAnalyzer : MonoBehaviour
         sliderEGM.value = EffectiveGroupMotion();
         sliderDist.value = DistanceWeightDistributionQuality();
         sliderOrder.value = Order();
+        sliderTowardCenterOfMass.value = TowardsCenterOfMass();
 
         if (time >= 0.5f)
         {
@@ -89,7 +93,7 @@ public class MetricsAnalyzer : MonoBehaviour
         }
 
         //Debug.Log(NumberOfAgentsIsolated());
-        Debug.Log(TowardsCenterOfMass());
+        //Debug.Log(TowardsCenterOfMass());
         //Debug.Log(TotalDistance());
         //Debug.Log(DistanceWeightDistributionQuality());
         //Debug.Log(AggregationQuality());
