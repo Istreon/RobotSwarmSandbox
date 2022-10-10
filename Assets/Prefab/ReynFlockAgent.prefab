@@ -111,13 +111,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldOfViewSize: 1
-  feelerEnable: 1
-  feelerDistance: 0.5
-  cohesionIntensity: 1
-  alignmentIntensity: 1
-  separationIntensity: 1
-  avoidingObstaclesIntensity: 1
+  blindSpotSize: 30
   moveForwardIntensity: 1
   randomMovementIntensity: 20
   frictionIntensity: 0.1
   maxSpeed: 1
+  cohesionIntensity: 1
+  alignmentIntensity: 1
+  separationIntensity: 1

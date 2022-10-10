@@ -333,7 +333,7 @@ public class PatternCreator : MonoBehaviour
     {
         foreach(LineRenderer l in patternRenderer)
         {
-            GameObject.Destroy(l);
+            GameObject.Destroy(l.gameObject);
         }
         patternRenderer.Clear();
     }
