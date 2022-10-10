@@ -47,7 +47,7 @@ public class MetricsAnalyzer : MonoBehaviour
 
 
     public GameObject prefab;
-    private List<GameObject> temp = new List<GameObject>();
+    private List<GameObject> subAttractorPoints = new List<GameObject>();
 
     [Range(0.05f, 0.3f)]
     public float thresholdDistance = 0.1f;
@@ -120,6 +120,16 @@ public class MetricsAnalyzer : MonoBehaviour
         {
 
             if(allowDisplayOfSubAttractor) FindSubAttractors();
+            else
+            {
+                //(Temporaire) afficher les points pour vérifier que ça fonctionne
+                foreach (GameObject t in subAttractorPoints)
+                {
+                    Destroy(t);
+                }
+
+                subAttractorPoints.Clear();
+            }
             //Logs
             AddLogLine();
             WriteLogLines();
@@ -587,12 +597,12 @@ public class MetricsAnalyzer : MonoBehaviour
         intersectionPoints = res.massCenters;
 
         //(Temporaire) afficher les points pour vérifier que ça fonctionne
-        foreach (GameObject t in this.temp)
+        foreach (GameObject t in subAttractorPoints)
         {
             Destroy(t);
         }
 
-        temp.Clear();
+        subAttractorPoints.Clear();
 
         int j = 0;
         foreach (Vector3 p in intersectionPoints)
@@ -606,7 +616,7 @@ public class MetricsAnalyzer : MonoBehaviour
 
             t.transform.position = pt;
             t.transform.localScale = st;
-            temp.Add(t);
+            subAttractorPoints.Add(t);
             j++;
         }
         //--
