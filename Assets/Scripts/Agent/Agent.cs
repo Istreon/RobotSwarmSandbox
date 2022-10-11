@@ -273,7 +273,7 @@ public class Agent : MonoBehaviour
     public List<GameObject> GetNeighbors()
     {
         if (detectedAgents == null) return new List<GameObject>();
-        else return detectedAgents;
+        else return new List<GameObject>(detectedAgents);
     }
 
     public float GetMaxSpeed()

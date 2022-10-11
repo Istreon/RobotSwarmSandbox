@@ -10,11 +10,14 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
 
     public Material material;
 
+    public bool displayLinks = false;
 
     AgentManager manager;
     private List<GameObject> agents;
 
     private List<LineRenderer> linksRenderer;
+
+
 
 
     // Start is called before the first frame update
@@ -57,22 +60,37 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
             agents = manager.GetAgents();
         }
         ClearRenderer();
-        foreach(GameObject a in agents)
+        if(displayLinks) DisplayLinks();
+
+    }
+
+    private void DisplayLinks()
+    {
+        //Create a dictionary of agents and their neighbours, to remove freely already drawn pairs
+        Dictionary<GameObject, List<GameObject>> agentAndNeighbours = new Dictionary<GameObject, List<GameObject>>();
+        foreach (GameObject a in agents)
         {
-            Agent currentAgent = a.GetComponent<Agent>();
-            List <GameObject> currentNeighbours = currentAgent.GetNeighbors();
+            agentAndNeighbours.Add(a, a.GetComponent<Agent>().GetNeighbors());
+        }
+        foreach (KeyValuePair<GameObject, List<GameObject>> a in agentAndNeighbours)
+        {
+            GameObject currentAgent = a.Key;
+            List<GameObject> currentNeighbours = a.Value;
             //Vector3 position;
             foreach (GameObject g in currentNeighbours)
             {
-
-
-                float distOnMaxDistance = Vector3.Distance(g.transform.position, a.transform.position) / currentAgent.GetFieldOfViewSize();
-                Color temp = gradient.Evaluate(distOnMaxDistance);
+                List<GameObject> otherNeighbours;
+                if (agentAndNeighbours.TryGetValue(g,out otherNeighbours))
+                {
+                    otherNeighbours.Remove(currentAgent); //Removing the pair from the other agent neighbours
+                }
+                float distOnMaxDistance = Vector3.Distance(g.transform.position, currentAgent.transform.position) / currentAgent.GetComponent<Agent>().GetFieldOfViewSize();
+                Color lineColor = gradient.Evaluate(distOnMaxDistance);
 
                 //For creating line renderer object
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
-                lineRenderer.startColor = temp;
-                lineRenderer.endColor = temp;
+                lineRenderer.startColor = lineColor;
+                lineRenderer.endColor = lineColor;
 
                 lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
                 lineRenderer.endWidth = 0.01f;
@@ -80,8 +98,8 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
                 lineRenderer.useWorldSpace = true;
                 lineRenderer.material = material;
                 //lineRenderer.material.SetFloat("_Mode", 2);
-                lineRenderer.material.color = temp;
-                
+                lineRenderer.material.color = lineColor;
+
                 //For drawing line in the world space, provide the x,y,z values
                 lineRenderer.SetPosition(0, currentAgent.transform.position); //x,y and z position of the starting point of the line
                 lineRenderer.SetPosition(1, g.transform.position); //x,y and z position of the end point of the line
@@ -95,7 +113,6 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
                 //}
             }
         }
-
     }
 
     private void ClearRenderer()
