@@ -2273,7 +2273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22c2815aaa0a89468f5a83e30b196df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8053766199369056058, guid: 5ebace30403b9dc42bc19a1e26306318, type: 3}
+  prefab: {fileID: 554044260297048986, guid: aa47caf57dc7b9d4180d62fe13ba982b, type: 3}
   mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
   numberOfAgents: 40
   mapSizeX: 5
@@ -2351,6 +2351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 290d1b3d09fdad749898033c8428372b, type: 2}
+  displayLinks: 0
 --- !u!1 &1666228533
 GameObject:
   m_ObjectHideFlags: 0
@@ -2651,6 +2652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit

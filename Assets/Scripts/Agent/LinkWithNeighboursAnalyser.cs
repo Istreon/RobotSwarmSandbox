@@ -13,12 +13,13 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
     public bool displayLinks = false;
 
     AgentManager manager;
+    ParameterManager parameterManager;
     private List<GameObject> agents;
 
     private List<LineRenderer> linksRenderer;
 
 
-
+   // Dictionary<GameObject, List<GameObject>> agentsAndPastNeighbours;
 
     // Start is called before the first frame update
     void Start()
@@ -26,16 +27,22 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
 
         manager = FindObjectOfType<AgentManager>();
         if (manager == null) Debug.LogError("AgentManager is missing in the scene", this);
+        parameterManager = FindObjectOfType<ParameterManager>();
+        if(parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
+
+
         linksRenderer = new List<LineRenderer>();
 
         gradient = new Gradient();
 
         // Populate the color keys at the relative time 0 and 1 (0 and 100%)
-        colorKey = new GradientColorKey[3];
+        colorKey = new GradientColorKey[2];
         colorKey[0].color = Color.blue;
-        colorKey[0].time = 0.5f;
+        colorKey[0].time = 0.0f;
         colorKey[1].color = Color.blue;
         colorKey[1].time = 1.0f;
+
+
 
 
         // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
@@ -50,6 +57,10 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
 
         this.material.SetFloat("_Mode", 2);
 
+        //agentsAndPastNeighbours = new Dictionary<GameObject, List<GameObject>>();
+
+        
+
     }
 
     // Update is called once per frame
@@ -58,6 +69,10 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
         if (agents == null)
         {
             agents = manager.GetAgents();
+            /*foreach (GameObject a in agents)
+            {
+                agentsAndPastNeighbours.Add(a, new List<GameObject>());
+            }*/
         }
         ClearRenderer();
         if(displayLinks) DisplayLinks();
@@ -84,8 +99,26 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
                 {
                     otherNeighbours.Remove(currentAgent); //Removing the pair from the other agent neighbours
                 }
+
+                 /*float distChanges = -1.0f;
+                 List<GameObject> pastNeighbours;
+                 if (agentsAndPastNeighbours.TryGetValue(currentAgent, out pastNeighbours))
+                 {
+                     if(pastNeighbours.Contains(g))
+                     {
+                         float oldDist = Vector3.Distance(currentAgent.GetComponent<Agent>().GetSavedPosition(), g.GetComponent<Agent>().GetSavedPosition());
+                         float currentDist = Vector3.Distance(currentAgent.transform.position, g.transform.position);
+                         distChanges = ((currentDist - oldDist)/ Time.deltaTime) / parameterManager.GetMaxSpeed() + parameterManager.GetMaxSpeed()/2;
+                         Debug.Log(oldDist + "   " + currentDist + "  " +distChanges);
+                     }
+                     //Time.deltaTime;   
+                 } 
+                Color lineColor = gradient.Evaluate(distChanges);*/
+                
+
                 float distOnMaxDistance = Vector3.Distance(g.transform.position, currentAgent.transform.position) / currentAgent.GetComponent<Agent>().GetFieldOfViewSize();
                 Color lineColor = gradient.Evaluate(distOnMaxDistance);
+
 
                 //For creating line renderer object
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
@@ -107,10 +140,7 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
                 linksRenderer.Add(lineRenderer);
 
 
-                //if (pastNeighbours.TryGetValue(g, out position))
-                //{
-                //Time.deltaTime;   
-                //}
+                //agentsAndPastNeighbours[currentAgent] = currentNeighbours;
             }
         }
     }

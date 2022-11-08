@@ -42,7 +42,7 @@ public class AgentManager : MonoBehaviour
         for(int i=0; i<numberOfAgents; i++)
         {
             GameObject newAgent=GameObject.Instantiate(prefab);
-            newAgent.transform.position = new Vector3(Random.Range(0.0f, mapSizeX), 0.1f, Random.Range(0.0f, mapSizeZ));
+            newAgent.transform.position = new Vector3(Random.Range(0.0f, mapSizeX), 0.001f, Random.Range(0.0f, mapSizeZ));
             newAgent.transform.rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 359.0f), 0.0f);
             agents.Add(newAgent);
         }

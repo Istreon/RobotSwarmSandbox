@@ -116,7 +116,30 @@ public class ReynoldsFlockingAgent : Agent
     }
 
 
-    private void Separation()
+    /*private void Separation() //Une separation trouvée sur internet fonctionne pas trop. Plus l'agent est proche, moins la repulsion est forte, alors que plus il est loin, plus elle l'est. ce n'est pas très logique
+    {
+        int count = 0;
+        Vector3 totalForce = Vector3.zero;
+
+        foreach (GameObject o in detectedAgents)
+        {
+            count += 1;
+            //Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
+            Vector3 force =  o.transform.position - this.transform.position;
+
+            totalForce += force;
+        }
+
+        if (count > 0)
+        {
+            totalForce.y = 0.0f; //To stay in 2D
+            totalForce = - totalForce;
+            totalForce *= separationIntensity;
+            addForce(totalForce);
+        }
+    }*/
+
+    private void Separation() // Bonne version
     {
         int count = 0;
         Vector3 totalForce = Vector3.zero;
@@ -139,6 +162,35 @@ public class ReynoldsFlockingAgent : Agent
             addForce(totalForce);
         }
     }
+
+    /*private void Separation() //Version particulière assez amusante
+    {
+        int count = 0;
+        Vector3 totalForce = Vector3.zero;
+
+        foreach (GameObject o in detectedAgents)
+        {
+            count += 1;
+            //Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
+            Vector3 force = this.transform.position - o.transform.position;
+
+           if(force.x != 0) force.x = 1 / force.x;
+
+           force.y = 0.0f;
+   
+           if(force.z !=0) force.z = 1 / force.z;
+
+            totalForce += force;
+        }
+
+        if (count > 0)
+        {
+            totalForce.y = 0.0f; //To stay in 2D
+            totalForce /= count;
+            totalForce *= separationIntensity;
+            addForce(totalForce);
+        }
+    }*/
 
     private void Alignment()
     {
