@@ -82,7 +82,7 @@ public class Agent : MonoBehaviour
         //Update agent position based on speed and time passed since last change
         this.transform.position += this.speed * Time.deltaTime;
         this.transform.position = new Vector3(this.transform.position.x, 0.001f, this.transform.position.z);
-        float agentDirection_YAxis = Mathf.Acos(this.speed.normalized.x) * 360.0f / Mathf.PI + 90.0f;
+        float agentDirection_YAxis = Mathf.Acos(this.speed.normalized.x) * 180.0f / Mathf.PI + 180.0f;
         this.transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
         //Loop position if it go further than map size limit
         //StayInInfiniteArea();
