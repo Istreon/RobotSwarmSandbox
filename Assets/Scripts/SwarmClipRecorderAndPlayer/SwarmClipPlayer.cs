@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine.UI;
-
+using UnityEditor;
 
 public class SwarmClipPlayer : MonoBehaviour
 {
@@ -140,4 +140,12 @@ public class SwarmClipPlayer : MonoBehaviour
         playing = false;
         slider.value = (float)frameNumber / (float)(this.nbFrames - 1);
     }
+
+    public void ShowExplorer()
+    {
+        string path = EditorUtility.OpenFilePanel("Choose a file", Application.persistentDataPath, "");
+        Debug.Log(path);
+    }
+
+
 }
