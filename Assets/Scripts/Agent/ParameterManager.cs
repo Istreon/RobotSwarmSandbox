@@ -49,9 +49,9 @@ public class ParameterManager : MonoBehaviour
     [SerializeField]
     [Range(0.0f, 5.0f)]
     private float separationIntensity = 1.0f;
-    [SerializeField]
-    [Range(0.0f, 20.0f)]
-    private float avoidingObstaclesIntensity = 1.0f;
+    //[SerializeField]
+    //[Range(0.0f, 20.0f)]
+    //private float avoidingObstaclesIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 5.0f)]
     private float moveForwardIntensity = 1.0f;
@@ -71,6 +71,7 @@ public class ParameterManager : MonoBehaviour
     private float distanceBetweenAgents = 1.0f;
 
 
+    #region Getter
     public float GetFieldOfViewSize()
     {
         return fieldOfViewSize;
@@ -123,10 +124,10 @@ public class ParameterManager : MonoBehaviour
         return cohesionIntensity;
     }
 
-    public float GetAvoidingObstaclesIntensity()
+    /*public float GetAvoidingObstaclesIntensity()
     {
         return avoidingObstaclesIntensity;
-    }
+    }*/
 
     public float GetMoveForwardIntensity()
     {
@@ -152,4 +153,74 @@ public class ParameterManager : MonoBehaviour
     {
         return distanceBetweenAgents;
     }
+
+    #endregion
+
+
+    #region Setter
+    public void SetFieldOfViewSize(float val)
+    {
+        this.fieldOfViewSize = val;
+    }
+
+    public void SetBlindSpotSize(float val)
+    {
+        this.blindSpotSize = val;
+    }
+
+    public void SetAttractionZoneSize(float val)
+    {
+        this.attractionZoneSize = val;
+    }
+    public void SetAlignmentZoneSize(float val)
+    {
+        this.alignmentZoneSize = val;
+    }
+    public void SetRepulsionZoneSize(float val)
+    {
+        this.repulsionZoneSize = val;
+    }
+
+    public void SetSeparationIntensity(float val)
+    {
+        this.separationIntensity = val;
+    }
+
+    public void SetAlignmentIntensity(float val)
+    {
+        this.alignmentIntensity = val;
+    }
+
+    public void SetCohesionIntensity(float val)
+    {
+        this.cohesionIntensity = val;
+    }
+
+
+    public void SetMoveForwardIntensity(float val)
+    {
+        this.moveForwardIntensity = val;
+    }
+
+    public void SetRandomMovementIntensity(float val)
+    {
+        this.randomMovementIntensity = val;
+    }
+
+    public void SetFrictionIntensity(float val)
+    {
+        this.frictionIntensity = val;
+    }
+
+    public void SetMaxSpeed(float val)
+    {
+        this.maxSpeed = val;
+    }
+
+    public void SetDistanceBetweenAgents(float val)
+    {
+        this.distanceBetweenAgents = val;
+    }
+    #endregion
+
 }

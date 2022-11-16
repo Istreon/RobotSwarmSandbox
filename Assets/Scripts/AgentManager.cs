@@ -37,6 +37,7 @@ public class AgentManager : MonoBehaviour
 
         mainCamera = FindObjectOfType<Camera>();
         mainCamera.transform.position= new Vector3(mapSizeX / 2.0f, Mathf.Max(mapSizeZ,mapSizeX), mapSizeZ / 2.0f);
+        mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
 
         agents = new List<GameObject>();
         for(int i=0; i<numberOfAgents; i++)

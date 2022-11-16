@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [System.Serializable]
-public class LogAgentData 
+public class LogAgentData
 {
-    private Vector3 position;
-    private Vector3 speed;
+    private SerializableVector3 position;
+    private SerializableVector3 speed;
 
     public LogAgentData(Vector3 position, Vector3 speed)
     {
@@ -24,3 +25,4 @@ public class LogAgentData
         return this.speed;
     }
 }
+
