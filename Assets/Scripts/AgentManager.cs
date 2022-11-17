@@ -29,7 +29,6 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         GameObject map=Instantiate(mapPrefab);
         map.transform.parent = null;
         map.transform.position = new Vector3(mapSizeX / 2.0f, 0.0f, mapSizeZ / 2.0f);

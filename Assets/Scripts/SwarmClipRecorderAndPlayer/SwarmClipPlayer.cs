@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine.UI;
 using UnityEditor;
+using TMPro;
 
 public class SwarmClipPlayer : MonoBehaviour
 {
@@ -26,11 +27,12 @@ public class SwarmClipPlayer : MonoBehaviour
     [SerializeField]
     private Slider slider;
 
+    [SerializeField]
+    private Button playButton;
+
     // Start is called before the first frame update
     void Start()
     {
-        loaded = LoadClip();
-
     }
 
     // Update is called once per frame
@@ -88,13 +90,12 @@ public class SwarmClipPlayer : MonoBehaviour
 
     }
 
-    private bool LoadClip()
+    private bool LoadClip(string filePath)
     {
-        string filename = "/" + "test" + ".dat";
-        if (File.Exists(Application.persistentDataPath + filename))
+        if (File.Exists(filePath))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + filename, FileMode.Open);
+            FileStream file = File.Open(filePath, FileMode.Open);
             this.clip = (LogClip) bf.Deserialize(file);
             file.Close();
 
@@ -107,6 +108,7 @@ public class SwarmClipPlayer : MonoBehaviour
             mainCamera.transform.position = new Vector3(clip.GetMapSizeX() / 2.0f, Mathf.Max(clip.GetMapSizeZ(), clip.GetMapSizeX()), clip.GetMapSizeZ() / 2.0f);
             mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
 
+            Debug.Log("Clip loaded");
             //Create gameObject simulating the swarm
             return (true);
         }
@@ -127,25 +129,22 @@ public class SwarmClipPlayer : MonoBehaviour
     }
 
 
-    public void PlayClip()
+    public void PlayOrPauseClip()
     {
         if (loaded)
         {
-            playing = true;
+            playing = ! playing;
+            playButton.GetComponentInChildren<TMP_Text>().text = playing ? "Pause" : "Play";
         }
     }
 
-    public void PauseCLip()
-    {
-        playing = false;
-        slider.value = (float)frameNumber / (float)(this.nbFrames - 1);
-    }
 
     public void ShowExplorer()
     {
         string path = EditorUtility.OpenFilePanel("Choose a file", Application.persistentDataPath, "");
-        Debug.Log(path);
+        if(path!=string.Empty)
+        {
+            loaded = LoadClip(path);
+        }
     }
-
-
 }

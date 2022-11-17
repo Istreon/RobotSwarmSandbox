@@ -81,7 +81,8 @@ public class SwamClipRecorder : MonoBehaviour
 
     private void SaveClip(LogClip clip)
     {
-        string filename = "/" + "test" + ".dat";
+        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+        string filename = "/" + "clip_" + date + ".dat";
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Open(Application.persistentDataPath + filename, FileMode.OpenOrCreate);
         Debug.Log(Application.persistentDataPath);
