@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 
 
 public class SwamClipRecorder : MonoBehaviour
@@ -50,7 +48,12 @@ public class SwamClipRecorder : MonoBehaviour
             {
                 Debug.Log("Clip Saved");
                 LogClip clip = new LogClip(frames, fps, agentManager.GetMapSizeX(), agentManager.GetMapSizeZ());
-                SaveClip(clip);
+                //Create filename based on current date time
+                string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+                string filename = "/" + "clip_" + date + ".dat";
+                //Save clip
+                SwarmClipTools.SaveClip(clip, Application.persistentDataPath + filename);
+                //Refresh recorder
                 timer = 0.0f;
                 frames.Clear();
             }
@@ -79,16 +82,6 @@ public class SwamClipRecorder : MonoBehaviour
         return frame;
     }
 
-    private void SaveClip(LogClip clip)
-    {
-        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-        string filename = "/" + "clip_" + date + ".dat";
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Open(Application.persistentDataPath + filename, FileMode.OpenOrCreate);
-        Debug.Log(Application.persistentDataPath);
-        //LogClip serializedClip = clip;
-        bf.Serialize(file, clip);
-        file.Close();
-    }
+
 }
 

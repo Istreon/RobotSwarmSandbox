@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using UnityEngine.UI;
 using UnityEditor;
 using TMPro;
@@ -10,12 +8,14 @@ public class SwarmClipPlayer : MonoBehaviour
 {
     private LogClip clip;
 
+    private int fps;
+    private int nbFrames;
+    private string filePath = "";
+
     private bool loaded = false;
     private bool playing = false;
     private bool sliderValueChanged = false;
-
-    private int fps;
-    int nbFrames;
+    private bool modifiedClip = false;
 
     float timer = 0.0f;
 
@@ -23,6 +23,13 @@ public class SwarmClipPlayer : MonoBehaviour
 
     private List<GameObject> actors = new List<GameObject>();
     public GameObject actorPrefab;
+
+
+    [SerializeField]
+    private GameObject buttonsIfClipLoaded;
+
+    [SerializeField]
+    private GameObject saveButton;
 
     [SerializeField]
     private Slider slider;
@@ -38,14 +45,15 @@ public class SwarmClipPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        buttonsIfClipLoaded.SetActive(loaded);
+        saveButton.SetActive(modifiedClip);
         if (playing)
         {
             if (timer >= (1.0f / this.fps))
             {
                 DisplayFrame();
                 frameNumber = (frameNumber + 1) % nbFrames;
-                sliderValueChanged = true;
-                slider.value = (float) frameNumber / (float)(this.nbFrames-1);
+                UpdateSliderValue();
                 timer = timer - (1.0f / fps);
             }
             timer += Time.deltaTime;
@@ -90,32 +98,12 @@ public class SwarmClipPlayer : MonoBehaviour
 
     }
 
-    private bool LoadClip(string filePath)
+
+
+    private void UpdateSliderValue()
     {
-        if (File.Exists(filePath))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(filePath, FileMode.Open);
-            this.clip = (LogClip) bf.Deserialize(file);
-            file.Close();
-
-            //Get clip informations
-            this.fps = clip.getFps();
-            this.nbFrames = clip.getClipFrames().Count;
-
-            //Camera positionning
-            Camera mainCamera = FindObjectOfType<Camera>();
-            mainCamera.transform.position = new Vector3(clip.GetMapSizeX() / 2.0f, Mathf.Max(clip.GetMapSizeZ(), clip.GetMapSizeX()), clip.GetMapSizeZ() / 2.0f);
-            mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
-
-            Debug.Log("Clip loaded");
-            //Create gameObject simulating the swarm
-            return (true);
-        }
-        else
-        {
-            return (false);
-        }
+        sliderValueChanged = true;
+        slider.value = (float)frameNumber / (float)(this.nbFrames - 1);
     }
 
     public void SelectFrame()
@@ -138,13 +126,80 @@ public class SwarmClipPlayer : MonoBehaviour
         }
     }
 
+    /**
+     * This methods allow to remove a part of the clip, to reduce it size.
+     * There is two options : 
+     * -remove the first part of the clip (all frame before "frameNumber") by setting "firstPart" parameter at true
+     * -remove the last part of the clip (all frame after "frameNumber" included) by setting "firstPart" parameter at false
+     * The removed part is lost, and there is no return value.
+     * */
+    public void RemoveClipPart(bool firstPart)
+    {
+        //If there are enough frame to cut the clip
+        if(clip.getClipFrames().Count>2)
+        {
+            if (firstPart) //Remove the first part of the clip
+            {
+                clip.getClipFrames().RemoveRange(0, frameNumber);
+
+                frameNumber = 0;
+            }
+            else //Remove the last part of the clip
+            {
+                clip.getClipFrames().RemoveRange(frameNumber, this.nbFrames - frameNumber);
+                frameNumber = clip.getClipFrames().Count-1;
+            }
+            modifiedClip = true;
+            this.nbFrames = clip.getClipFrames().Count;
+            UpdateSliderValue();
+            DisplayFrame();
+            
+        }
+    }
+
+    public void SaveUpdatedClip()
+    {
+        if(modifiedClip)
+        {
+            int pos=filePath.LastIndexOf('.');
+            string newFilePath = filePath.Remove(pos);
+            newFilePath += "_mod.dat";
+            Debug.Log(newFilePath);
+            SwarmClipTools.SaveClip(clip, newFilePath);
+        }
+    }
+
 
     public void ShowExplorer()
     {
-        string path = EditorUtility.OpenFilePanel("Choose a file", Application.persistentDataPath, "");
-        if(path!=string.Empty)
+        this.filePath = EditorUtility.OpenFilePanel("Choose a file", Application.persistentDataPath, "");
+        if (filePath!=string.Empty)
         {
-            loaded = LoadClip(path);
+            clip = SwarmClipTools.LoadClip(filePath);
+            loaded = (clip != null);
+
+            if(loaded)
+            {
+                Debug.Log("Clip loaded");
+
+                //Reset values for this new clip
+                modifiedClip = false;
+                frameNumber = 0;
+                playing = false;
+
+                //Get clip informations
+                this.fps = clip.getFps();
+                this.nbFrames = clip.getClipFrames().Count;
+                
+
+                //Camera positionning
+                Camera mainCamera = FindObjectOfType<Camera>();
+                mainCamera.transform.position = new Vector3(clip.GetMapSizeX() / 2.0f, Mathf.Max(clip.GetMapSizeZ(), clip.GetMapSizeX()), clip.GetMapSizeZ() / 2.0f);
+                mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
+
+                UpdateSliderValue();
+                DisplayFrame();
+            }
         }
     }
 }
