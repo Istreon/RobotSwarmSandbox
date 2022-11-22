@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/ClipPlayerScene.unity
+    guid: 7be73522dc23a274a861e7ccf7296ed5
   m_configObjects: {}

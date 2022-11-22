@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -263,7 +262,7 @@ public class Agent : MonoBehaviour
     }
 
 
-    #region Get Methods
+    #region Methods - Getter
     public Vector3 GetSpeed()
     {
         return speed;

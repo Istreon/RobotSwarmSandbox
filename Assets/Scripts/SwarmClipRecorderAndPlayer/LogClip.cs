@@ -1,25 +1,19 @@
 using System.Collections.Generic;
 
-
 [System.Serializable]
 public class LogClip
 {
+    #region Private fields
     private List<LogClipFrame> clipFrames;
     private int fps = 60; //frame per second
-
-    private int nbAgents;
-
 
     //Map parameters
     private float mapSizeX;
     private float mapSizeZ;
+    #endregion
 
 
-
-
-    //Stocker les infos map et paramètre!!!
-
-
+    #region Methods - Constructor
     public LogClip(List<LogClipFrame> clipFrames, int fps, float mapSizeX, float mapSizeZ)
     {
         this.clipFrames = clipFrames;
@@ -27,7 +21,9 @@ public class LogClip
         this.mapSizeX = mapSizeX;
         this.mapSizeZ = mapSizeZ;
     }
+    #endregion
 
+    #region Methods - Getter
     public int getFps()
     {
         return this.fps;
@@ -47,5 +43,6 @@ public class LogClip
     {
         return mapSizeZ;
     }
+    #endregion
 }
 

@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ParameterManager : MonoBehaviour
 {
-
     [Header("Field of view size")]
     [SerializeField]
     [Range(0.0f, 5.0f)]
@@ -71,7 +68,7 @@ public class ParameterManager : MonoBehaviour
     private float distanceBetweenAgents = 1.0f;
 
 
-    #region Getter
+    #region Methods - Getter
     public float GetFieldOfViewSize()
     {
         return fieldOfViewSize;
@@ -157,7 +154,7 @@ public class ParameterManager : MonoBehaviour
     #endregion
 
 
-    #region Setter
+    #region Methods : Setter
     public void SetFieldOfViewSize(float val)
     {
         this.fieldOfViewSize = val;

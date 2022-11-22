@@ -1,4 +1,3 @@
-
 [System.Serializable]
 public class LogParameters
 {
@@ -17,6 +16,7 @@ public class LogParameters
     private float distanceBetweenAgents;
     #endregion
 
+    #region Methods - Constructor
     public LogParameters(float fieldOfViewSize, float blindSpotSize, float moveForwardIntensity, float randomMovementIntensity, float frictionIntensity, float maxSpeed, float cohesionIntensity, float alignmentIntensity, float separationIntensity, float distanceBetweenAgents)
     {
         this.fieldOfViewSize = fieldOfViewSize;
@@ -30,8 +30,9 @@ public class LogParameters
         this.separationIntensity = separationIntensity;
         this.distanceBetweenAgents = distanceBetweenAgents;
     }
+    #endregion
 
-    #region Getter
+    #region Methods - Getter
 
     public float GetFieldOfViewSize()
     {

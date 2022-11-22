@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class SwamClipRecorder : MonoBehaviour
 {
+    #region Serialized fields
     [SerializeField]
     private int fps = 60; //frames per second
+    #endregion
 
+    #region Private fields
     private AgentManager agentManager;
     private ParameterManager parameterManager;
 
@@ -15,7 +18,9 @@ public class SwamClipRecorder : MonoBehaviour
     float timer = 0.0f;
 
     private List<LogClipFrame> frames;
+    #endregion
 
+    #region MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +31,6 @@ public class SwamClipRecorder : MonoBehaviour
         if (parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
 
         frames = new List<LogClipFrame>();
-
     }
 
     // Update is called once per frame
@@ -58,14 +62,27 @@ public class SwamClipRecorder : MonoBehaviour
                 frames.Clear();
             }
         }
-
     }
+    #endregion
 
+    #region Methods
+    /**
+     * Reverses the state of the recorder
+     * 
+     * Return value :
+     * -There is no return value
+     * */
     public void ChangeRecordState()
     {
         recording = !recording;
     }
 
+    /**
+     * Record the actual frame of the swarm, and add it to the list of frames
+     * 
+     * Return value :
+     * -Return the recorded frame (LogCLipFrame)
+     * */
     private LogClipFrame RecordFrame()
     {
         List<LogAgentData> agentData = new List<LogAgentData>();
@@ -81,6 +98,7 @@ public class SwamClipRecorder : MonoBehaviour
         LogClipFrame frame = new LogClipFrame(agentData, parameters);
         return frame;
     }
+    #endregion
 
 
 }
