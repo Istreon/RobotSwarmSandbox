@@ -66,7 +66,7 @@ public class SwamClipRecorder : MonoBehaviour
     #endregion
 
     #region Methods
-    /**
+    /**----------------------------
      * Reverses the state of the recorder
      * 
      * Return value :
@@ -77,7 +77,7 @@ public class SwamClipRecorder : MonoBehaviour
         recording = !recording;
     }
 
-    /**
+    /**----------------------------
      * Record the actual frame of the swarm, and add it to the list of frames
      * 
      * Return value :

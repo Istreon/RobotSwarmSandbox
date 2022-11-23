@@ -17,6 +17,7 @@ public class LogClipFrame
     }
     #endregion
 
+
     #region Methods - Getter
     public List<LogAgentData> getAgentData()
     {

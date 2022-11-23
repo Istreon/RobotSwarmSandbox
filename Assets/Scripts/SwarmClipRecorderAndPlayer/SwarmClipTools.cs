@@ -4,7 +4,7 @@ using System.IO;
 public class SwarmClipTools
 {
     #region Methods
-    /**
+    /**----------------------------
      * This method load a clip from a specific file type (.dat)
      * Parameters : 
      * -filePath (string) : is the path (absolute) of the file to load
@@ -31,7 +31,7 @@ public class SwarmClipTools
     }
 
 
-    /**
+    /**----------------------------
      * This method save a clip into a .dat file
      * Parameters :
      * -clip (LogClip) :  the clip to save
