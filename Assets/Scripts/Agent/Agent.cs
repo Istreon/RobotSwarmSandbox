@@ -218,10 +218,10 @@ public class Agent : MonoBehaviour
     {
         foreach(GameObject g in detectedAgents)
         {
-            if(Vector3.Distance(g.transform.position, this.transform.position)<=0.06f) {
+            if(Vector3.Distance(g.transform.position, this.transform.position)<=0.09f) {
                 Vector3 force = this.transform.position - g.transform.position;
                 force.Normalize();
-                force *= 2;
+                force *= 20*this.maxSpeed;
                 addForce(force);
             }
         }
