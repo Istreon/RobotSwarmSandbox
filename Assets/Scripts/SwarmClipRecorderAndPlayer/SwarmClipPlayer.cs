@@ -6,6 +6,7 @@ using TMPro;
 //using AnotherFileBrowser.Windows;
 using SFB;
 
+
 public class SwarmClipPlayer : MonoBehaviour
 {
     #region Serialized fields
@@ -55,7 +56,7 @@ public class SwarmClipPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        colorPalette = ColorTools.GetColorPalette(40);
+        colorPalette = ColorTools.GetShuffledColorPalette(40);
     }
 
     // Update is called once per frame
