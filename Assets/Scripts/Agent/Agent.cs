@@ -214,6 +214,19 @@ public class Agent : MonoBehaviour
         addForce(force);
     }
 
+    protected void AvoidCollisionWithNeighbors()
+    {
+        foreach(GameObject g in detectedAgents)
+        {
+            if(Vector3.Distance(g.transform.position, this.transform.position)<=0.06f) {
+                Vector3 force = this.transform.position - g.transform.position;
+                force.Normalize();
+                force *= 2;
+                addForce(force);
+            }
+        }
+    }
+
     /**----------------------------
     * This method create a force generated from the environmental forces of the map, added to the acceleration of the agent
     * It aim to influence the agent movement depending of the environmental constraints

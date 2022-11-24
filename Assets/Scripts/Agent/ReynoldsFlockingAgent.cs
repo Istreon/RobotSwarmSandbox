@@ -77,6 +77,7 @@ public class ReynoldsFlockingAgent : Agent
         RandomMovement();
         MoveForward();
         Friction();
+        AvoidCollisionWithNeighbors();
         Cohesion();
         Separation();
         Alignment();
