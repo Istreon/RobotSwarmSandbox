@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using TMPro;
-//using AnotherFileBrowser.Windows;
 using SFB;
 
 
@@ -82,14 +80,12 @@ public class SwarmClipPlayer : MonoBehaviour
     #endregion
 
     #region Methods - Clip player methods
-    /**----------------------------
-     * This method check if there is the right amount of actors (gameobject) to simulate each agent of the clip
-     * If there is more, it deletes the surplus actor
-     * Is there is less, it create new gameObjects to fit the right amount of agents
-     * 
-     * Return value :
-     * -There is no return value
-     **/
+
+    /// <summary>
+    /// This method check if there is the right amount of actors (<see cref="GameObject"/>) to simulate each agent of the clip.
+    /// If there is more, it deletes the surplus actors. 
+    /// Is there is less, it create new <see cref="GameObject"/> to fit the right amount of agents.
+    /// </summary>
     private void AdjustActorNumber()
     {
         int numberOfAgents = clip.getClipFrames()[frameNumber].getAgentData().Count;
@@ -118,16 +114,13 @@ public class SwarmClipPlayer : MonoBehaviour
         }
     }
 
-    /**----------------------------
-     * This method displays the current frame of the loaded clip
-     * By displaying the position of saved agents in the clip using actors
-     * There is two possiblities :
-     * -(See DisplaySimpleFrame method) It display the frame in the simpliest way possible, meaning that all actor are the same color
-     * -(See DisplayColoredClusterFrame method) Or it display the frame coloring actors from the same clusters in an unique color, allowing an user to identify groups visually
-     * 
-     * Return value :
-     * -There is no return value
-     * */
+    /// <summary>
+    /// This method displays the current frame of the loaded <see cref="LogClip"/>.
+    /// By displaying the position of saved agents in the clip using actors.
+    /// There is two possiblities, depending on <see cref="SwarmClipPlayer.displayClusterColors"/> value : 
+    /// <see cref="SwarmClipPlayer.DisplaySimpleFrame"/> displays the frame in the simpliest way possible, meaning that all actor are the same color.
+    /// <see cref="SwarmClipPlayer.DisplayColoredClusterFrame"/> displays the frame coloring actors from the same clusters in an unique color, allowing an user to identify groups visually.
+    /// </summary>
     private void DisplayFrame()
     {
         if(displayClusterColors)
@@ -140,14 +133,12 @@ public class SwarmClipPlayer : MonoBehaviour
         }
     }
 
-    /**----------------------------
-     * This method displays the current frame of the loaded clip
-     * By displaying the position of saved agents in the clip using actors
-     * It display the frame coloring actors from the same clusters in an unique color, allowing an user to identify groups visually
-     * 
-     * Return value :
-     * -There is no return value
-     * */
+
+    /// <summary>
+    /// This method displays the current frame of the loaded <see cref="LogClip"/>,
+    /// by displaying the position of saved agents in the clip using actors.
+    /// It display the frame coloring actors from the same clusters in an unique <see cref="UnityEngine.Color"/>, allowing an user to identify groups visually.
+    /// </summary>
     private void DisplayColoredClusterFrame()
     {
         AdjustActorNumber();
@@ -172,23 +163,17 @@ public class SwarmClipPlayer : MonoBehaviour
                 {
                     actors[i].GetComponent<Renderer>().material.color = colorPalette[c];
                 } 
-
-                
                 i++;
             }
             c++;
         }
     }
 
-    /**----------------------------
-     * This method displays the current frame of the loaded clip
-     * By displaying the position of saved agents in the clip using actors
-     * It display the frame in the simpliest way possible, meaning that all actor are the same color
-     * 
-     * 
-     * Return value :
-     * -There is no return value
-     * */
+    /// <summary>
+    /// This method displays the current frame of the loaded <see cref="LogClip"/>, 
+    /// by displaying the position of saved agents in the clip using actors.
+    /// It display the frame in the simpliest way possible, meaning that all actor are the same <see cref="UnityEngine.Color"/>.
+    /// </summary>
     private void DisplaySimpleFrame()
     {
         AdjustActorNumber();
@@ -203,24 +188,21 @@ public class SwarmClipPlayer : MonoBehaviour
     }
 
 
-    /**----------------------------
-     * This method udpates the visual state of the slider in the UI
-     * In doing so, it prevent the call of the "on slider change" by setting a bool value to true
-     * This method do not return value
-     * */
+    /// <summary>
+    /// This method udpates the visual state of the slider in the UI.
+    /// In doing so, it prevent the call of the "on slider change" by setting a bool value to true.
+    /// </summary>
     private void UpdateSliderValue()
     {
         sliderValueChanged = true;
         slider.value = (float)frameNumber / (float)(this.nbFrames - 1);
     }
 
-
-    /**----------------------------
-     * This methods allow to select a specific frame moment in the clip
-     * This selection is based on the slider value (set in parameter in the editor)
-     * Reload the display to show the actual frame of the clip
-     * This method do not return value
-     * */
+    /// <summary>
+    /// This methods allow to select a specific frame moment in the clip.
+    /// This selection is based on the slider value  (set in parameter in the editor).
+    /// Reload the display to show the actual frame of the clip.
+    /// </summary>
     public void SelectFrame()
     {
         if (!sliderValueChanged)
@@ -231,12 +213,11 @@ public class SwarmClipPlayer : MonoBehaviour
         sliderValueChanged = false;
     }
 
-    /** ----------------------------
-     * This method reverses the state of the clip player
-     * If the clip player was playing, then this method changes it state to pause
-     * Else, if the clip player was paused, this method changes it state to play
-     * This method do not return value
-     * */
+    /// <summary> 
+    /// This method reverses the state of the clip player.
+    /// If the clip player was playing, then this method changes it state to pause.
+    /// Else, if the clip player was paused, this method changes it state to play
+    /// </summary>
     public void PlayOrPauseClip()
     {
         if (loaded)
@@ -246,23 +227,23 @@ public class SwarmClipPlayer : MonoBehaviour
         }
     }
 
-    /**----------------------------
-     * This method sets the state of the clip player to "pause"
-     * This method do not return value
-     **/
+    /// <summary>
+    /// This method sets the state of the clip player to "pause".
+    /// </summary>
     public void PauseClipPlayer()
     {
         playing = false;
         playButton.GetComponentInChildren<TMP_Text>().text = "Play";
     }
 
-    /**----------------------------
-     * This method allows to remove a part of the clip, to reduce it size.
-     * There is two options : 
-     * -remove the first part of the clip (all frame before "frameNumber") by setting "firstPart" parameter at true
-     * -remove the last part of the clip (all frame after "frameNumber" included) by setting "firstPart" parameter at false
-     * The removed part is lost, and there is no return value.
-     * */
+    /// <summary>
+    /// This method allows to remove a part of the clip, to reduce it size. The removed part is lost"/>
+    /// </summary>
+    /// <param name="firstPart">
+    /// A <see cref="bool"/> value that decides whether the first or the last part of the clip which is deleted. 
+    /// True, the first part is deleted. 
+    /// False, the last part is deleted.
+    /// </param>
     public void RemoveClipPart(bool firstPart)
     {
         //If there are enough frame to cut the clip
@@ -287,12 +268,10 @@ public class SwarmClipPlayer : MonoBehaviour
         }
     }
 
-    /**----------------------------
-     * This method allows to save a modified clip
-     * When a clip is modified, the bool "modifiedClip" is set to True
-     * Consequently, this method save the modified clip (under the original filename + "_mod") in the same folder as the original clip
-     * This method do not return value
-     * */
+    /// <summary>
+    /// Save a modified clip, under the original filename adding "_mod", in the same folder as the original clip. 
+    /// A clip can't be saved using this method if it wasn't modified.
+    /// </summary>
     public void SaveUpdatedClip()
     {
         if (modifiedClip)
@@ -311,11 +290,10 @@ public class SwarmClipPlayer : MonoBehaviour
         DisplayFrame();
     }
 
-    /**----------------------------
-     * This method intialize a clip, allowing to be play in the right conditions
-     * It pause the player, get the clip parameter, set the camera position according to the clip parameters, and then display the first frame (and update the UI)
-     * This method do not return value
-     * */
+    /// <summary>
+    /// This method intialize a clip, allowing it to be play in the right conditions.
+    /// It pause the player, get the clip parameter, set the camera position according to the clip parameters, and then display the first frame (and update the UI).
+    /// </summary>
     private void InitializeClip()
     {
         //Pause clip player
@@ -339,15 +317,13 @@ public class SwarmClipPlayer : MonoBehaviour
         DisplayFrame();
     }
 
-    /**----------------------------
-     * This method allow to select a clip and load it using a windows explorer 
-     * The files have a .dat extension
-     * When the clip is load, initialize it
-     * This method do not return value
-     **/
+    /// <summary>
+    /// Open a windows explorer to select a clip and load it.
+    /// Allowed files have .dat extension.
+    /// Once the clip is load, it's intialized.
+    /// </summary>
     public void ShowExplorer()
     {
-
         var extensions = new[] {
         new ExtensionFilter("Data files", "dat" ),
         };
@@ -365,49 +341,6 @@ public class SwarmClipPlayer : MonoBehaviour
                 InitializeClip();
             }
         }
-        /*
-        #if UNITY_EDITOR
-
-                //Only in editor
-                this.filePath = EditorUtility.OpenFilePanel("Choose a file", Application.persistentDataPath, "");
-                if (filePath != string.Empty)
-                {
-                    clip = SwarmClipTools.LoadClip(filePath);
-                    loaded = (clip != null);
-
-                    if (loaded)
-                    {
-                        Debug.Log("Clip loaded");
-                        InitializeClip();
-                    }
-                }
-
-                #else
-
-
-
-
-                var bp = new BrowserProperties();
-                bp.filter = "Images files (*.dat) | *.dat";
-                bp.filterIndex = 0;
-
-                new FileBrowser().OpenFileBrowser(bp, filePath =>
-                {
-                    if (filePath != string.Empty)
-                    {
-                        clip = SwarmClipTools.LoadClip(filePath);
-                        loaded = (clip != null);
-
-                        if (loaded)
-                        {
-                            Debug.Log("Clip loaded");
-                            InitializeClip();
-                        }
-                    }
-                });
-                #endif
-                */
-
     }
 
     public void ExitApp()
@@ -418,6 +351,12 @@ public class SwarmClipPlayer : MonoBehaviour
 
 
     #region Methods - Analyser
+
+    /// <summary>
+    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory.
+    /// An agent belong to only one cluster.
+    /// </summary>
+    /// <returns> A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="LogAgentData"/>.</returns>
     private List<List<LogAgentData>> GetClusters()
     {
         //Reset clusters list
@@ -447,14 +386,20 @@ public class SwarmClipPlayer : MonoBehaviour
                     }
                 }
                 i++;
-
             }
             clusters.Add(newCluster);
         }
         return clusters;
     }
 
-
+    /// <summary>
+    /// Detect all neighbours of an agent based on its perception, and return them.
+    /// </summary>
+    /// <param name="agent"> A <see cref="LogAgentData"/> representing the agent searching its neighbours.</param>
+    /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible neighbours.</param>
+    /// <param name="fieldOfViewSize"> A <see cref="float"/> value representing the distance of perception of the agent.</param>
+    /// <param name="blindSpotSize"> A <see cref="float"/> value representing the blind angle behind the agent where neighbours are not perceived.</param>
+    /// <returns> The <see cref="List{T}"/> of neighbours.</returns>
     private List<LogAgentData> GetNeighbours(LogAgentData agent, List<LogAgentData> agentList, float fieldOfViewSize, float blindSpotSize) {
         List<LogAgentData>  detectedAgents = new List<LogAgentData>();
         foreach (LogAgentData g in agentList)

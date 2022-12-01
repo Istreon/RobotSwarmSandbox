@@ -6,9 +6,7 @@ public class ReynoldsFlockingAgent : Agent
 {
     #region Serialized Fields
 
-   
-
-
+  
 
     /*[Header("Feeler parameters")]
     [SerializeField]
@@ -94,6 +92,9 @@ public class ReynoldsFlockingAgent : Agent
     #endregion
 
 
+    /// <summary>
+    /// Add to the current acceleration a cohesion force based on current neighbours. This force brings this agent closer to its detected neighbours.
+    /// </summary>
     private void Cohesion()
     {
         int count = 0;
@@ -140,6 +141,9 @@ public class ReynoldsFlockingAgent : Agent
         }
     }*/
 
+    /// <summary>
+    /// Add to the current acceleration a separation force based on current neighbours. This force moves this agent away to its detected neighbours.
+    /// </summary>
     private void Separation() // Bonne version
     {
         int count = 0;
@@ -193,6 +197,9 @@ public class ReynoldsFlockingAgent : Agent
         }
     }*/
 
+    /// <summary>
+    /// Add to the current acceleration a alignment force based on current neighbours. This force align this agent to match its detected neighbours speed (direction and intensity).
+    /// </summary>
     private void Alignment()
     {
         int count = 0;
@@ -206,7 +213,6 @@ public class ReynoldsFlockingAgent : Agent
                 count += 1;
                 vm += temp.GetSpeed();
             }
-            
         }
 
         if (count > 0)
@@ -273,13 +279,9 @@ public class ReynoldsFlockingAgent : Agent
         }
     }*/
 
-
-
-
-
-  
-
-
+    /// <summary>
+    /// Update all parameters from the <see cref="ParameterManager"/> instance in the scene.
+    /// </summary>
     private void UpdateParameters()
     {
         cohesionIntensity = this.parameterManager.GetCohesionIntensity();
@@ -296,9 +298,4 @@ public class ReynoldsFlockingAgent : Agent
         feelerDistance = this.parameterManager.GetFeelerDistance();
         feelerSize = this.parameterManager.GetFeelerSize();*/
     }
-
-
-   
-
-
 }

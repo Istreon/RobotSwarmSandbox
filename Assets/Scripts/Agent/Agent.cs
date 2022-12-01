@@ -7,12 +7,12 @@ public class Agent : MonoBehaviour
     [Header("Field of view size")]
     [SerializeField]
     [Range(0.0f, 5.0f)]
-    [Tooltip("This is the size of the radius (in meters).")]
-    protected float fieldOfViewSize = 1.0f; //meters
+    [Tooltip("This is the size of the agent perception radius (in meters).")]
+    protected float fieldOfViewSize = 1.0f; //The range of perception of this agent in meters
     [SerializeField]
     [Range(0, 360)]
-    [Tooltip("This is the size of blind spot of the agent (in degrees).")]
-    protected float blindSpotSize = 30; //Degrees
+    [Tooltip("This is the size of blind spot of the agent (starting from the back) (in degrees).")]
+    protected float blindSpotSize = 30; //The size of the blind spot of this agent (starting from the back) in Degrees
     #endregion
 
     #region Serialized fields - Intensity parameters
@@ -31,7 +31,6 @@ public class Agent : MonoBehaviour
     protected float maxSpeed = 1.0f;
     #endregion
 
-
     #region Private fields
     //Field of view
     //private GameObject fieldOfView;
@@ -44,8 +43,8 @@ public class Agent : MonoBehaviour
     //private List<GameObject> detectedObstacles;
 
 
-    protected Vector3 acceleration = Vector3.zero;
-    protected Vector3 speed = Vector3.zero;
+    protected Vector3 acceleration = Vector3.zero; //the current acceleration of this agent, in m/s^2
+    protected Vector3 speed = Vector3.zero; //The current speed of this agent, in m/s
 
 
     protected List<GameObject> detectedAgents;
@@ -65,7 +64,6 @@ public class Agent : MonoBehaviour
 
     #endregion
 
-
     #region Methods - MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
@@ -81,20 +79,31 @@ public class Agent : MonoBehaviour
     #endregion
 
     #region Methods - Agent's primary methods
+
+    /// <summary>
+    /// This method update the current position and the current speed of an agent.
+    /// The new position is based on the current speed and the  current position (position(t+1) = position(t) + speed(t) * DT).
+    /// The new speed is based on the current acceleration and the current speed (speed(t+1) = speed(t) + acceleration(t+1) * DT).
+    /// To avoid having speed reaching unlimited intensity, there is a speed max value lowering the speed intensity when it exceeds speed max value.
+    /// The acceleration is then reset to zero.
+    /// Moreover, this methods update the direction of the visual robot to match its current speed.
+    /// </summary>
     protected void updateAgent()
     {
-
         //Update agent position based on speed and time passed since last change
         this.transform.position += this.speed * Time.deltaTime;
         this.transform.position = new Vector3(this.transform.position.x, 0.001f, this.transform.position.z);
+
         //Update agent visual direction to match the current movement
         float agentDirection_YAxis = 180-(Mathf.Acos(this.speed.normalized.x) * 180.0f / Mathf.PI);
         if (this.speed.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
         this.transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+
         //Loop position if it go further than map size limit
         //StayInInfiniteArea();
+
         //Stay in the finite area if it go further than map size limit
-        StayInFiniteArea();
+        StayInFiniteArea(); //Called before updating speed and reseting acceleration
 
         //Update agent speed based on acceleration and time passed since last change
         this.speed += this.acceleration * Time.deltaTime;
@@ -104,33 +113,27 @@ public class Agent : MonoBehaviour
 
         //Limit speed vector based on agent max speed
         float temp = this.speed.sqrMagnitude; //faster than Vector3.Magnitude(this.speed);
-        if (temp > (maxSpeed * maxSpeed))
+        if (temp > (maxSpeed * maxSpeed)) // Temp is squared, so it's necessary to compare whith "maxSpeed" squared too
         {
             this.speed.Normalize();
             this.speed *= this.maxSpeed;
         }
     }
 
-    /**----------------------------
-     * This method add a force to the agent acceleration
-     * 
-     * Return value :
-     * -There is no return value
-     **/
+    /// <summary>
+    /// This method add a force to the agent acceleration.
+    /// </summary>
     protected void addForce(Vector3 force)
     {
         this.acceleration += force; //  *(1.0f/this.mass);
     }
 
-    /**----------------------------
-     * This method get the other agents perceived by the current agent.
-     * The perceived agent depend of the field of view size and the blind spot angle
-     * Agents in the blind spot are not perceived
-     * Agents further the field of view size are not perceived
-     * 
-     * Return value :
-     * -There is no return value
-     **/
+    /// <summary>
+    /// This method get the other agents perceived by the current agent, and add them to the "detectedAgents" list.
+    /// The perceived agent depend of the field of view size and the blind spot angle.
+    /// Agents in the blind spot are not perceived.
+    /// Agents further the field of view size are not perceived.
+    /// </summary>
     protected virtual void getAgentsInFieldOfView()
     {
 
@@ -156,14 +159,11 @@ public class Agent : MonoBehaviour
 
     #region Methods - Agent rules
 
-    /**----------------------------
-     * This method create a random force, added to the acceleration of the agent
-     * It aim to allow an agent to move randomly
-     * The greater the intensity, the greater the force
-     * 
-     * Return value :
-     * -There is no return value
-     **/
+    /// <summary> 
+    /// This method create a random force, added to the acceleration of the agent.
+    /// It aim to allow an agent to move randomly.
+    /// The greater the intensity (<see cref="Agent.randomMovementIntensity"/>), the greater the force.
+    /// </summary>
     protected void RandomMovement()
     {
         float alea = 0.1f;
@@ -181,14 +181,11 @@ public class Agent : MonoBehaviour
         }
     }
 
-    /**----------------------------
-    * This method create a force leading forward, added to the acceleration of the agent
-    * It aim to allow an agent to move forward, depending of the move forward intensity
-    * The greater the intensity, the greater the force
-    * 
-    * Return value :
-    * -There is no return value
-    **/
+    /// <summary> 
+    /// This method create a force leading forward, added to the acceleration of the agent.
+    /// It aim to allow an agent to move forward, depending of the move forward intensity.
+    /// The greater the intensity (<see cref="Agent.moveForwardIntensity"/>), the greater the force.
+    /// </summary>
     protected void MoveForward()
     {
         Vector3 force = speed.normalized;
@@ -199,13 +196,10 @@ public class Agent : MonoBehaviour
         addForce(force);
     }
 
-    /**----------------------------
-    * This method create a force opposite to the current speed, added to the acceleration of the agent
-    * It aim to reduce the agent speed, depending of the friction intensity
-    * 
-    * Return value :
-    * -There is no return value
-    **/
+    /// <summary>
+    /// This method create a force opposite to the current speed, added to the acceleration of the agent.
+    /// It aim to reduce the agent speed, depending of the friction intensity (<see cref="Agent.frictionIntensity"/>).
+    /// </summary> 
     protected void Friction()
     {
         float k = frictionIntensity;
@@ -214,11 +208,16 @@ public class Agent : MonoBehaviour
         addForce(force);
     }
 
+    /// <summary>
+    /// This method create a force opposite to the neighbours that are too close, added to the acceleration of the agent.
+    /// It aim to avoid collision between agents.
+    /// </summary>
     protected void AvoidCollisionWithNeighbors()
     {
+        float safetyDistance = 0.09f;
         foreach(GameObject g in detectedAgents)
         {
-            if(Vector3.Distance(g.transform.position, this.transform.position)<=0.09f) {
+            if(Vector3.Distance(g.transform.position, this.transform.position)<= safetyDistance) {
                 Vector3 force = this.transform.position - g.transform.position;
                 force.Normalize();
                 force *= 20*this.maxSpeed;
@@ -227,13 +226,10 @@ public class Agent : MonoBehaviour
         }
     }
 
-    /**----------------------------
-    * This method create a force generated from the environmental forces of the map, added to the acceleration of the agent
-    * It aim to influence the agent movement depending of the environmental constraints
-    * 
-    * Return value :
-    * -There is no return value
-    **/
+    /// <summary> 
+    /// This method create a force generated from the environmental forces of the map, added to the acceleration of the agent.
+    /// It aim to influence the agent movement depending of the environmental constraints.
+    /// </summary>
     protected void EnvironmentalForce()
     {
         Vector2 temp = new Vector2(transform.position.x, transform.position.z);
@@ -245,57 +241,55 @@ public class Agent : MonoBehaviour
     #endregion
 
     #region Methods - Finite area
-    /**----------------------------
-     * This method prevents the agent to leave the borders of the map
-     * And add a force to push back the agent in the area
-     * 
-     * Return value :
-     * -There is no return value
-     **/
+    /// <summary>
+    /// This method prevents the agent to leave the borders of the map.
+    /// And add a force to push back the agent in the area.
+    /// </summary>
     protected void StayInFiniteArea()
     {
+        float safetyDistance = 0.3f;
         float x = 0.0f;
         float z = 0.0f;
         Vector3 temp = this.transform.position;
-        if (this.transform.position.x > mapSizeX)
+        if (this.transform.position.x > mapSizeX-safetyDistance)
         {
-            temp.x = mapSizeX;
-            x = -1;
-            speed.x = 0.0f;
+            float dist = Mathf.Abs(mapSizeX - this.transform.position.x);
+            //temp.x = mapSizeX;
+            x = -1 * safetyDistance / dist;
         }
-        if (this.transform.position.x < 0.0f)
+        if (this.transform.position.x < safetyDistance )
         {
-            temp.x = 0.0f;
-            x = 1;
-            speed.x = 0.0f;
+            float dist = Mathf.Abs(this.transform.position.x);
+            //temp.x = 0.0f;
+            x = 1 * safetyDistance / dist;
         }
 
-        if (this.transform.position.z > mapSizeZ)
+        if (this.transform.position.z > mapSizeZ - safetyDistance)
         {
-            temp.z = mapSizeZ;
-            z = -1;
-            speed.z = 0.0f;
+            float dist = Mathf.Abs(mapSizeZ - this.transform.position.z);
+            //temp.z = mapSizeZ;
+            z = -1 * safetyDistance/dist;
         }
-        if (this.transform.position.z < 0.0f)
+        if (this.transform.position.z < safetyDistance)
         {
-            temp.z = 0.0f;
-            z = 1;
-            speed.z = 0.0f;
+            float dist = Mathf.Abs(this.transform.position.z);
+            //temp.z = 0.0f;
+            z = 10*this.maxSpeed * safetyDistance / dist;
         }
         Vector3 rebond = new Vector3(x, 0.0f, z);
-        rebond *= 50;
+        //rebond *= 50;
         addForce(rebond);
         this.transform.position = temp;
     }
     #endregion
 
     #region Methods - Infinite area
-    /**----------------------------
-     * This method return the nearest position of an agent if we considere the environment as infinite
-     * The area is infinite in height and width
-     * Return value :
-     * -(Vector 3) Nearest position in infinite area
-     **/
+
+    /// <summary>
+    /// This method return the nearest position of an agent if we considere the environment as infinite.
+    /// The area is infinite in height and width.
+    /// </summary>
+    /// <returns> A <see cref="Vector3"/> value representing the nearest position in infinite area </returns>
     //A mettre à jour pour obtenir la position du "to", et ne pas normaliser
     protected Vector3 NearestPositionInInfiniteArea(Vector3 to)
     {
@@ -329,14 +323,10 @@ public class Agent : MonoBehaviour
         return to;
     }
 
-
-    /**----------------------------
-     * This method allow the agent to navigate in an infinite environment
-     * When the agent goes beyond the borders of the map (in x or z), loops its position to the other border
-     * 
-     * Return value :
-     * -The is no return value
-     **/
+    /// <summary>
+    /// This method allow the agent to navigate in an infinite environment.
+    /// When the agent goes beyond the borders of the map (in x or z), loops its position to the other border.
+    /// </summary>
     protected void StayInInfiniteArea()
     {
         Vector3 temp = this.transform.position;

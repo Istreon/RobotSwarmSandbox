@@ -66,23 +66,17 @@ public class SwamClipRecorder : MonoBehaviour
     #endregion
 
     #region Methods
-    /**----------------------------
-     * Reverses the state of the recorder
-     * 
-     * Return value :
-     * -There is no return value
-     * */
+
+    /// <summary>
+    /// Reverse the state of the recorder
+    /// </summary>
     public void ChangeRecordState()
     {
         recording = !recording;
     }
 
-    /**----------------------------
-     * Record the actual frame of the swarm, and add it to the list of frames
-     * 
-     * Return value :
-     * -Return the recorded frame (LogCLipFrame)
-     * */
+    /// <summary> Record the current frame (state) of the swarm</summary>
+    /// <returns> A <see cref="LogClipFrame"/> instance representing the recorded frame</returns>
     private LogClipFrame RecordFrame()
     {
         List<LogAgentData> agentData = new List<LogAgentData>();
