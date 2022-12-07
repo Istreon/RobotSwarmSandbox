@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class SwamClipRecorder : MonoBehaviour
+public class ClipRecorder : MonoBehaviour
 {
     #region Serialized fields
     [SerializeField]
@@ -93,7 +92,4 @@ public class SwamClipRecorder : MonoBehaviour
         return frame;
     }
     #endregion
-
-
 }
-

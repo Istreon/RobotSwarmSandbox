@@ -217,6 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1557432349}
   - component: {fileID: 1557432350}
+  - component: {fileID: 1557432351}
   m_Layer: 0
   m_Name: ClipPlayer
   m_TagString: Untagged
@@ -249,6 +250,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 86bc64865d103e3449b9e01bd8c99e62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1557432351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557432347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 554b239b6be7d87468af2ce1da82b846, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}

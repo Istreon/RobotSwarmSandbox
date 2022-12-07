@@ -614,8 +614,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: PlayOrPauseClip
         m_Mode: 1
         m_Arguments:
@@ -748,8 +748,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: RemoveClipPart
         m_Mode: 6
         m_Arguments:
@@ -992,8 +992,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: SelectFrame
         m_Mode: 1
         m_Arguments:
@@ -1555,8 +1555,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: ChangeVisualization
         m_Mode: 1
         m_Arguments:
@@ -1802,7 +1802,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
         m_MethodName: ExitApp
         m_Mode: 1
@@ -1998,7 +1998,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1557432349}
-  - component: {fileID: 1557432348}
+  - component: {fileID: 1557432350}
+  - component: {fileID: 1557432351}
   m_Layer: 0
   m_Name: ClipPlayer
   m_TagString: Untagged
@@ -2006,24 +2007,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1557432348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1557432347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e905047999e50c540ad6888ff2a1ecab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
-  buttonsIfClipLoaded: {fileID: 1861730347}
-  saveButton: {fileID: 2049981063}
-  slider: {fileID: 200058103}
-  playButton: {fileID: 74091455}
-  colorPalette: []
 --- !u!4 &1557432349
 Transform:
   m_ObjectHideFlags: 0
@@ -2039,6 +2022,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1557432350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557432347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19a924e450c56024795139acdbf54ba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonsIfClipLoaded: {fileID: 1861730347}
+  saveButton: {fileID: 2049981063}
+  slider: {fileID: 200058103}
+  playButton: {fileID: 74091455}
+--- !u!114 &1557432351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557432347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 554b239b6be7d87468af2ce1da82b846, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
 --- !u!1 &1579176413
 GameObject:
   m_ObjectHideFlags: 0
@@ -2479,8 +2491,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: RemoveClipPart
         m_Mode: 6
         m_Arguments:
@@ -2613,8 +2625,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: ShowExplorer
         m_Mode: 1
         m_Arguments:
@@ -2748,8 +2760,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1557432348}
-        m_TargetAssemblyTypeName: SwarmClipPlayer, Assembly-CSharp
+      - m_Target: {fileID: 1557432350}
+        m_TargetAssemblyTypeName: ClipEditor, Assembly-CSharp
         m_MethodName: SaveUpdatedClip
         m_Mode: 1
         m_Arguments:

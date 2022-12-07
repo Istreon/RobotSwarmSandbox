@@ -397,8 +397,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1806125647}
-        m_TargetAssemblyTypeName: SwamClipRecorder, Assembly-CSharp
+      - m_Target: {fileID: 1806125649}
+        m_TargetAssemblyTypeName: ClipRecorder, Assembly-CSharp
         m_MethodName: ChangeRecordState
         m_Mode: 1
         m_Arguments:
@@ -447,55 +447,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381245137}
   m_CullTransparentMesh: 1
---- !u!1 &487860750
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 487860752}
-  - component: {fileID: 487860751}
-  m_Layer: 0
-  m_Name: ClipPlayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &487860751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487860750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e905047999e50c540ad6888ff2a1ecab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
-  buttonsIfClipLoaded: {fileID: 0}
-  saveButton: {fileID: 0}
-  slider: {fileID: 0}
-  playButton: {fileID: 0}
---- !u!4 &487860752
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487860750}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 93.5, y: 43, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &552575807
 GameObject:
   m_ObjectHideFlags: 0
@@ -3025,7 +2976,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1806125648}
-  - component: {fileID: 1806125647}
+  - component: {fileID: 1806125649}
   m_Layer: 0
   m_Name: ClipRecorder
   m_TagString: Untagged
@@ -3033,19 +2984,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1806125647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1806125646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77570a8dbba6063449ad2bbdadd97ddc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fps: 60
 --- !u!4 &1806125648
 Transform:
   m_ObjectHideFlags: 0
@@ -3061,6 +2999,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1806125649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806125646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 799f5f4b0a93ed946b7621fe08d901b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fps: 60
 --- !u!1 &1807048403
 GameObject:
   m_ObjectHideFlags: 0
