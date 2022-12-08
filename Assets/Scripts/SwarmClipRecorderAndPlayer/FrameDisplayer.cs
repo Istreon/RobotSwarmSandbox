@@ -84,7 +84,7 @@ public class FrameDisplayer
         AdjustActorNumber(frame.getAgentData().Count);
 
         //Searching for fracture
-        List<List<LogAgentData>> clusters = SwarmClipTools.GetClusters(frame);
+        List<List<LogAgentData>> clusters = ClipTools.GetClusters(frame);
 
         int i = 0;
         int c = 0;
@@ -107,6 +107,7 @@ public class FrameDisplayer
             }
             c++;
         }
+        Debug.Log(i);
     }
 
     /// <summary>

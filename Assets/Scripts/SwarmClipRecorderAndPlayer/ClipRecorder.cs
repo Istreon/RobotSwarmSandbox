@@ -55,7 +55,7 @@ public class ClipRecorder : MonoBehaviour
                 string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
                 string filename = "/" + "clip_" + date + ".dat";
                 //Save clip
-                SwarmClipTools.SaveClip(clip, Application.persistentDataPath + filename);
+                ClipTools.SaveClip(clip, Application.persistentDataPath + filename);
                 //Refresh recorder
                 timer = 0.0f;
                 frames.Clear();

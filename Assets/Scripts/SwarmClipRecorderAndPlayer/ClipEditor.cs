@@ -63,6 +63,8 @@ public class ClipEditor : MonoBehaviour
         //Display or hide UI button
         buttonsIfClipLoaded.SetActive(loaded);
         saveButton.SetActive(modifiedClip);
+        //Update button name based on his behavior if pressed
+        playButton.GetComponentInChildren<TMP_Text>().text = clipPlayer.IsPlaying() ? "Pause" : "Play";
     }
     #endregion
 
@@ -109,7 +111,6 @@ public class ClipEditor : MonoBehaviour
             {
                 clipPlayer.Play();
             }  
-            playButton.GetComponentInChildren<TMP_Text>().text = clipPlayer.IsPlaying() ? "Pause" : "Play";
         }
     }
 
@@ -168,7 +169,8 @@ public class ClipEditor : MonoBehaviour
             string newFilePath = filePath.Remove(pos);
             newFilePath += "_mod.dat";
             Debug.Log(newFilePath);
-            SwarmClipTools.SaveClip(clip, newFilePath);
+            ClipTools.SaveClip(clip, newFilePath);
+            modifiedClip = false;
         }
     }
 
@@ -187,17 +189,20 @@ public class ClipEditor : MonoBehaviour
         new ExtensionFilter("Data files", "dat" ),
         };
         var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
-        filePath = paths[0];
-
-        if (filePath != string.Empty)
+        if(paths.Length > 0)
         {
-            clip = SwarmClipTools.LoadClip(filePath);
-            loaded = (clip != null);
+            filePath = paths[0];
 
-            if (loaded)
+            if (filePath != string.Empty)
             {
-                Debug.Log("Clip loaded");
-                clipPlayer.SetClip(clip);
+                clip = ClipTools.LoadClip(filePath);
+                loaded = (clip != null);
+
+                if (loaded)
+                {
+                    Debug.Log("Clip loaded");
+                    clipPlayer.SetClip(clip);
+                }
             }
         }
     }

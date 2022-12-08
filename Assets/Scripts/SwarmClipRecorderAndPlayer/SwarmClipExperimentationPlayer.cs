@@ -37,7 +37,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
             string s = this.filePath + fname;
 
             //Loading clip from full file path
-            LogClip clip = SwarmClipTools.LoadClip(s);
+            LogClip clip = ClipTools.LoadClip(s);
 
             if (clip != null)
                 clips.Add(clip); //Add the loaded clip to the list
