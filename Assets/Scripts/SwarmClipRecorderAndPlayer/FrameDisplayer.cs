@@ -107,7 +107,7 @@ public class FrameDisplayer
             }
             c++;
         }
-        Debug.Log(i);
+        //Debug.Log(i);
     }
 
     /// <summary>
