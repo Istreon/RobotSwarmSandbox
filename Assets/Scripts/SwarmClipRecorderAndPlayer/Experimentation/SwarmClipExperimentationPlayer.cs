@@ -7,6 +7,7 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(ClipPlayer))]
 public class SwarmClipExperimentationPlayer : MonoBehaviour
@@ -14,12 +15,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     #region Serialize fields
     [SerializeField]
     private GameObject nextClipMenu;
-
-    [SerializeField]
-    private GameObject fractureButton;
-
-    [SerializeField]
-    private GameObject noFractureButton;
 
     [SerializeField]
     private Slider slider;
@@ -73,7 +68,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     };
 
 
-
     private List<LogClip> clips = new List<LogClip>();
 
     private int currentClip = 0;
@@ -99,8 +93,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         string resultFilename = "/" + "resultXP_" + date + ".dat";
         resultFilePath = Application.persistentDataPath + resultFilename;
 
-        fractureButton.SetActive(false);
-        noFractureButton.SetActive(false);
         slider.gameObject.SetActive(false);
 
         clipPlayer = FindObjectOfType<ClipPlayer>();
@@ -164,31 +156,33 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
     public void NextClip()
     {
-        if (currentClip >= clips.Count - 1)
+        if (clipPlayer.IsClipFinished())
         {
-            Debug.Log("Experimentation finished");
-        }
-        else
-        {
-            currentClip++;
-            clipPlayer.SetClip(clips[currentClip]);
-            Debug.Log("Next clip" + (currentClip + 1));
-            clipPlayer.Play();
-            fractureButton.SetActive(true);
-            noFractureButton.SetActive(true);
-            slider.gameObject.SetActive(true);
-            answered = false;
-        }
+            if (currentClip >= clips.Count - 1)
+            {
+                Debug.Log("Experimentation finished");
+            }
+            else
+            {
+                currentClip++;
+                clipPlayer.SetClip(clips[currentClip]);
+                Debug.Log("Next clip" + (currentClip + 1));
+                clipPlayer.Play();
+                slider.gameObject.SetActive(true);
+                answered = false;
+            }
+        }     
     }
 
 
+    //Choice = true   => fracture
     public void GiveAnswer(bool choice)
-    {
-        fractureButton.SetActive(false);
-        noFractureButton.SetActive(false);
-        ClipResult res = new ClipResult(fileNames[currentClip], choice, clipPlayer.GetFrameNumber());
-        Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
-        experimentationResult.AddClipResult(res);
+    {   if(!answered)
+        {
+            ClipResult res = new ClipResult(fileNames[currentClip], choice, clipPlayer.GetFrameNumber());
+            Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
+            experimentationResult.AddClipResult(res);
+        }
         answered = true;
     }
 
