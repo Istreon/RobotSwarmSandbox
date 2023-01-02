@@ -5,8 +5,11 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ClipPlayerScene.unity
     guid: 7be73522dc23a274a861e7ccf7296ed5
+  - enabled: 1
+    path: Assets/Scenes/Experimentation.unity
+    guid: 9da27281465565647a9109cc619842e3
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 625051f14c7c9064b9955bd56cbc179b, type: 2}

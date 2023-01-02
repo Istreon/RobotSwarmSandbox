@@ -52,10 +52,10 @@ public class ClipRecorder : MonoBehaviour
                 Debug.Log("Clip Saved");
                 LogClip clip = new LogClip(frames, fps, agentManager.GetMapSizeX(), agentManager.GetMapSizeZ());
                 //Create filename based on current date time
-                string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+                string date = System.DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
                 string filename = "/" + "clip_" + date + ".dat";
                 //Save clip
-                ClipTools.SaveClip(clip, Application.persistentDataPath + filename);
+                ClipTools.SaveClip(clip, Application.dataPath + "/RecordedClips" + filename);
                 //Refresh recorder
                 timer = 0.0f;
                 frames.Clear();

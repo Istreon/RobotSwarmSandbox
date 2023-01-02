@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(ClipPlayer))]
 public class SwarmClipExperimentationPlayer : MonoBehaviour
@@ -18,10 +16,16 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
     [SerializeField]
     private Slider slider;
+
+    [SerializeField]
+    private TMP_Text feedback;
     #endregion
 
     #region Private fields
-    string filePath = "C:/Users/hmaym/OneDrive/Bureau/UnityBuild/Clip/"; //The folder containing clip files
+    //string filePath = "C:/Users/hmaym/OneDrive/Bureau/UnityBuild/Clip/"; //The folder containing clip files
+    string filePath = "/Clips/"; //The folder containing clip files
+    
+
     string[] fileNames = {
         "F_1.dat",
         "F_2.dat",
@@ -41,6 +45,16 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         "F_16.dat",
         "F_17.dat",
         "F_18.dat",
+        "F_19.dat",
+        "F_20.dat",
+        "F_21.dat",
+        "F_22.dat",
+        "F_23.dat",
+        "F_24.dat",
+        "F_25.dat",
+        "F_26.dat",
+        "F_27.dat",
+        "F_28.dat",
         "SF_1.dat",
         "SF_2.dat",
         "SF_3.dat",
@@ -64,7 +78,15 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         "SF_21.dat",
         "SF_22.dat",
         "SF_23.dat",
-        "SF_24.dat"
+        "SF_24.dat",
+        "SF_25.dat",
+        "SF_26.dat",
+        "SF_27.dat",
+        "SF_28.dat",
+        "SF_29.dat",
+        "SF_30.dat",
+        "SF_31.dat",
+        "SF_32.dat",
     };
 
 
@@ -89,9 +111,11 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        filePath = Application.dataPath + filePath;
+        Debug.Log(filePath);
         string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
         string resultFilename = "/" + "resultXP_" + date + ".dat";
-        resultFilePath = Application.persistentDataPath + resultFilename;
+        resultFilePath = Application.dataPath + "/Results" + resultFilename;
 
         slider.gameObject.SetActive(false);
 
@@ -106,7 +130,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
         LoadFirstClips();
         backgroundThread = new Thread(new ThreadStart(LoadOtherClips));
-        // Start thread  
+        // Start thread loading the other clips
         backgroundThread.Start();
 
        
@@ -170,6 +194,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
                 clipPlayer.Play();
                 slider.gameObject.SetActive(true);
                 answered = false;
+                feedback.text = "";
             }
         }     
     }
@@ -179,6 +204,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     public void GiveAnswer(bool choice)
     {   if(!answered)
         {
+            feedback.text = choice ? "You answered \"Fracture\"" : "You answered \"No fracture\"";
             ClipResult res = new ClipResult(fileNames[currentClip], choice, clipPlayer.GetFrameNumber());
             Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
             experimentationResult.AddClipResult(res);
@@ -239,8 +265,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
             }
             else
                 Debug.LogError("Clip can't be load from " + s, this);
-
-            //TO DO !!! (ajouter un visuel d'avancement du chargement en cas de nombreux clip, car cela peut être long)
         }
     }
 

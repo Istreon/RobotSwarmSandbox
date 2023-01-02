@@ -127,7 +127,7 @@ public class FrameDisplayer
         for (int i = 0; i < numberOfAgents; i++)
         {
             actors[i].transform.position = frame.getAgentData()[i].getPosition() + spatialOrigin;
-            actors[i].GetComponent<Renderer>().material.color = Color.red;
+            actors[i].GetComponent<Renderer>().material.color = Color.black;
         }
     }
     #endregion
