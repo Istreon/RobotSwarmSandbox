@@ -65,6 +65,7 @@ public class ClipEditor : MonoBehaviour
         saveButton.SetActive(modifiedClip);
         //Update button name based on his behavior if pressed
         playButton.GetComponentInChildren<TMP_Text>().text = clipPlayer.IsPlaying() ? "Pause" : "Play";
+        Debug.Log(clipPlayer.GetFrameNumber());
     }
     #endregion
 

@@ -6,6 +6,8 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Text;
 
 [RequireComponent(typeof(ClipPlayer))]
 public class SwarmClipExperimentationPlayer : MonoBehaviour
@@ -85,8 +87,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         "SF_28.dat",
         "SF_29.dat",
         "SF_30.dat",
-        "SF_31.dat",
-        "SF_32.dat",
     };
 
 
@@ -98,13 +98,16 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
     private ExperimentationResult experimentationResult = new ExperimentationResult();
 
-    string resultFilePath = "";
+    string resultFilePathCSV = "";
+    string resultFilePathDat = "";
 
     private bool answered = false;
 
     private bool resultSaved = false;
 
     Thread backgroundThread;
+
+    StringBuilder sb = new StringBuilder();
     #endregion
 
 
@@ -114,14 +117,21 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
         string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-        string resultFilename = "/" + "resultXP_" + date + ".dat";
-        resultFilePath = Application.dataPath + "/Results" + resultFilename;
+        string resultFilename = "/" + "resultXP_" + date;
+        resultFilePathDat = Application.dataPath + "/Results" + resultFilename + ".dat";
+        resultFilePathCSV = Application.dataPath + "/Results" + resultFilename + ".csv";
+
+        //Prepare csv result file
+        string line = "Filename;Framenumber;Result\r";
+        sb.Append(line);
 
         slider.gameObject.SetActive(false);
 
         clipPlayer = FindObjectOfType<ClipPlayer>();
 
-        
+
+
+
         //Shuffle list
         var rnd = new System.Random();
         List<string> l = fileNames.ToList();
@@ -215,10 +225,24 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
     public void SaveResult()
     {
+        //Save result : format .dat
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Open(resultFilePath, FileMode.OpenOrCreate);
+        FileStream file = File.Open(resultFilePathDat, FileMode.OpenOrCreate);
         bf.Serialize(file, experimentationResult);
         file.Close();
+
+
+        //Save result : format .csv
+        foreach (ClipResult cr in experimentationResult.results)
+        {
+            string line;
+            line = cr.filename + ";" + cr.frameNumber + ";" + cr.fracture + "\r";
+            sb.Append(line);
+        }
+
+        File.AppendAllText(resultFilePathCSV, sb.ToString());
+        sb.Clear();
+
         resultSaved = true;
         Debug.Log("Results saved.");
     }
