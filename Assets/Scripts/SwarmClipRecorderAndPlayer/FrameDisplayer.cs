@@ -84,7 +84,7 @@ public class FrameDisplayer
         AdjustActorNumber(frame.getAgentData().Count);
 
         //Searching for fracture
-        List<List<LogAgentData>> clusters = ClipTools.GetClusters(frame);
+        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(frame);
 
         int i = 0;
         int c = 0;

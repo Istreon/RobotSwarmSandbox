@@ -122,7 +122,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         resultFilePathCSV = Application.dataPath + "/Results" + resultFilename + ".csv";
 
         //Prepare csv result file
-        string line = "Filename;Framenumber;Result\r";
+        string line = "Filename,Framenumber,Result\r";
         sb.Append(line);
 
         slider.gameObject.SetActive(false);
@@ -236,7 +236,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         foreach (ClipResult cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename + ";" + cr.frameNumber + ";" + cr.fracture + "\r";
+            line = cr.filename + "," + cr.frameNumber + "," + cr.fracture + "\r";
             sb.Append(line);
         }
 

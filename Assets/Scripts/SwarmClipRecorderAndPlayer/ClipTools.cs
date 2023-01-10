@@ -111,7 +111,7 @@ public class ClipTools
 
     /// <summary>
     /// Detect all neighbours of an agent based on its perception, and return them.
-    /// A neighbours here mean that the agent perceived, or is perceived by the neighbour.
+    /// A neighbour here mean that the agent perceived, or is perceived by the neighbour.
     /// </summary>
     /// <param name="agent"> A <see cref="LogAgentData"/> representing the agent searching its neighbours.</param>
     /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible neighbours.</param>
@@ -183,5 +183,40 @@ public class ClipTools
         }
         return clusters;
     }
+
+    /// <summary>
+    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory. Those groups are sorted by size.
+    /// An agent belong to only one cluster.
+    /// </summary>
+    /// <returns> 
+    /// A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="LogAgentData"/>. 
+    /// They are sorted by size, from the largest group to the smallest.
+    /// </returns>
+    public static List<List<LogAgentData>> GetOrderedClusters(LogClipFrame frame)
+    {
+        List<List<LogAgentData>> orderedClusters = new List<List<LogAgentData>>();
+
+        List<List<LogAgentData>> clusters = GetClusters(frame);
+
+        while(clusters.Count >0)
+        {
+            int maxSize = -1;
+            List<LogAgentData> biggerCluster = null;
+
+            foreach(List<LogAgentData> c in clusters)
+            {
+                if(c.Count > maxSize)
+                {
+                    maxSize = c.Count;
+                    biggerCluster = c;
+                }
+            }
+            orderedClusters.Add(biggerCluster);
+            clusters.Remove(biggerCluster);
+        }
+
+        return orderedClusters;
+    }
+
     #endregion
 }
