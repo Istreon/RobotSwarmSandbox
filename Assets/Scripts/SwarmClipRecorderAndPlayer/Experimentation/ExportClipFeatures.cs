@@ -8,137 +8,59 @@ public class ExportClipFeatures : MonoBehaviour
 {
     string filePath = "/Clips/"; //The folder containing clip files
 
-
-    string[] fileNames = {
-        "F_1.dat",
-        "F_2.dat",
-        "F_3.dat",
-        "F_4.dat",
-        "F_5.dat",
-        "F_6.dat",
-        "F_7.dat",
-        "F_8.dat",
-        "F_9.dat",
-        "F_10.dat",
-        "F_11.dat",
-        "F_12.dat",
-        "F_13.dat",
-        "F_14.dat",
-        "F_15.dat",
-        "F_16.dat",
-        "F_17.dat",
-        "F_18.dat",
-        "F_19.dat",
-        "F_20.dat",
-        "F_21.dat",
-        "F_22.dat",
-        "F_23.dat",
-        "F_24.dat",
-        "F_25.dat",
-        "F_26.dat",
-        "F_27.dat",
-        "F_28.dat",
-        "SF_1.dat",
-        "SF_2.dat",
-        "SF_3.dat",
-        "SF_4.dat",
-        "SF_5.dat",
-        "SF_6.dat",
-        "SF_7.dat",
-        "SF_8.dat",
-        "SF_9.dat",
-        "SF_10.dat",
-        "SF_11.dat",
-        "SF_12.dat",
-        "SF_13.dat",
-        "SF_14.dat",
-        "SF_15.dat",
-        "SF_16.dat",
-        "SF_17.dat",
-        "SF_18.dat",
-        "SF_19.dat",
-        "SF_20.dat",
-        "SF_21.dat",
-        "SF_22.dat",
-        "SF_23.dat",
-        "SF_24.dat",
-        "SF_25.dat",
-        "SF_26.dat",
-        "SF_27.dat",
-        "SF_28.dat",
-        "SF_29.dat",
-        "SF_30.dat",
-    };
-
-
-    int[] fractureFrames =
-    {
-        2080,
-        60,
-        1311,
-        190,
-        377,
-        281,
-        638,
-        122,
-        957,
-        399,
-        276,
-        760,
-        797,
-        99,
-        652,
-        663,
-        868,
-        944,
-        2169,
-        2146,
-        400,
-        277,
-        969,
-        757,
-        1148,
-        648,
-        708,
-        339
-    };
-
     private List<LogClip> clips = new List<LogClip>();
 
     private int currentClip = 0;
     // Start is called before the first frame update
     void Start()
     {
-        if (fractureFrames.Length != fileNames.Length) Debug.Log("Nonnonononono");
+        
+
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
+
+        string[] filePaths = Directory.GetFiles(filePath, "*.dat",
+                                         SearchOption.TopDirectoryOnly);
+
+
 
         string resultFilePathCSV = Application.dataPath + "/Results/clip_features.csv";
 
         StringBuilder sb = new StringBuilder();
 
         //Prepare csv result file
-        string line = "Filename;FPS;NbFrames;FractureFrame;DistMedianKNN;SignificantDist;FractureScore;BestScore;ExpansionScore;MeanTowardsCenterOfMass;MedianTowardsCenterOfMass;MeanEffectiveGroupMotion;MedianEffectiveGroupMotion;MedianOrder\r";
+        string line = "Filename;" +
+            "FPS;" +
+            "NbFrames;" +
+            "FractureFrame;" +
+            "FractureScore;" +
+            "BestScore;" +
+            "SeparationSpeed;"+
+            "ExpansionScore;" +
+            "MeanTowardsCenterOfMass;" +
+            //"MedianTowardsCenterOfMass;" +
+            "MeanEffectiveGroupMotion;" +
+            "MeanEffectiveDirectionMotion;" +
+            //"MedianEffectiveGroupMotion;" +
+            "MedianOrder;" +
+            "MeanOrder;" +
+            "MeanTowardsCenterOfMassStandardDeviation;" +
+            "StandardDeviationOfKnnDirection\r";
         sb.Append(line);
 
         //Load all clip
-        for (int i = 0; i < fileNames.Length; i++)
+        for (int i = 0; i < filePaths.Length; i++)
         {
-            string fname = fileNames[i];
-
-            //Concatenation of file path and file name
-            string s = this.filePath + fname;
-
             //Loading clip from full file path
-            LogClip clip = ClipTools.LoadClip(s);
+            LogClip clip = ClipTools.LoadClip(filePaths[i]);
 
             if (clip != null)
             {
                 clips.Add(clip); //Add the loaded clip to the list
-                Debug.Log("Clip " + s + " Loaded.");
+                Debug.Log("Clip " + filePaths[i] + " Loaded.");
             }
             else
-                Debug.LogError("Clip can't be load from " + s, this);
+                Debug.LogError("Clip can't be load from " + filePaths[i], this);
         }
 
         Debug.Log("Clips are loaded.");
@@ -150,21 +72,42 @@ public class ExportClipFeatures : MonoBehaviour
         {
             //int fractureFrame = GetFractureFrame(c);
             //int fractureFrame = fractureFrames[currentClip];
-            int otherFractureFrame = GetFractureFrame(c);
-            float knnMedian = -1;
-            float significantDistance = -1;
+            int fractureFrame = GetFractureFrame(c);
             float score = -1;
             float best = -1;
+            float speedScore = -1;
         
-        if (otherFractureFrame !=-1)
-            {
-                knnMedian = KNNDistanceMedianAt(c, otherFractureFrame, 3);
-                significantDistance = SignificantDistanceBetweenClustersAtFrame(c, otherFractureFrame);
-                score = significantDistance / knnMedian;
-                best = BestFractureVisibilityScore(c, otherFractureFrame);
+        if (fractureFrame !=-1)
+            {              
+                best = BestFractureVisibilityScore(c, fractureFrame);
+                score = FractureVisibilityScore(c, fractureFrame);
+                speedScore = SeparationSpeed(c);
             }
-            
-            line = fileNames[currentClip] + ";" + c.getFps() + ";" + c.getClipFrames().Count + ";" /*+ fractureFrame + ";"*/ + GetFractureFrame(c) + ";" + knnMedian + ";" +  significantDistance + ";" + score + ";" + best +  ";" + ExpansionScore(c) + ";" + MeanTowardsCenterOfMass(c) + ";" + MedianTowardsCenterOfMass(c) + ";" + MeanEffectiveGroupMotion(c) + ";" + MedianEffectiveGroupMotion(c) + ";" + MedianOrder( c) + "\r";
+
+            string s = filePaths[currentClip];
+            int pos = s.IndexOf("/");
+            while(pos!=-1)
+            {
+                s = s.Substring(pos + 1);
+                pos = s.IndexOf("/");
+            } 
+            line =  s + ";" 
+                + c.getFps() + ";" 
+                + c.getClipFrames().Count + ";" 
+                + fractureFrame + ";" 
+                + score + ";"  
+                + best +  ";" 
+                + speedScore + ";"
+                + ExpansionScore(c) + ";" 
+                + MeanTowardsCenterOfMass(c) + ";" 
+                //+ MedianTowardsCenterOfMass(c) + ";" 
+                + MeanEffectiveGroupMotion(c) + ";"
+                + MeanEffectiveDirectionMotion(c) + ";"
+                //+ MedianEffectiveGroupMotion(c) + ";" 
+                + MedianOrder( c) + ";"  
+                + MeanOrder(c) + ";" 
+                + MeanTowardsCenterOfMassStandardDeviation(c) + ";"
+                + StandardDeviationOfKnnDirection(c) + "\r";
             sb.Append(line);
          
             currentClip++;
@@ -221,7 +164,234 @@ public class ExportClipFeatures : MonoBehaviour
     }
 
 
+
+    //Trouver la frame de la fracture
+    //Récuperer le premier groupe de la fracture
+    //Mesurer la distance la plus petite entre les deux groupes
+    //Identifier les deux agents les plus proches par leur ID
+    //Mesurer sur les 10 frames précédentes la vitesse d'éloignement
+    //retourner cette vitesse
+    //Faire ça sur tous les groupes?
+
+
+
+    private float SeparationSpeed(LogClip c)
+    {
+        int fracFrame = GetFractureFrame(c);
+
+        List<LogAgentData> agents = c.getClipFrames()[fracFrame].getAgentData();
+
+        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[fracFrame]);
+
+        List<LogAgentData> temp = new List<LogAgentData>(agents);
+
+        foreach(LogAgentData a in clusters[1])
+        {
+            temp.Remove(a);
+        }
+
+        LogAgentData a1=null;
+        LogAgentData a2=null;
+        float minDist = float.MaxValue;
+
+        foreach (LogAgentData a in clusters[1])
+        {
+            foreach (LogAgentData b in temp)
+            {
+                float dist = Vector3.Distance(a.getPosition(), b.getPosition());
+                if(dist<minDist)
+                {
+                    minDist = dist;
+                    a1 = a;
+                    a2 = b;
+                }
+            }
+        }
+
+        if(a1 == null || a2 == null) return -1;
+        int id1 = agents.IndexOf(a1);
+        int id2 = agents.IndexOf(a2);
+
+        return SeparationSpeed(c, fracFrame, id1, id2);
+
+    }
+
+
+
+    private float SeparationSpeed(LogClip c, int frame, int id1, int id2)
+    {
+        List<LogAgentData> agentsAtFrac = c.getClipFrames()[frame].getAgentData();
+        float distAtFrac = Vector3.Distance(agentsAtFrac[id1].getPosition(), agentsAtFrac[id2].getPosition());
+
+        int n = 10;
+
+        if (frame < n) n = frame;
+
+        List<LogAgentData> pastAgents = c.getClipFrames()[frame-n].getAgentData();
+        float pastDist = Vector3.Distance(pastAgents[id1].getPosition(), pastAgents[id2].getPosition());
+
+
+        float change = distAtFrac - pastDist;
+
+        float res = (change / (float)n) * (float)c.getFps(); //To get a value per second
+
+        return res;
+
+    }
+
+
+    private float StandardDeviationOfKnnDirection(LogClip c)
+    {
+        List<LogClipFrame> frames = c.getClipFrames();
+        int n = GetFractureFrame(c);
+
+        if (n == -1) n = frames.Count;
+
+        float mean = 0.0f;
+        for (int i=0; i<n; i++)
+        {
+            mean += StandardDeviationOfKnnDirection(frames[i]);
+        }
+
+        return (mean / (float)n);
+
+
+    }
+
+
+    private float StandardDeviationOfKnnDirection(LogClipFrame f)
+    {
+        List<LogAgentData> agents = f.getAgentData();
+        List<float> directionDiff = new List<float>();
+
+        foreach(LogAgentData a in agents)
+        {
+            List<LogAgentData> knn = KNN(a, agents, 3);
+            foreach(LogAgentData n in knn)
+            {
+                float angleDiff = Vector3.Angle(a.getSpeed(), n.getSpeed()) / 180.0f;
+                directionDiff.Add(angleDiff);
+            }
+        }
+
+        return StandardDeviation(directionDiff);
+    }
+
+
+
+    private float StandardDeviationOfKnnDistance(LogClip c)
+    {
+        List<LogClipFrame> frames = c.getClipFrames();
+        int n = GetFractureFrame(c);
+
+        if (n == -1) n = frames.Count;
+
+        float mean = 0.0f;
+        for (int i = 0; i < n; i++)
+        {
+            mean += StandardDeviationOfKnnDistance(frames[i]);
+        }
+
+        return (mean / (float)n);
+    }
+
+
+    private float StandardDeviationOfKnnDistance(LogClipFrame f)
+    {
+        List<LogAgentData> agents = f.getAgentData();
+        List<float> directionDiff = new List<float>();
+
+        foreach (LogAgentData a in agents)
+        {
+            List<LogAgentData> knn = KNN(a, agents, 3);
+            foreach (LogAgentData n in knn)
+            {
+                float dist = Vector3.Distance(a.getPosition(), n.getPosition());
+                directionDiff.Add(dist);
+            }
+        }
+
+        return StandardDeviation(directionDiff);
+    }
+
+
+    /*
+
+    private float CenterOfMassDirectionVariation(LogClip c)
+    {
+        List<LogClipFrame> frames = c.getClipFrames();
+        int n;
+        int fractureFrame = GetFractureFrame(c);
+
+        if (fractureFrame == -1) n = frames.Count;
+        else n = fractureFrame;
+
+        float res = 0.0f;
+        for (int i = 0; i < n - 2; i++)
+        {
+            res += Vector3.Angle(CenterOfMassDirection(frames[i], frames[i + 1]), CenterOfMassDirection(frames[i+1], frames[i + 2]))/180;
+        }
+
+        res /= (n - 1);
+        return res;
+    }
+    */
+    private Vector3 CenterOfMassDirection(LogClipFrame f1,LogClipFrame f2)
+    {
+        List<LogAgentData> pastAgents = f1.getAgentData();
+        List<LogAgentData> agents = f2.getAgentData();
+
+        Vector3 pastCenterOfMass = CenterOfMass(pastAgents);
+        Vector3 centerOfMass = CenterOfMass(agents);
+
+        Vector3 direction = centerOfMass - pastCenterOfMass;
+
+        return direction;
+    }
+
+    /*
+    private float IndividualDirectionVariation(LogClip c)
+    {
+        List<LogClipFrame> frames = c.getClipFrames();
+        int n;
+        int fractureFrame = GetFractureFrame(c);
+
+        if (fractureFrame == -1) n = frames.Count;
+        else n = fractureFrame;
+
+        float res = 0.0f;
+        for(int i=0;i<n-1; i++)
+        {
+            res += IndividualDirectionVariation(frames[i], frames[i+1]);
+        }
+
+        res /= (n - 1);
+        return res;
+    }
+
+
+    private float IndividualDirectionVariation(LogClipFrame f1, LogClipFrame f2)
+    {
+        List<LogAgentData> pastAgents = f1.getAgentData();
+        List<LogAgentData> agents = f2.getAgentData();
+
+        int n = agents.Count;
+
+        float res = 0.0f;
+
+        for(int i = 0; i<n; i++)
+        {
+            res += Vector3.Angle(agents[i].getSpeed(), pastAgents[i].getSpeed())/180;
+        }
+        res /= n;
+
+        return res;
+    }*/
+
+
     #region Methods - Expansion and total distance
+
+    /*
     private float TotalDistanceExpansion(LogClip c)
     {
         float start = TotalDistance(c.getClipFrames()[0]);
@@ -243,12 +413,12 @@ public class ExportClipFeatures : MonoBehaviour
             }
         }
         return total;
-    }
+    }*/
 
     private float ExpansionScore(LogClip c)
     {
-        float startValue = KNNDistanceMedianAt(c, 0, 3);
-        float endValue = KNNDistanceMedianAt(c, c.getClipFrames().Count - 1, 3);
+        float startValue = MeanKNNDistanceAt(c, 0, 3);
+        float endValue = MeanKNNDistanceAt(c, c.getClipFrames().Count - 1, 3);
 
         float res = (endValue / startValue);
 
@@ -266,6 +436,22 @@ public class ExportClipFeatures : MonoBehaviour
             if (ClipTools.GetClusters(f).Count > 1) break;
 
             res += TowardsCenterOfMass(f);
+            i++;
+        }
+        res /= i;
+
+        return res;
+    }
+
+    private float MeanTowardsCenterOfMassStandardDeviation(LogClip c)
+    {
+        float res = 0.0f;
+        int i = 0;
+        foreach (LogClipFrame f in c.getClipFrames())
+        {
+            if (ClipTools.GetClusters(f).Count > 1) break;
+
+            res += TowardsCenterOfMassStandardDeviation(f);
             i++;
         }
         res /= i;
@@ -302,6 +488,8 @@ public class ExportClipFeatures : MonoBehaviour
     }
 
 
+
+
     private float TowardsCenterOfMass(LogClipFrame f)
     {
         List<LogAgentData> agents = f.getAgentData();
@@ -330,13 +518,39 @@ public class ExportClipFeatures : MonoBehaviour
         float res = 1 - ((b / n) / 180);
         return res;
     }
+
+    private float TowardsCenterOfMassStandardDeviation(LogClipFrame f)
+    {
+        List<LogAgentData> agents = f.getAgentData();
+        int n = agents.Count;
+
+        Vector3 centerOfMass = CenterOfMass(agents);
+        List<float> l = new List<float>();
+        int i;
+        for (i = 0; i < n; i++)
+        {
+            Vector3 speed = agents[i].getSpeed();
+            Vector3 temp = centerOfMass - agents[i].getPosition();
+            float angle = 0.0f;
+            if (speed.magnitude == 0.0f)
+            {
+                angle = 90; //Represent the neutral angle, if the agent isn't moving.
+            }
+            else
+            {
+                angle = Vector3.Angle(speed, temp);
+            }
+
+
+            l.Add(1-(angle/180));
+        }
+
+        
+        return StandardDeviation(l);
+    }
     #endregion
 
     #region Methods - Fracture number
-    private float RatioFractureNumberSize(LogClip c)
-    {
-        return ((float) MaxFractureNumber(c) / (float)MainSwarmSizeAtMaxFractureNumber(c));
-    }
 
     private int MaxFractureNumber(LogClip c)
     {
@@ -376,22 +590,35 @@ public class ExportClipFeatures : MonoBehaviour
    {
         List<float> l = new List<float>();
         foreach (LogClipFrame f in c.getClipFrames())
-       {
+        {
            l.Add(Order(f));
-       }
+        }
 
         return Median(l);
     }
 
+    private float MeanOrder(LogClip c)
+    {
+        float meanOrder = 0.0f;
+        foreach (LogClipFrame f in c.getClipFrames())
+        {
+            meanOrder += Order(f);
+        }
+        meanOrder /= c.getClipFrames().Count;
+
+        return meanOrder;
+    }
+
+
 
     private float Order(LogClipFrame f)
-   {
-       List<LogAgentData> agents = f.getAgentData();
+    {
+        List<LogAgentData> agents = f.getAgentData();
         float psi = Order(agents);
-       return psi;
-   }
+        return psi;
+    }
 
-
+    /*
     private float MeanLocalOrder(LogClip c)
     {
         float meanLocalOrder = 0.0f;
@@ -422,7 +649,7 @@ public class ExportClipFeatures : MonoBehaviour
         meanLocalOrder /= n;
         return meanLocalOrder;
     }
-
+    
     private LogAgentData NearestAgent(LogAgentData agent, List<LogAgentData> l)
     {
         float min = float.MaxValue;
@@ -493,7 +720,7 @@ public class ExportClipFeatures : MonoBehaviour
         
         return Median(localOrder);
     }
-
+    */
 
 
     private float Order(List<LogAgentData> agents)
@@ -574,9 +801,79 @@ public class ExportClipFeatures : MonoBehaviour
         if (meanDist == 0.0f) return 0.0f; //Protect from division by 0
         else return (distCM / meanDist);
     }
+
+    private float MeanEffectiveDirectionMotion(LogClip c)
+    {
+        int nbFrames = c.getClipFrames().Count;
+        float meanValue = 0.0f;
+        int i = 1;
+        while (true)
+        {
+            float temp = EffectiveGroupDirectionAtFrame(c, i);
+            if (temp == -1) break;
+
+            meanValue += temp;
+            i++;
+        }
+
+        meanValue /= (i - 1);
+
+        return meanValue;
+    }
+
+    private float EffectiveGroupDirectionAtFrame(LogClip c, int frame)
+    {
+        if (frame < 1) return -1;
+        if (frame >= c.getClipFrames().Count) return -1;
+        if (ClipTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
+
+        Vector3 dirCM = CenterOfMass(c.getClipFrames()[frame].getAgentData()) - CenterOfMass(c.getClipFrames()[frame - 1].getAgentData());
+
+        float res = 0.0f;
+
+        List<LogAgentData> currentPositions = c.getClipFrames()[frame].getAgentData();
+        int nbAgent = currentPositions.Count;
+        List<LogAgentData> pastPositions = c.getClipFrames()[frame - 1].getAgentData();
+        for (int i = 0; i < nbAgent; i++)
+        {
+            Vector3 dir = currentPositions[i].getPosition() - pastPositions[i].getPosition(); 
+            res += Vector3.Angle(dir, dirCM) /180;
+        }
+
+        res /= nbAgent;
+
+        return 1 - res;
+    }
     #endregion
 
     #region Methods - Fracture visibility score
+    /* private float BestFractureVisibilityScore(LogClip c, int startFrame)
+     {
+         float bestScore = -1;
+
+         for (int i = startFrame; i < c.getClipFrames().Count; i++)
+         {
+             float score = FractureVisibilityScore(c, i);
+             if (score > bestScore)
+             {
+                 bestScore = score;
+             }
+         }
+
+         return bestScore;
+     }
+
+     private float FractureVisibilityScore(LogClip c, int frame)
+     {
+         float meanDist = KNNDistanceMedianAt(c, frame, 3);
+
+         float dist = SignificantDistanceBetweenClustersAtFrame( c, frame);
+         float ratio = dist / meanDist;
+
+         return ratio;
+     }    */
+
+
     private float BestFractureVisibilityScore(LogClip c, int startFrame)
     {
         float bestScore = -1;
@@ -595,7 +892,7 @@ public class ExportClipFeatures : MonoBehaviour
 
     private float FractureVisibilityScore(LogClip c, int frame)
     {
-        float meanDist = KNNDistanceMedianAt(c, frame, 3);
+        float meanDist = MeanKNNDistanceAt(c, frame, 3);
 
         float dist = SignificantDistanceBetweenClustersAtFrame( c, frame);
         float ratio = dist / meanDist;
@@ -717,6 +1014,7 @@ public class ExportClipFeatures : MonoBehaviour
     #endregion
 
     #region Methods - Distance intra cluster
+    /*
     private float KNNDistanceMedianAt(LogClip c, int frameNumber, int k)
     {
 
@@ -726,7 +1024,7 @@ public class ExportClipFeatures : MonoBehaviour
         float dist = KNNDistanceMedian(clusters[0],k);
 
         return dist;
-    }
+    }*/
 
     private float MeanKNNDistanceAt(LogClip c, int frameNumber, int k)
     {
@@ -740,7 +1038,7 @@ public class ExportClipFeatures : MonoBehaviour
     }
 
 
-
+    /*
     /// <summary>
     /// From a list of agent and for each agent, get the median of the k nearest distance to another agent. Returns the median distance.
     /// </summary>
@@ -757,7 +1055,7 @@ public class ExportClipFeatures : MonoBehaviour
         }
 
         return Median(distances);
-    }
+    }*/
 
     private float MeanKNNDistance(List<LogAgentData> cluster, int k)
     {
@@ -823,6 +1121,71 @@ public class ExportClipFeatures : MonoBehaviour
 
     #endregion
 
+
+    private List<LogAgentData> KNN(LogAgentData agent, List<LogAgentData> l, int n)
+    {
+        List<LogAgentData> agents = new List<LogAgentData>(l);
+        List<LogAgentData> knn = new List<LogAgentData>();
+
+        if (agents.Count < n) n = agents.Count;
+
+        for(int i=0; i<n; i++)
+        {
+            LogAgentData nearest = NearestAgent(agent, agents);
+            knn.Add(nearest);
+            agents.Remove(nearest);
+        }
+
+        return knn;
+    }
+
+
+    private LogAgentData NearestAgent(LogAgentData agent, List<LogAgentData> l)
+    {
+        float min = float.MaxValue;
+        LogAgentData minAgent = null;
+        foreach (LogAgentData a in l)
+        {
+            if (System.Object.ReferenceEquals(a, agent)) continue;
+
+            float dist = Vector3.Distance(a.getPosition(), agent.getPosition());
+
+            if (dist < min)
+            {
+                min = dist;
+                minAgent = a;
+            }
+        }
+
+        return minAgent;
+    }
+
+
+    private float StandardDeviation(List<float> l)
+    {
+        //Calcul de la moyenne
+        float mean = 0.0f;
+
+        foreach (float v in l)
+        {
+            mean += v;
+        }
+
+        mean /= l.Count;
+
+        float variance = 0.0f;
+        foreach (float v in l)
+        {
+            float val = (v - mean);
+            val = Mathf.Pow(val, 2);
+            variance += val;
+        }
+
+        variance /= (l.Count - 1);
+
+        float standardDeviation = Mathf.Sqrt(variance);
+        return standardDeviation;
+    }
 
 
     private float Median(List<float> l)

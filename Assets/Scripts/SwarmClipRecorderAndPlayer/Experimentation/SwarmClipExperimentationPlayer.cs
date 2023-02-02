@@ -26,68 +26,9 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     #region Private fields
     //string filePath = "C:/Users/hmaym/OneDrive/Bureau/UnityBuild/Clip/"; //The folder containing clip files
     string filePath = "/Clips/"; //The folder containing clip files
-    
 
-    string[] fileNames = {
-        "F_1.dat",
-        "F_2.dat",
-        "F_3.dat",
-        "F_4.dat",
-        "F_5.dat",
-        "F_6.dat",
-        "F_7.dat",
-        "F_8.dat",
-        "F_9.dat",
-        "F_10.dat",
-        "F_11.dat",
-        "F_12.dat",
-        "F_13.dat",
-        "F_14.dat",
-        "F_15.dat",
-        "F_16.dat",
-        "F_17.dat",
-        "F_18.dat",
-        "F_19.dat",
-        "F_20.dat",
-        "F_21.dat",
-        "F_22.dat",
-        "F_23.dat",
-        "F_24.dat",
-        "F_25.dat",
-        "F_26.dat",
-        "F_27.dat",
-        "F_28.dat",
-        "SF_1.dat",
-        "SF_2.dat",
-        "SF_3.dat",
-        "SF_4.dat",
-        "SF_5.dat",
-        "SF_6.dat",
-        "SF_7.dat",
-        "SF_8.dat",
-        "SF_9.dat",
-        "SF_10.dat",
-        "SF_11.dat",
-        "SF_12.dat",
-        "SF_13.dat",
-        "SF_14.dat",
-        "SF_15.dat",
-        "SF_16.dat",
-        "SF_17.dat",
-        "SF_18.dat",
-        "SF_19.dat",
-        "SF_20.dat",
-        "SF_21.dat",
-        "SF_22.dat",
-        "SF_23.dat",
-        "SF_24.dat",
-        "SF_25.dat",
-        "SF_26.dat",
-        "SF_27.dat",
-        "SF_28.dat",
-        "SF_29.dat",
-        "SF_30.dat",
-    };
+
+    string[] filePaths;
 
 
     private List<LogClip> clips = new List<LogClip>();
@@ -116,10 +57,21 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     {
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
+
+        //Clips
+        filePaths = Directory.GetFiles(filePath, "*.dat",
+                                         SearchOption.TopDirectoryOnly);
+
         string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
         string resultFilename = "/" + "resultXP_" + date;
-        resultFilePathDat = Application.dataPath + "/Results" + resultFilename + ".dat";
-        resultFilePathCSV = Application.dataPath + "/Results" + resultFilename + ".csv";
+        string resultFolderPath = Application.dataPath + "/Results";
+        resultFilePathDat = resultFolderPath + resultFilename + ".dat";
+        resultFilePathCSV = resultFolderPath + resultFilename + ".csv";
+
+        if (!Directory.Exists(resultFolderPath))
+        {
+            Directory.CreateDirectory(resultFolderPath);
+        }
 
         //Prepare csv result file
         string line = "Filename,Framenumber,Result\r";
@@ -134,9 +86,9 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
         //Shuffle list
         var rnd = new System.Random();
-        List<string> l = fileNames.ToList();
+        List<string> l = filePaths.ToList();
         l = l.OrderBy(item => rnd.Next()).ToList<string>();
-        fileNames = l.ToArray();
+        filePaths = l.ToArray();
 
         LoadFirstClips();
         backgroundThread = new Thread(new ThreadStart(LoadOtherClips));
@@ -215,7 +167,17 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     {   if(!answered)
         {
             feedback.text = choice ? "You answered \"Fracture\"" : "You answered \"No fracture\"";
-            ClipResult res = new ClipResult(fileNames[currentClip], choice, clipPlayer.GetFrameNumber());
+
+            //Get file name from file path
+            string s = filePaths[currentClip];
+            int pos = s.IndexOf("/");
+            while (pos != -1)
+            {
+                s = s.Substring(pos + 1);
+                pos = s.IndexOf("/");
+            }
+
+            ClipResult res = new ClipResult(s, choice, clipPlayer.GetFrameNumber());
             Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
             experimentationResult.AddClipResult(res);
         }
@@ -251,10 +213,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     public void LoadFirstClips()
     {
 
-        string fname = fileNames[0];
-
-        //Concatenation of file path and file name
-        string s = this.filePath + fname;
+        string s = filePaths[0];
 
         //Loading clip from full file path
         LogClip clip = ClipTools.LoadClip(s);
@@ -272,12 +231,10 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     public void LoadOtherClips()
     {
         //Load all clip
-        for (int i = 1; i< fileNames.Length; i++)
+        for (int i = 1; i< filePaths.Length; i++)
         {
-            string fname = fileNames[i];
-
             //Concatenation of file path and file name
-            string s = this.filePath + fname;
+            string s = this.filePaths[i];
 
             //Loading clip from full file path
             LogClip clip = ClipTools.LoadClip(s);

@@ -21,7 +21,7 @@ public class LogClipFrame
     #region Methods - Getter
     public List<LogAgentData> getAgentData()
     {
-        return this.agentData;
+        return new List<LogAgentData>(this.agentData);
     }
 
     public LogParameters GetParameters()
