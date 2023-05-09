@@ -10,6 +10,10 @@ public class ParameterManager : MonoBehaviour
     [Range(0.0f, 5.0f)]
     [Tooltip("This is the size of the radius.")]
     private float fieldOfViewSize = 1.0f;
+    [SerializeField]
+    [Range(0, 360)]
+    [Tooltip("This is the size of blind spot of the agent (in degrees)")]
+    protected float blindSpotSize = 30;
 
     [Header("Intensity parameters")]
     [SerializeField]
@@ -38,9 +42,16 @@ public class ParameterManager : MonoBehaviour
     private float maxSpeed = 1.0f;
 
 
+    #region Methods - Getter
+
     public float GetFieldOfViewSize()
     {
         return fieldOfViewSize;
+    }
+
+    public float GetBlindSpotSize()
+    {
+        return blindSpotSize;
     }
 
     public float GetSeparationIntensity()
@@ -82,4 +93,56 @@ public class ParameterManager : MonoBehaviour
     {
         return maxSpeed;
     }
+
+    #endregion
+
+
+    #region Methods : Setter
+    public void SetFieldOfViewSize(float val)
+    {
+        this.fieldOfViewSize = val;
+    }
+
+    public void SetBlindSpotSize(float val)
+    {
+        this.blindSpotSize = val;
+    }
+
+    public void SetSeparationIntensity(float val)
+    {
+        this.separationIntensity = val;
+    }
+
+    public void SetAlignmentIntensity(float val)
+    {
+        this.alignmentIntensity = val;
+    }
+
+    public void SetCohesionIntensity(float val)
+    {
+        this.cohesionIntensity = val;
+    }
+
+
+    public void SetMoveForwardIntensity(float val)
+    {
+        this.moveForwardIntensity = val;
+    }
+
+    public void SetRandomMovementIntensity(float val)
+    {
+        this.randomMovementIntensity = val;
+    }
+
+    public void SetFrictionIntensity(float val)
+    {
+        this.frictionIntensity = val;
+    }
+
+    public void SetMaxSpeed(float val)
+    {
+        this.maxSpeed = val;
+    }
+
+    #endregion
 }
