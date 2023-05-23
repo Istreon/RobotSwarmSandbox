@@ -35,7 +35,12 @@ public class ExportClipFeatures : MonoBehaviour
             "FractureFrame;" +
             "FractureScore;" +
             "BestScore;" +
-            "SeparationSpeed;"+
+            "SpeedScoreAtFracture;" +
+            "BestSpeedScore;" +
+            "SpeedScoreAtFracture2;" +
+            "BestSpeedScore2;" +
+            "SpeedScoreAtFracture3;" +
+            "BestSpeedScore3;" +
             "ExpansionScore;" +
             "MeanTowardsCenterOfMass;" +
             //"MedianTowardsCenterOfMass;" +
@@ -75,13 +80,23 @@ public class ExportClipFeatures : MonoBehaviour
             int fractureFrame = GetFractureFrame(c);
             float score = -1;
             float best = -1;
-            float speedScore = -1;
-        
-        if (fractureFrame !=-1)
+            float speedScoreAtFracture = -1;
+            float bestSpeedScore = -1;
+            float speedScoreAtFracture2 = -1;
+            float bestSpeedScore2 = -1;            
+            float speedScoreAtFracture3 = -1;
+            float bestSpeedScore3 = -1;
+
+            if (fractureFrame !=-1)
             {              
                 best = BestFractureVisibilityScore(c, fractureFrame);
                 score = FractureVisibilityScore(c, fractureFrame);
-                speedScore = SeparationSpeed(c);
+                speedScoreAtFracture = SeparationSpeed(c,fractureFrame);
+                bestSpeedScore = BestSeparationSpeed(c);
+                speedScoreAtFracture2 = SeparationSpeed2(c, fractureFrame, 10);
+                bestSpeedScore2 = BestSeparationSpeed2(c, 10);
+                speedScoreAtFracture3 = SeparationSpeed3(c, fractureFrame, 10);
+                bestSpeedScore3 = BestSeparationSpeed3(c, 10);
             }
 
             string s = filePaths[currentClip];
@@ -96,8 +111,13 @@ public class ExportClipFeatures : MonoBehaviour
                 + c.getClipFrames().Count + ";" 
                 + fractureFrame + ";" 
                 + score + ";"  
-                + best +  ";" 
-                + speedScore + ";"
+                + best +  ";"
+                + speedScoreAtFracture + ";"
+                + bestSpeedScore + ";"
+                + speedScoreAtFracture2 + ";"
+                + bestSpeedScore2 + ";"
+                + speedScoreAtFracture3 + ";"
+                + bestSpeedScore3 + ";"
                 + ExpansionScore(c) + ";" 
                 + MeanTowardsCenterOfMass(c) + ";" 
                 //+ MedianTowardsCenterOfMass(c) + ";" 
@@ -173,46 +193,73 @@ public class ExportClipFeatures : MonoBehaviour
     //retourner cette vitesse
     //Faire ça sur tous les groupes?
 
-
-
-    private float SeparationSpeed(LogClip c)
+    private float BestSeparationSpeed(LogClip c)
     {
         int fracFrame = GetFractureFrame(c);
+        if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
 
-        List<LogAgentData> agents = c.getClipFrames()[fracFrame].getAgentData();
+        float maxSepSpeed = float.MinValue;
 
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[fracFrame]);
-
-        List<LogAgentData> temp = new List<LogAgentData>(agents);
-
-        foreach(LogAgentData a in clusters[1])
+        for (int i = fracFrame; i < c.getClipFrames().Count; i++)
         {
-            temp.Remove(a);
-        }
-
-        LogAgentData a1=null;
-        LogAgentData a2=null;
-        float minDist = float.MaxValue;
-
-        foreach (LogAgentData a in clusters[1])
-        {
-            foreach (LogAgentData b in temp)
+            float res = SeparationSpeed(c, i);
+            if (res > maxSepSpeed)
             {
-                float dist = Vector3.Distance(a.getPosition(), b.getPosition());
-                if(dist<minDist)
-                {
-                    minDist = dist;
-                    a1 = a;
-                    a2 = b;
-                }
+                maxSepSpeed = res;
             }
         }
 
-        if(a1 == null || a2 == null) return -1;
-        int id1 = agents.IndexOf(a1);
-        int id2 = agents.IndexOf(a2);
+        return maxSepSpeed;
 
-        return SeparationSpeed(c, fracFrame, id1, id2);
+    }
+
+    private float SeparationSpeed(LogClip c, int frame)
+    {
+
+        List<LogAgentData> agents = c.getClipFrames()[frame].getAgentData();
+
+        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+
+        float maxSepSpeed = float.MinValue;
+
+        foreach(List<LogAgentData> cluster in clusters)
+        {
+            List<LogAgentData> temp = new List<LogAgentData>(agents);
+
+            foreach (LogAgentData a in cluster)
+            {
+                temp.Remove(a);
+            }
+
+            LogAgentData a1 = null;
+            LogAgentData a2 = null;
+            float minDist = float.MaxValue;
+
+            foreach (LogAgentData a in cluster)
+            {
+                foreach (LogAgentData b in temp)
+                {
+                    float dist = Vector3.Distance(a.getPosition(), b.getPosition());
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        a1 = a;
+                        a2 = b;
+                    }
+                }
+            }
+
+            if (a1 == null || a2 == null) return -1;
+            int id1 = agents.IndexOf(a1);
+            int id2 = agents.IndexOf(a2);
+
+            float sepSpeed = SeparationSpeed(c, frame, id1, id2);
+            if(sepSpeed>maxSepSpeed)
+            {
+                maxSepSpeed = sepSpeed;
+            }
+        }
+        return maxSepSpeed;
 
     }
 
@@ -237,6 +284,185 @@ public class ExportClipFeatures : MonoBehaviour
 
         return res;
 
+    }
+
+    private float DistanceClusterCMFromRemainingSwarmCM(List<LogAgentData> cluster, List<LogAgentData> agents)
+    {
+        //Remove cluster agents from the swarm agents list
+        List<LogAgentData> temp = new List<LogAgentData>(agents);
+
+        foreach (LogAgentData a in cluster)
+        {
+            temp.Remove(a);
+        }
+
+        Vector3 clusterCM = CenterOfMass(cluster);
+        Vector3 remSwarmCM = CenterOfMass(temp);
+
+        float dist = Vector3.Distance(clusterCM, remSwarmCM);
+
+        return dist;
+    }
+
+
+    private List<LogAgentData> GetPreviousAgentsState(List<LogAgentData> cluster, List<LogAgentData> agents, List<LogAgentData> pastAgents)
+    {
+        List<LogAgentData> res = new List<LogAgentData>();
+
+        foreach(LogAgentData l in cluster)
+        {
+            int pos = agents.IndexOf(l);
+            res.Add(pastAgents[pos]);
+        }
+
+        return res;
+    }
+
+
+    private float SeparationSpeed2(LogClip c, int frame, int k)
+    {
+        if (frame < k) throw new System.Exception("Can't calculate on the k previous frame, because there is less past frame.");
+
+        List<LogAgentData> agents = c.getClipFrames()[frame].getAgentData();
+
+        List<LogAgentData> pastAgents = c.getClipFrames()[frame-k].getAgentData();
+
+        //Identifying clusters
+        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+
+        float maxSepSpeed = float.MinValue;
+
+        //For each cluster
+        foreach(List<LogAgentData> cluster in clusters)
+        {
+            //Get the current distance between the cluster and the remaining of the swarm
+            float currentDist = DistanceClusterCMFromRemainingSwarmCM(cluster, agents);
+
+            List<LogAgentData> pastCluster = GetPreviousAgentsState(cluster, agents, pastAgents);
+
+            float pastDist = DistanceClusterCMFromRemainingSwarmCM(pastCluster, pastAgents);
+
+            float sepSpeed = ((currentDist - pastDist) / k ) * c.getFps();
+
+            if(sepSpeed > maxSepSpeed)
+            {
+                maxSepSpeed = sepSpeed;
+            }
+        }
+
+        return maxSepSpeed;
+
+    }
+
+
+    private float BestSeparationSpeed2(LogClip c, int k)
+    {
+        int fracFrame = GetFractureFrame(c);
+        if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
+
+        float maxSepSpeed = float.MinValue;
+
+        for(int i = fracFrame; i < c.getClipFrames().Count; i++)
+        {
+            float res = SeparationSpeed2(c, i, k);
+            if(res > maxSepSpeed)
+            {
+                maxSepSpeed = res;
+            }
+        }
+
+        return maxSepSpeed;
+    }
+
+    private float SeparationSpeed3(LogClip c, int frame, int k)
+    {
+        if (frame < k) throw new System.Exception("Can't calculate on the k previous frame, because there is less past frame.");
+
+        List<LogAgentData> agents = c.getClipFrames()[frame].getAgentData();
+
+        List<LogAgentData> pastAgents = c.getClipFrames()[frame - k].getAgentData();
+
+        //Identifying clusters
+        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+
+        if (clusters.Count < 2) return float.MinValue;
+
+        float maxSepSpeed = float.MinValue;
+        List<LogAgentData> bestCluster = null;
+        List<LogAgentData> bestPastCluster = null;
+
+        //For each cluster
+        foreach (List<LogAgentData> cluster in clusters)
+        {
+            //Get the current distance between the cluster and the remaining of the swarm
+            float currentDist = DistanceClusterCMFromRemainingSwarmCM(cluster, agents);
+
+            List<LogAgentData> pastCluster = GetPreviousAgentsState(cluster, agents, pastAgents);
+
+            float pastDist = DistanceClusterCMFromRemainingSwarmCM(pastCluster, pastAgents);
+
+            float sepSpeed = ((currentDist - pastDist) / k) * c.getFps();
+
+            if (sepSpeed > maxSepSpeed)
+            {
+                maxSepSpeed = sepSpeed;
+                bestCluster = cluster;
+                bestPastCluster = pastCluster;
+            }
+        }
+
+        float densityChangeSpeed = DensityChangeSpeed(bestCluster, bestPastCluster, k, c.getFps());
+
+        maxSepSpeed += densityChangeSpeed * 2; //fois 2 car on prend en compte le changement de densité du reste de l'essaim de façon simplifié (essaim homogène)
+
+
+        return maxSepSpeed;
+
+    }
+
+    private float DensityChangeSpeed(List<LogAgentData> cluster,  List<LogAgentData> pastCluster, int k, int fps)
+    {
+        float currentDist = MeanDistFromCM(cluster);
+        float pastDist = MeanDistFromCM(pastCluster);
+
+        float densityChangeSpeed = ((pastDist - currentDist) /(float) k) * (float)fps;
+
+        return densityChangeSpeed;
+    }
+
+    private float MeanDistFromCM(List<LogAgentData> cluster)
+    {
+        Vector3 cm = CenterOfMass(cluster);
+
+        float meanDist = 0.0f;
+
+        foreach(LogAgentData a in cluster)
+        {
+            meanDist += Vector3.Distance(cm, a.getPosition());
+        }
+
+        meanDist /= cluster.Count;
+
+        return meanDist;
+    }
+
+    private float BestSeparationSpeed3(LogClip c, int k)
+    {
+        int fracFrame = GetFractureFrame(c);
+        if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
+
+        float maxSepSpeed = float.MinValue;
+
+        for (int i = fracFrame; i < c.getClipFrames().Count; i++)
+        {
+            float res = SeparationSpeed3(c, i, k);
+            if (res > maxSepSpeed)
+            {
+                maxSepSpeed = res;
+            }
+        }
+
+        return maxSepSpeed;
     }
 
 
