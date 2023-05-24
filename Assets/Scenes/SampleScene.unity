@@ -2540,7 +2540,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 290d1b3d09fdad749898033c8428372b, type: 2}
   displayVisual: 0
-  diplayConvexHul: 1
+  diplayConvexHul: 0
   intensity: 1
 --- !u!1 &1666228533
 GameObject:

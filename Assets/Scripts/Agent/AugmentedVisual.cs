@@ -86,95 +86,104 @@ public class AugmentedVisual : MonoBehaviour
 
     private void ConvexHul()
     {
-        List<Vector3> positions = new List<Vector3>();
-        foreach(GameObject g in agents)
-        {
-            positions.Add(g.transform.position);
-        }
 
-        //Calcul du point pivot
-        float ordinate = float.MaxValue;
-        float abcissa = float.MaxValue;
-        Vector3 pivot = Vector3.zero;
-        foreach(Vector3 p in positions)
+        List<List<GameObject>> clusters = SwarmAnalyserTools.GetClusters(agents);
+
+        //Debug.Log(clusters.Count);
+
+        foreach (List<GameObject> c in clusters)
         {
-            if(p.z < ordinate || (p.z == ordinate && p.x < abcissa))
+            if (c.Count < 3) continue;
+            List<Vector3> positions = new List<Vector3>();
+
+            foreach (GameObject g in c)
             {
-                pivot = p;
-                ordinate = pivot.z;
-                abcissa = pivot.x;
-            } 
-        }
-        positions.Remove(pivot);
+                positions.Add(g.transform.position);
+            }
 
-        //Calcul des angles pour tri
-        List<float> angles = new List<float>();
-        Vector3 abissaAxe = new Vector3(1, 0, 0);
-        foreach (Vector3 p in positions)
-        {
-            Vector3 temp = p - pivot;
-            angles.Add(Vector3.Angle(temp, abissaAxe));
-        }
-
-        //Tri des points
-        for(int i=1;i<positions.Count;i++)
-        {
-            for(int j=0;j< positions.Count-i;j++)
+            //Calcul du point pivot
+            float ordinate = float.MaxValue;
+            float abcissa = float.MaxValue;
+            Vector3 pivot = Vector3.zero;
+            foreach (Vector3 p in positions)
             {
-                if(angles[j]>angles[j+1])
+                if (p.z < ordinate || (p.z == ordinate && p.x < abcissa))
                 {
-                    float temp = angles[j + 1];
-                    angles[j + 1] = angles[j];
-                    angles[j] = temp;
-
-                    Vector3 tempPos = positions[j + 1];
-                    positions[j + 1] = positions[j];
-                    positions[j] = tempPos;
+                    pivot = p;
+                    ordinate = pivot.z;
+                    abcissa = pivot.x;
                 }
             }
-        }
-        angles.Clear();
-        positions.Insert(0,pivot);
+            positions.Remove(pivot);
 
-        //Itérations
-        List<Vector3> pile = new List<Vector3>();
-        pile.Add(positions[0]);
-        pile.Add(positions[1]);
-
-        for(int i = 3; i< positions.Count; i++)
-        {
-            while((pile.Count>=2) && VectorialProduct(pile[pile.Count-2], pile[pile.Count-1], positions[i])<=0)
+            //Calcul des angles pour tri
+            List<float> angles = new List<float>();
+            Vector3 abissaAxe = new Vector3(1, 0, 0);
+            foreach (Vector3 p in positions)
             {
-                pile.RemoveAt(pile.Count - 1);
+                Vector3 temp = p - pivot;
+                angles.Add(Vector3.Angle(temp, abissaAxe));
             }
-            pile.Add(positions[i]);
+
+            //Tri des points
+            for (int i = 1; i < positions.Count; i++)
+            {
+                for (int j = 0; j < positions.Count - i; j++)
+                {
+                    if (angles[j] > angles[j + 1])
+                    {
+                        float temp = angles[j + 1];
+                        angles[j + 1] = angles[j];
+                        angles[j] = temp;
+
+                        Vector3 tempPos = positions[j + 1];
+                        positions[j + 1] = positions[j];
+                        positions[j] = tempPos;
+                    }
+                }
+            }
+            angles.Clear();
+            positions.Insert(0, pivot);
+
+            //Itérations
+            List<Vector3> pile = new List<Vector3>();
+            pile.Add(positions[0]);
+            pile.Add(positions[1]);
+
+            for (int i = 3; i < positions.Count; i++)
+            {
+                while ((pile.Count >= 2) && VectorialProduct(pile[pile.Count - 2], pile[pile.Count - 1], positions[i]) <= 0 || pile[pile.Count - 1] == positions[i])
+                {
+                    pile.RemoveAt(pile.Count - 1);
+                }
+                pile.Add(positions[i]);
+            }
+
+            //Affichage
+
+            for (int i = 0; i < pile.Count; i++)
+            {
+                //For creating line renderer object
+                LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
+                lineRenderer.startColor = Color.blue;
+                lineRenderer.endColor = Color.blue;
+
+                lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
+                lineRenderer.endWidth = 0.01f;
+                lineRenderer.positionCount = 2;
+                lineRenderer.useWorldSpace = true;
+                lineRenderer.material = material;
+                //lineRenderer.material.SetFloat("_Mode", 2);
+                lineRenderer.material.color = Color.blue;
+
+                //For drawing line in the world space, provide the x,y,z values
+                int nextVal = (i + 1) % pile.Count;
+                lineRenderer.SetPosition(0, pile[i]); //x,y and z position of the starting point of the line
+                lineRenderer.SetPosition(1, pile[nextVal]); //x,y and z position of the end point of the line
+
+                visualRenderer.Add(lineRenderer);
+            }
         }
-
-        //Affichage
-
-        for(int i =0; i < pile.Count; i++)
-        {
-            //For creating line renderer object
-            LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
-            lineRenderer.startColor = Color.blue;
-            lineRenderer.endColor = Color.blue;
-
-            lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
-            lineRenderer.endWidth = 0.01f;
-            lineRenderer.positionCount = 2;
-            lineRenderer.useWorldSpace = true;
-            lineRenderer.material = material;
-            //lineRenderer.material.SetFloat("_Mode", 2);
-            lineRenderer.material.color = Color.blue;
-
-            //For drawing line in the world space, provide the x,y,z values
-            int nextVal = (i + 1) % pile.Count;
-            lineRenderer.SetPosition(0, pile[i]); //x,y and z position of the starting point of the line
-            lineRenderer.SetPosition(1, pile[nextVal]); //x,y and z position of the end point of the line
-
-            visualRenderer.Add(lineRenderer);
-        }
-
     }
 
     private float VectorialProduct(Vector3 a, Vector3 b, Vector3 c)

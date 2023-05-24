@@ -148,7 +148,8 @@ public class Agent : MonoBehaviour
                 Vector3 dir = g.transform.position - this.transform.position;
                 float angle = Vector3.Angle(this.speed, dir);
 
-                if (angle <= 180 - (blindSpotSize / 2))
+
+                if (angle <= (180 - (blindSpotSize / 2)))
                 {
                     detectedAgents.Add(g);
                 }
@@ -355,6 +356,10 @@ public class Agent : MonoBehaviour
         return fieldOfViewSize;
     }
 
+    public virtual float GetBlindSpotSize()
+    {
+        return blindSpotSize;
+    }
 
     public List<GameObject> GetNeighbors()
     {
