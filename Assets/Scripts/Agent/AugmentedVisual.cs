@@ -89,7 +89,7 @@ public class AugmentedVisual : MonoBehaviour
 
         List<List<GameObject>> clusters = SwarmAnalyserTools.GetClusters(agents);
 
-        //Debug.Log(clusters.Count);
+        Debug.Log(clusters.Count);
 
         foreach (List<GameObject> c in clusters)
         {

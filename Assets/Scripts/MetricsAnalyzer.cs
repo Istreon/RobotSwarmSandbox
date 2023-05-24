@@ -22,6 +22,9 @@ public class MetricsAnalyzer : MonoBehaviour
     [SerializeField]
     private bool allowDisplayOfSubAttractor = false;
 
+    [SerializeField]
+    private bool allowLog = false;
+
     private float time = 0.0f;
     private float totalTime = 0.0f;
 
@@ -62,11 +65,14 @@ public class MetricsAnalyzer : MonoBehaviour
         parameterManager = FindObjectOfType<ParameterManager>();
         if (parameterManager == null) Debug.LogError("AgentManager is missing in the scene", this);
 
+        if(allowLog)
+        {
+            fileName = "log_" + System.DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".csv";
 
-        fileName = "log_" + System.DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".csv";
+            //Logs
+            AddHeaderLogLine();
+        }
 
-        //Logs
-        AddHeaderLogLine();
 
 
         gradient = new Gradient();
@@ -130,9 +136,13 @@ public class MetricsAnalyzer : MonoBehaviour
 
                 subAttractorPoints.Clear();
             }
-            //Logs
-            AddLogLine();
-            WriteLogLines();
+            if(allowLog)
+            {
+                //Logs
+                AddLogLine();
+                WriteLogLines();
+            }
+
             time = 0.0f;
 
 

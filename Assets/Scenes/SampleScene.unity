@@ -2510,6 +2510,7 @@ MonoBehaviour:
   sliderDist: {fileID: 992177126}
   sliderTowardCenterOfMass: {fileID: 894099075}
   allowDisplayOfSubAttractor: 0
+  allowLog: 0
   prefab: {fileID: 3670647569092956346, guid: 741a983f6aa6a6447b6c9f519c590603, type: 3}
   thresholdDistance: 0.1
 --- !u!114 &1638191338
