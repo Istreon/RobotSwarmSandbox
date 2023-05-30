@@ -50,38 +50,44 @@ public class AugmentedVisual : MonoBehaviour
 
     private void DisplayVisual()
     {
-        Vector3 meanSwarmSpeed = Vector3.zero;
-        foreach(GameObject a in agents)
+        List<List<GameObject>> clusters = SwarmAnalyserTools.GetClusters(agents);
+
+        foreach(List<GameObject> c in clusters)
         {
-            meanSwarmSpeed += a.GetComponent<Agent>().GetSpeed();
+            Vector3 meanSwarmSpeed = Vector3.zero;
+            foreach (GameObject a in c)
+            {
+                meanSwarmSpeed += a.GetComponent<Agent>().GetSpeed();
+            }
+            meanSwarmSpeed = meanSwarmSpeed / c.Count;
+
+            foreach (GameObject a in c)
+            {
+                Vector3 individualMouvement = a.GetComponent<Agent>().GetSpeed() - meanSwarmSpeed;
+
+                //For creating line renderer object
+                LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
+                lineRenderer.startColor = Color.blue;
+                lineRenderer.endColor = Color.blue;
+
+                lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
+                lineRenderer.endWidth = 0.01f;
+                lineRenderer.positionCount = 2;
+                lineRenderer.useWorldSpace = true;
+                lineRenderer.material = material;
+                //lineRenderer.material.SetFloat("_Mode", 2);
+                lineRenderer.material.color = Color.blue;
+
+
+                Vector3 temp = a.transform.position + (individualMouvement * intensity);
+                //For drawing line in the world space, provide the x,y,z values
+                lineRenderer.SetPosition(0, a.transform.position); //x,y and z position of the starting point of the line
+                lineRenderer.SetPosition(1, temp); //x,y and z position of the end point of the line
+
+                visualRenderer.Add(lineRenderer);
+            }
         }
-        meanSwarmSpeed = meanSwarmSpeed / agents.Count;
-
-        foreach (GameObject a in agents)
-        {
-            Vector3 individualMouvement = a.GetComponent<Agent>().GetSpeed() - meanSwarmSpeed;
-
-            //For creating line renderer object
-            LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
-            lineRenderer.startColor = Color.blue;
-            lineRenderer.endColor = Color.blue;
-
-            lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
-            lineRenderer.endWidth = 0.01f;
-            lineRenderer.positionCount = 2;
-            lineRenderer.useWorldSpace = true;
-            lineRenderer.material = material;
-            //lineRenderer.material.SetFloat("_Mode", 2);
-            lineRenderer.material.color = Color.blue;
-
-
-            Vector3 temp = a.transform.position + (individualMouvement * intensity);
-            //For drawing line in the world space, provide the x,y,z values
-            lineRenderer.SetPosition(0, a.transform.position); //x,y and z position of the starting point of the line
-            lineRenderer.SetPosition(1, temp); //x,y and z position of the end point of the line
-
-            visualRenderer.Add(lineRenderer);
-        }
+        
     }
 
     private void ConvexHul()
@@ -165,8 +171,8 @@ public class AugmentedVisual : MonoBehaviour
             {
                 //For creating line renderer object
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
-                lineRenderer.startColor = Color.blue;
-                lineRenderer.endColor = Color.blue;
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.red;
 
                 lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
                 lineRenderer.endWidth = 0.01f;
@@ -174,7 +180,7 @@ public class AugmentedVisual : MonoBehaviour
                 lineRenderer.useWorldSpace = true;
                 lineRenderer.material = material;
                 //lineRenderer.material.SetFloat("_Mode", 2);
-                lineRenderer.material.color = Color.blue;
+                lineRenderer.material.color = Color.red;
 
                 //For drawing line in the world space, provide the x,y,z values
                 int nextVal = (i + 1) % pile.Count;

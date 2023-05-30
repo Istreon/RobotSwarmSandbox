@@ -6,14 +6,25 @@ public class SwarmAnalyserTools : MonoBehaviour
 {
 
     /// <summary>
-    /// Check if an agent perceive another another, based on its field of view distance and its blind spot size.
+    /// Define the different link type existing between two agents
+    /// </summary>
+    public enum LinkType
+    {
+        reciprocal,
+        unidirectional,
+        unidirectional_reverse,
+    }
+
+
+    /// <summary>
+    /// Check if an agent perceive another agent, based on its field of view distance and its blind spot size.
     /// </summary>
     /// <param name="agent">The agent perceiving.</param>
     /// <param name="potentialNeighbour"> The agent potentially perceived.</param>
     /// <param name="fieldOfViewSize">The distance of perception of the agent.</param>
     /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived.</param>
     /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
-    private static bool Perceive(GameObject agent, GameObject potentialNeighbour, float fieldOfViewSize, float blindSpotSize)
+    public static bool Perceive(GameObject agent, GameObject potentialNeighbour, float fieldOfViewSize, float blindSpotSize)
     {
         //Check whether the potential neighbour is close enough (at a distance shorter than the perception distance).
         if (Vector3.Distance(potentialNeighbour.transform.position, agent.transform.position) <= fieldOfViewSize)
@@ -52,6 +63,49 @@ public class SwarmAnalyserTools : MonoBehaviour
             if (System.Object.ReferenceEquals(g, agent)) continue;
 
             if (Perceive(agent, g, fieldOfViewSize, blindSpotSize) || Perceive(g, agent, fieldOfViewSize, blindSpotSize))
+            {
+                neighbours.Add(g);
+            }
+        }
+        return neighbours;
+    }
+
+
+    /// <summary>
+    /// Detect all neighbours of an agent based on its perception, and return them.
+    /// A neighbour here depend on the link type specified in the parameter. 
+    /// </summary>
+    /// <param name="agent"> A <see cref="LogAgentData"/> representing the agent searching its neighbours.</param>
+    /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible neighbours.</param>
+    /// <param name="fieldOfViewSize"> A <see cref="float"/> value representing the distance of perception of the agent.</param>
+    /// <param name="blindSpotSize"> A <see cref="float"/> value representing the blind angle behind the agent where neigbours are not perceived.</param>
+    /// <param name="type"> A <see cref="LinkType"/> value representing the neighbours wanted based on their link with the agent</param>
+    /// <returns> The <see cref="List{T}"/> of neighbours.</returns>
+    public static List<GameObject> GetNeighboursBasedOnTypeLink(GameObject agent, List<GameObject> agentList, float fieldOfViewSize, float blindSpotSize, LinkType type)
+    {
+        //Create a list that will store the perceived agent
+        List<GameObject> neighbours = new List<GameObject>();
+
+        //Compare current agent with all agents
+        foreach (GameObject g in agentList)
+        {
+            //Check if the current agent is compared with itself
+            if (System.Object.ReferenceEquals(g, agent)) continue;
+
+            bool rightLink = false;
+            switch(type)
+            {
+                case LinkType.reciprocal:
+                    if (Perceive(agent, g, fieldOfViewSize, blindSpotSize) && Perceive(g, agent, fieldOfViewSize, blindSpotSize)) rightLink = true;
+                    break;
+                case LinkType.unidirectional:
+                    if (Perceive(agent, g, fieldOfViewSize, blindSpotSize) && !Perceive(g, agent, fieldOfViewSize, blindSpotSize)) rightLink = true;
+                    break;
+                case LinkType.unidirectional_reverse:
+                    if (!Perceive(agent, g, fieldOfViewSize, blindSpotSize) && Perceive(g, agent, fieldOfViewSize, blindSpotSize)) rightLink = true;
+                    break;
+            }
+            if (rightLink)
             {
                 neighbours.Add(g);
             }
@@ -103,6 +157,4 @@ public class SwarmAnalyserTools : MonoBehaviour
         }
         return clusters;
     }
-
-
 }
