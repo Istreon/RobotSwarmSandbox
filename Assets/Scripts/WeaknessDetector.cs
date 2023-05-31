@@ -8,6 +8,10 @@ public class WeaknessDetector : MonoBehaviour
 
     public GameObject prefab;
 
+    public float timestep=1;
+
+    public float threshold = 0.97f;
+
     private Gradient gradient;
     GradientColorKey[] colorKey;
     GradientAlphaKey[] alphaKey;
@@ -55,11 +59,23 @@ public class WeaknessDetector : MonoBehaviour
         }
         displayCube.Clear();
 
-        List<GameObject> agents = agentManager.GetAgents();
+        List<GameObject> agentsGO = agentManager.GetAgents();
 
-        UpdateLinksList(agents);
+        List<Agent> agents = new List<Agent>();
 
-        Debug.Log(links.Count);
+        foreach (GameObject g in agentsGO)
+        {
+            agents.Add(g.GetComponent<Agent>());
+        }
+
+
+
+
+        UpdateLinksList(agentsGO);
+
+        List<Tuple<Agent, Agent, float>> criticalLinks = GetCriticalLinks(links,agents);
+
+
 
         /*
         foreach (GameObject a in agents)
@@ -70,10 +86,21 @@ public class WeaknessDetector : MonoBehaviour
             temp.transform.position = a.transform.position;
 
             displayCube.Add(temp);
-        }
-        */
+        }*/
 
-        foreach (GameObject g in agents)
+
+        
+        for (int i=0; i<criticalLinks.Count; i++)
+        {
+            GameObject temp = GameObject.Instantiate(prefab);
+            temp.transform.position = (criticalLinks[i].Item1.transform.position + criticalLinks[i].Item2.transform.position) / 2;
+
+            displayCube.Add(temp);
+        }
+        
+
+
+        foreach (GameObject g in agentsGO)
         {
             g.GetComponent<Agent>().SavePosition();
         }
@@ -84,18 +111,117 @@ public class WeaknessDetector : MonoBehaviour
 
         //DisplayLinkTension(agents[0].GetComponent<Agent>(), neighbours);
         //DisplayLinkAngle(agents[0].GetComponent<Agent>(), neighbours);
+    }
 
 
+    private List<Tuple<Agent, Agent, float>> GetCriticalLinks(List<Tuple<Agent, Agent, float>> linksList, List<Agent> agents)
+    {
+        List<Tuple<Agent, Agent, float>> criticalLinks = new List<Tuple<Agent, Agent, float>>();
+
+
+        List<List<Agent>> clusters = GetClustersFromLinks(linksList, agents);
+        int count = clusters.Count;
+
+        foreach(Tuple<Agent, Agent, float> l in links)
+        {
+            //If the score link isn't critical, stop
+            if (l.Item3 < threshold) break;
+
+            List<Tuple<Agent, Agent, float>> clone = new List<Tuple<Agent, Agent, float>>(links);
+            clone.Remove(l);
+
+            List<List<Agent>> temp = GetClustersFromLinks(clone, agents);
+
+            if (temp.Count > count) criticalLinks.Add(l);
+        }
+
+        return criticalLinks;
 
     }
 
-    private void SortLinksUsingScore ()
+
+
+    private List<List<Agent>> GetClustersFromLinks(List<Tuple<Agent, Agent, float>> linksList, List<Agent> agents)
+    {
+        //Clone the links list to modify it
+        List<Tuple<Agent, Agent, float>> clone = new List<Tuple<Agent, Agent, float>>(linksList);
+
+
+        //Create the list that will store the different clusters
+        List<List<Agent>> clusters = new List<List<Agent>>();
+
+
+        while(clone.Count > 0) 
+        { 
+            //Take the first link to start a new cluster
+            List<Agent> newCluster = new List<Agent>();
+
+            //Add the two agents of the link
+            newCluster.Add(clone[0].Item1);
+            newCluster.Add(clone[0].Item2);
+
+            //Remove the two agents from the list
+            agents.Remove(clone[0].Item1);
+            agents.Remove(clone[0].Item2);
+
+            //Remove the link from the list
+            clone.RemoveAt(0);
+
+            int i = 0;
+            while(i<newCluster.Count)
+            {
+                List<Tuple<Agent, Agent, float>> temp = new List<Tuple<Agent, Agent, float>>();
+                foreach(Tuple<Agent, Agent, float> l in clone)
+                {
+                    if(System.Object.ReferenceEquals(l.Item1, newCluster[i]))
+                    {
+                        temp.Add(l);
+                        if (!newCluster.Contains(l.Item2))
+                        {
+                            newCluster.Add(l.Item2);
+                            agents.Remove(l.Item2);
+                        }
+                    }
+
+                    if (System.Object.ReferenceEquals(l.Item2, newCluster[i]))
+                    {
+                        temp.Add(l);
+                        if (!newCluster.Contains(l.Item1))
+                        {
+                            newCluster.Add(l.Item1);
+                            agents.Remove(l.Item1);
+                        }
+                    }
+                } 
+                
+                foreach(Tuple<Agent, Agent, float> t in temp)
+                {
+                    clone.Remove(t);
+                }
+                i++;
+            }
+            clusters.Add(newCluster);
+        }
+
+        //Now, all the clusters are defined from the links. However, some agents are missing because they are isolated.
+        //Complete the list of cluster by adding isolated agents
+        foreach(Agent a in agents)
+        {
+            List<Agent> temp = new List<Agent>();
+            temp.Add(a);
+            clusters.Add(temp);
+        }
+
+        return clusters;
+    }
+
+    private void SortLinksUsingScore()
     {
         for (int i = 1; i < links.Count; i++)
         {
             for (int j = 0; j < links.Count - i; j++)
             {
-                if(links[j].Item3 < links[j+1].Item3)
+                if (links[j].Item3 < links[j + 1].Item3)
                 {
                     Tuple<Agent, Agent, float> temp = links[j];
                     links[j] = links[j + 1];
@@ -104,7 +230,6 @@ public class WeaknessDetector : MonoBehaviour
             }
         }
     }
-
 
     private void UpdateLinksList(List<GameObject> agents)
     {
@@ -163,7 +288,9 @@ public class WeaknessDetector : MonoBehaviour
 
     private float ComputeLinkTensionScore(Agent agent, Agent neighbour)
     {
-        return ComputeLinkTension(agent, neighbour) * (ComputeLinkTensionEvolution(agent, neighbour) + 1.0f);
+        float score = ComputeLinkTension(agent, neighbour) + (ComputeLinkTensionEvolution(agent, neighbour) * timestep);
+
+        return score;
     }
 
 
@@ -184,7 +311,7 @@ public class WeaknessDetector : MonoBehaviour
 
         float ratio = change / agent.GetFieldOfViewSize();
 
-        ratio *= Time.fixedDeltaTime;
+        ratio /= Time.fixedDeltaTime;
 
         return ratio;
     }

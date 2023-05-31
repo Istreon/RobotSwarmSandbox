@@ -2557,6 +2557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 3670647569092956346, guid: 741a983f6aa6a6447b6c9f519c590603, type: 3}
+  timestep: 1
 --- !u!1 &1666228533
 GameObject:
   m_ObjectHideFlags: 0
