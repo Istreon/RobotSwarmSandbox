@@ -43,6 +43,20 @@ public class SwarmAnalyserTools : MonoBehaviour
 
 
     /// <summary>
+    /// Check if at least one of the two agent perceive the other one.
+    /// </summary>
+    /// <param name="agent1">The first agent tested.</param>
+    /// <param name="agent2"> The second agent tested.</param>
+    /// <param name="fieldOfViewSize">The distance of perception of both agent. If different, use <see cref="Perceive(GameObject, GameObject, float, float)"/> instead </param>
+    /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived. If different, use <see cref="Perceive(GameObject, GameObject, float, float)"/> instead</param>
+    /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
+    public static bool Linked(GameObject agent1, GameObject agent2, float fieldOfViewSize, float blindSpotSize)
+    {
+        return (Perceive(agent1, agent2, fieldOfViewSize, blindSpotSize) || Perceive(agent2, agent1, fieldOfViewSize, blindSpotSize));
+    }
+
+
+    /// <summary>
     /// Detect all neighbours of an agent based on its perception, and return them.
     /// A neighbour here mean that the agent perceived, or is perceived by the neighbour.
     /// </summary>

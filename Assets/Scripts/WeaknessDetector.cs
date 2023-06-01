@@ -73,31 +73,56 @@ public class WeaknessDetector : MonoBehaviour
 
         UpdateLinksList(agentsGO);
 
-        List<Tuple<Agent, Agent, float>> criticalLinks = GetCriticalLinks(links,agents);
+        //List<Tuple<Agent, Agent, float>> criticalLinks = GetCriticalLinks(links,agents);
 
+        List<List<Agent>> communities = ModularityOptimisation.GetCommunities(agents);
+
+        for (int i = 1; i < communities.Count; i++)
+        {
+            for (int j = 0; j < communities.Count - i; j++)
+            {
+                if (communities[j].Count > communities[j+1].Count)
+                {
+                    List<Agent> temp = communities[j];
+                    communities[j] = communities[j + 1];
+                    communities[j + 1] = temp;
+                }
+            }
+        }
+
+        /*
+        int count = 0;
+        foreach(List<Agent> c in communities)
+        {
+            count += c.Count;
+        }
+        Debug.Log(communities.Count + " - (" + count + ")");*/
+
+        List<Color> colors = ColorTools.GetColorPalette(communities.Count);
+        for(int i = 0; i < communities.Count; i++)
+        {
+            foreach(Agent a in communities[i])
+            {
+                GameObject temp = GameObject.Instantiate(prefab);
+                temp.transform.position = a.transform.position;
+                temp.GetComponent<Renderer>().material.color = colors[i];
+                displayCube.Add(temp);
+            }
+        }
+
+        
 
 
         /*
-        foreach (GameObject a in agents)
-        {
-            float agentScore = ComputeAgentScore(a.GetComponent<Agent>(), agents);
-            GameObject temp = GameObject.Instantiate(prefab);
-            temp.GetComponent<Renderer>().material.color = gradient.Evaluate(agentScore);
-            temp.transform.position = a.transform.position;
-
-            displayCube.Add(temp);
-        }*/
-
-
         
         for (int i=0; i<criticalLinks.Count; i++)
         {
             GameObject temp = GameObject.Instantiate(prefab);
             temp.transform.position = (criticalLinks[i].Item1.transform.position + criticalLinks[i].Item2.transform.position) / 2;
-
+            //temp.GetComponent<Renderer>().material.color = gradient.Evaluate(agentScore);
             displayCube.Add(temp);
         }
-        
+        */
 
 
         foreach (GameObject g in agentsGO)
