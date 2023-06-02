@@ -49,7 +49,7 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
         alphaKey = new GradientAlphaKey[2];
         alphaKey[0].alpha = 1.0f;
         alphaKey[0].time = 0.5f;
-        alphaKey[1].alpha = 0.05f;
+        alphaKey[1].alpha = 0.2f;
         alphaKey[1].time = 1.0f;
 
 

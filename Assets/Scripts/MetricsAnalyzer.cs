@@ -14,9 +14,6 @@ public class MetricsAnalyzer : MonoBehaviour
     private Slider sliderOrder;
 
     [SerializeField]
-    private Slider sliderDist;
-
-    [SerializeField]
     private Slider sliderTowardCenterOfMass;
 
     [SerializeField]
@@ -113,7 +110,6 @@ public class MetricsAnalyzer : MonoBehaviour
         totalTime += Time.deltaTime;
 
         sliderEGM.value = EffectiveGroupMotion();
-        sliderDist.value = DistanceWeightDistributionQuality();
         sliderOrder.value = Order();
         sliderTowardCenterOfMass.value = TowardsCenterOfMass();
         //Example to change slider color (it only need now to adapt the color depending on the metric value)
