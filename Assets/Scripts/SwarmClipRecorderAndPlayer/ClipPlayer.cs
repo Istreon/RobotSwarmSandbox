@@ -1,11 +1,15 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ClipPlayer : MonoBehaviour
 { 
     #region Serialized fields
     [SerializeField]
     private GameObject actorPrefab;
+
+    [SerializeField]
+    private List<Displayer> displayers;
     #endregion
 
     #region Private fields - clip parameters
@@ -122,6 +126,10 @@ public class ClipPlayer : MonoBehaviour
             case DisplayType.ColoredCluster:
                 frameDisplayer.DisplayColoredClusterFrame(clip.getClipFrames()[frameNumber]);
                 break;
+        }
+        foreach(Displayer d in displayers)
+        {
+            d.DisplayVisual(clip.getClipFrames()[frameNumber]);
         }
     }
 

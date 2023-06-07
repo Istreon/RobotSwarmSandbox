@@ -7,6 +7,7 @@ public class WeaknessDetector : MonoBehaviour
     AgentManager agentManager;
 
     public GameObject prefab;
+    public GameObject prefabArrow;
 
     public float timestep=1;
 
@@ -19,6 +20,8 @@ public class WeaknessDetector : MonoBehaviour
     List<GameObject> displayCube = new List<GameObject>();
 
     List<Tuple<Agent, Agent, float>> links = new List<Tuple<Agent, Agent, float>>();
+
+    List<Color> colorPalette;
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +51,8 @@ public class WeaknessDetector : MonoBehaviour
 
 
         gradient.SetKeys(colorKey, alphaKey);
+
+        colorPalette = ColorTools.GetShuffledColorPalette(10);
     }
 
     // Update is called once per frame
@@ -90,6 +95,8 @@ public class WeaknessDetector : MonoBehaviour
             }
         }
 
+
+
         /*
         int count = 0;
         foreach(List<Agent> c in communities)
@@ -98,16 +105,39 @@ public class WeaknessDetector : MonoBehaviour
         }
         Debug.Log(communities.Count + " - (" + count + ")");*/
 
-        List<Color> colors = ColorTools.GetColorPalette(communities.Count);
+        
         for(int i = 0; i < communities.Count; i++)
         {
             foreach(Agent a in communities[i])
             {
                 GameObject temp = GameObject.Instantiate(prefab);
                 temp.transform.position = a.transform.position;
-                temp.GetComponent<Renderer>().material.color = colors[i];
+                temp.GetComponent<Renderer>().material.color = colorPalette[i%10];
                 displayCube.Add(temp);
             }
+        }
+
+
+        foreach(List<Agent> c in communities)
+        {
+            Vector3 meanSpeed = Vector3.zero;
+            Vector3 meanPos = Vector3.zero;
+            foreach(Agent a in c)
+            {
+                meanSpeed += a.GetSpeed();
+                meanPos += a.transform.position;
+            }
+            meanSpeed /= c.Count;
+            meanPos /= c.Count;
+
+            GameObject temp = GameObject.Instantiate(prefabArrow);
+            temp.transform.position = meanPos;
+
+            float agentDirection_YAxis = 180 - (Mathf.Acos(meanSpeed.normalized.x) * 180.0f / Mathf.PI);
+            if (meanSpeed.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+            temp.transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+
+            displayCube.Add(temp);
         }
 
         

@@ -141,7 +141,7 @@ public class ClipTools
 
 
     /// <summary>
-    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory.
+    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory from a single frame.
     /// An agent belong to only one cluster.
     /// </summary>
     /// <returns> A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="LogAgentData"/>.</returns>
@@ -185,7 +185,7 @@ public class ClipTools
     }
 
     /// <summary>
-    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory. Those groups are sorted by size.
+    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory from a single frame. Those groups are sorted by size.
     /// An agent belong to only one cluster.
     /// </summary>
     /// <returns> 
@@ -216,6 +216,64 @@ public class ClipTools
         }
 
         return orderedClusters;
+    }
+
+
+    /// <summary>
+    /// From a clip frame, get all unique pairs of agents based on their perception.
+    /// </summary>
+    /// <param name="frame">The analysed frame</param>
+    /// <returns>The <see cref="List{T}"/> of pairs of agents.</returns>
+    public static List<Tuple<LogAgentData, LogAgentData>> GetLinksList(LogClipFrame frame)
+    {
+        List<Tuple<LogAgentData, LogAgentData>> links = new List<Tuple<LogAgentData, LogAgentData>>();
+
+        List<LogAgentData> agents = frame.getAgentData();
+
+        foreach (LogAgentData a in agents)
+        {
+            //Get agent neigbours
+            List<LogAgentData> neigbours = GetNeighbours(a, agents, frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
+
+            foreach (LogAgentData n in neigbours)
+            {
+                //Check if the list already contains this pair
+                if (!ContainsLink(a, n, links))
+                {
+                    Tuple<LogAgentData, LogAgentData> link = new Tuple<LogAgentData, LogAgentData>(a,n);
+                    links.Add(link);
+                }
+            }
+        }
+
+        return links;
+    }
+
+
+    /// <summary>
+    /// Check if the list of links in parameter contains or not the pair formed by the two agents in parameter.
+    /// </summary>
+    /// <param name="agent">The first agent of the pair.</param>
+    /// <param name="neighbour">The second agent of the pair.</param>
+    /// <param name="links">The list of existing links</param>
+    /// <returns>True if the list already contains this pair, False otherwise.</returns>
+    private static bool ContainsLink(LogAgentData agent, LogAgentData neighbour, List<Tuple<LogAgentData, LogAgentData>> links)
+    {
+        bool exists = false;
+        foreach (Tuple<LogAgentData, LogAgentData> t in links)
+        {
+            if (System.Object.ReferenceEquals(t.Item1, agent) && System.Object.ReferenceEquals(t.Item2, neighbour)) exists = true;
+            if (System.Object.ReferenceEquals(t.Item1, neighbour) && System.Object.ReferenceEquals(t.Item2, agent)) exists = true;
+        }
+
+        return exists;
+    }
+
+
+    //TO DO
+    public static bool[,] GetAdjacentMatrix(LogClipFrame frame)
+    {
+        return null;
     }
 
     #endregion

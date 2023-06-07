@@ -49,7 +49,7 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
         alphaKey = new GradientAlphaKey[2];
         alphaKey[0].alpha = 1.0f;
         alphaKey[0].time = 0.5f;
-        alphaKey[1].alpha = 0.2f;
+        alphaKey[1].alpha = 0.05f;
         alphaKey[1].time = 1.0f;
 
 
@@ -136,6 +136,12 @@ public class LinkWithNeighboursAnalyser : MonoBehaviour
                 //For drawing line in the world space, provide the x,y,z values
                 lineRenderer.SetPosition(0, currentAgent.transform.position); //x,y and z position of the starting point of the line
                 lineRenderer.SetPosition(1, g.transform.position); //x,y and z position of the end point of the line
+
+
+                lineRenderer.receiveShadows = false;
+                lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                
+
 
                 linksRenderer.Add(lineRenderer);
 
