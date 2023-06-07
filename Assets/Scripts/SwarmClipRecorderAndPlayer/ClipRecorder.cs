@@ -39,7 +39,7 @@ public class ClipRecorder : MonoBehaviour
         {
             if (timer >= (1.0f / fps))
             {
-                frames.Add(RecordFrame());
+                frames.Add(agentManager.RecordFrame());
                 Debug.Log("--frame");
                 timer = timer - (1.0f / fps);
             }
@@ -72,24 +72,6 @@ public class ClipRecorder : MonoBehaviour
     public void ChangeRecordState()
     {
         recording = !recording;
-    }
-
-    /// <summary> Record the current frame (state) of the swarm</summary>
-    /// <returns> A <see cref="LogClipFrame"/> instance representing the recorded frame</returns>
-    private LogClipFrame RecordFrame()
-    {
-        List<LogAgentData> agentData = new List<LogAgentData>();
-        List<GameObject> agents = agentManager.GetAgents();
-
-        foreach (GameObject o in agents)
-        {
-            Agent a = o.GetComponent<Agent>();
-            LogAgentData log = new LogAgentData(a.transform.position, a.GetSpeed());
-            agentData.Add(log);
-        }
-        LogParameters parameters = new LogParameters(parameterManager.GetFieldOfViewSize(), parameterManager.GetBlindSpotSize(), parameterManager.GetMoveForwardIntensity(), parameterManager.GetRandomMovementIntensity(), parameterManager.GetFrictionIntensity(), parameterManager.GetMaxSpeed(), parameterManager.GetCohesionIntensity(), parameterManager.GetAlignmentIntensity(), parameterManager.GetSeparationIntensity(), parameterManager.GetDistanceBetweenAgents());
-        LogClipFrame frame = new LogClipFrame(agentData, parameters);
-        return frame;
     }
     #endregion
 }

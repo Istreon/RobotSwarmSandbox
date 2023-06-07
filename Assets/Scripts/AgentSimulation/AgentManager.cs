@@ -8,6 +8,12 @@ public class AgentManager : MonoBehaviour
     private GameObject prefab;
 
     [SerializeField]
+    private GameObject agentVisualPrefab;
+
+    [SerializeField]
+    private List<Displayer> displayers;
+
+    [SerializeField]
     private GameObject mapPrefab;
 
     [SerializeField]
@@ -26,6 +32,11 @@ public class AgentManager : MonoBehaviour
 
 
     private List<GameObject> agents;
+
+    private ParameterManager parameterManager;
+
+    private FrameDisplayer frameDisplayer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,12 +57,42 @@ public class AgentManager : MonoBehaviour
             newAgent.transform.rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 359.0f), 0.0f);
             agents.Add(newAgent);
         }
+
+        parameterManager = FindObjectOfType<ParameterManager>();
+        if (parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
+
+        frameDisplayer = new FrameDisplayer(agentVisualPrefab);
     }
 
     // Update is called once per frame
     void Update()
     {
+        LogClipFrame frame = RecordFrame();
+        frameDisplayer.DisplayColoredClusterFrame(frame);
+
+        foreach(Displayer d in displayers)
+        {
+            d.DisplayVisual(frame);
+        }
         
+    }
+
+    /// <summary> Record the current frame (state) of the swarm</summary>
+    /// <returns> A <see cref="LogClipFrame"/> instance representing the recorded frame</returns>
+    public LogClipFrame RecordFrame()
+    {
+        List<LogAgentData> agentData = new List<LogAgentData>();
+        List<GameObject> agents = GetAgents();
+
+        foreach (GameObject o in agents)
+        {
+            Agent a = o.GetComponent<Agent>();
+            LogAgentData log = new LogAgentData(a.transform.position, a.GetSpeed());
+            agentData.Add(log);
+        }
+        LogParameters parameters = new LogParameters(parameterManager.GetFieldOfViewSize(), parameterManager.GetBlindSpotSize(), parameterManager.GetMoveForwardIntensity(), parameterManager.GetRandomMovementIntensity(), parameterManager.GetFrictionIntensity(), parameterManager.GetMaxSpeed(), parameterManager.GetCohesionIntensity(), parameterManager.GetAlignmentIntensity(), parameterManager.GetSeparationIntensity(), parameterManager.GetDistanceBetweenAgents());
+        LogClipFrame frame = new LogClipFrame(agentData, parameters);
+        return frame;
     }
 
     public List<GameObject> GetAgents()

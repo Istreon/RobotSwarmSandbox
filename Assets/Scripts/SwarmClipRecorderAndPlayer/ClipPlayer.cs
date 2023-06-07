@@ -127,6 +127,8 @@ public class ClipPlayer : MonoBehaviour
                 frameDisplayer.DisplayColoredClusterFrame(clip.getClipFrames()[frameNumber]);
                 break;
         }
+
+        //TEMP : TO IMPROVE TO SELECT THE DISPLAYER TO USE USING BOOL
         foreach(Displayer d in displayers)
         {
             d.DisplayVisual(clip.getClipFrames()[frameNumber]);

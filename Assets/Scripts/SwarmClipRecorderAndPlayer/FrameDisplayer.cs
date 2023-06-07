@@ -92,7 +92,13 @@ public class FrameDisplayer
         {
             foreach (LogAgentData a in l)
             {
+                //Update actor position
                 actors[i].transform.position = a.getPosition() + spatialOrigin;
+
+                //Update actor orientation
+                float agentDirection_YAxis = 180-(Mathf.Acos(a.getSpeed().normalized.x) * 180.0f / Mathf.PI);
+                if (a.getSpeed().z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+                actors[i].transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
 
 
                 if (clusters.Count > colorPalette.Count)
@@ -126,7 +132,17 @@ public class FrameDisplayer
         //Update actors position
         for (int i = 0; i < numberOfAgents; i++)
         {
-            actors[i].transform.position = frame.getAgentData()[i].getPosition() + spatialOrigin;
+            LogAgentData a = frame.getAgentData()[i];
+
+            //Update actor position
+            actors[i].transform.position = a.getPosition() + spatialOrigin;
+
+            //Update actor orientation
+            float agentDirection_YAxis = 180 - (Mathf.Acos(a.getSpeed().normalized.x) * 180.0f / Mathf.PI);
+            if (a.getSpeed().z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+            actors[i].transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+
+            //Update actor color
             actors[i].GetComponent<Renderer>().material.color = Color.black;
         }
     }
