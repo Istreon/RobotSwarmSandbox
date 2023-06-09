@@ -81,6 +81,8 @@ public class Links : Displayer
             lineRenderer.receiveShadows = false;
             lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
+            lineRenderer.transform.parent = this.transform;
+
             linksRenderer.Add(lineRenderer);
         }
     }

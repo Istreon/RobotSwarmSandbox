@@ -1,19 +1,27 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Communities : Displayer
 {
-    public GameObject prefab;
-    List<GameObject> displayCube = new List<GameObject>();
-    List<Color> colorPalette;
+    #region Serialized fields
+    [SerializeField]
+    private GameObject prefab;
+    #endregion
 
+    #region Private fields
+    private List<GameObject> displayCube = new List<GameObject>();
+    private List<Color> colorPalette;
+    #endregion
+
+    #region Methods - MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
     {
         colorPalette = ColorTools.GetShuffledColorPalette(10);
     }
+    #endregion
 
+    #region Methods - Displayer override
     public override void DisplayVisual(LogClipFrame frame)
     {
         ClearVisual();
@@ -26,6 +34,7 @@ public class Communities : Displayer
                 GameObject temp = GameObject.Instantiate(prefab);
                 temp.transform.position = a.getPosition();
                 temp.GetComponent<Renderer>().material.color = colorPalette[i % 10];
+                temp.transform.parent = this.transform;
                 displayCube.Add(temp);
             }
         }
@@ -39,4 +48,5 @@ public class Communities : Displayer
         }
         displayCube.Clear();
     }
+    #endregion
 }

@@ -54,7 +54,7 @@ public class ClipTools
     }
     #endregion
 
-    #region Methods - Analyser
+    #region Methods - Agent perception
     /// <summary>
     /// Check if an agent perceive another another, based on its field of view distance and its blind spot size.
     /// </summary>
@@ -142,7 +142,7 @@ public class ClipTools
             //Check if the current agent is compared with itself
             if (System.Object.ReferenceEquals(g, agent)) continue;
 
-            if(Perceive(agent, g, fieldOfViewSize, blindSpotSize) || Perceive(g, agent, fieldOfViewSize, blindSpotSize))
+            if(Linked(agent, g, fieldOfViewSize, blindSpotSize))
             {
                 neighbours.Add(g);
             }
@@ -150,7 +150,9 @@ public class ClipTools
         return neighbours;
     }
 
+    #endregion
 
+    #region Methods - Agents links
     /// <summary>
     /// From a clip frame, get all unique pairs of agents based on their perception.
     /// </summary>
@@ -162,123 +164,22 @@ public class ClipTools
 
         List<LogAgentData> agents = frame.getAgentData();
 
-        foreach (LogAgentData a in agents)
-        {
-            //Get agent neigbours
-            List<LogAgentData> neigbours = GetNeighbours(a, agents, frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
+        bool[,] adjacentMatrix = GetAdjacentMatrix(frame);
 
-            foreach (LogAgentData n in neigbours)
-            {
-                //Check if the list already contains this pair
-                if (!ContainsLink(a, n, links))
-                {
-                    Tuple<LogAgentData, LogAgentData> link = new Tuple<LogAgentData, LogAgentData>(a,n);
-                    links.Add(link);
-                }
-            }
-        }
-
-        return links;
-    }
-
-
-    /// <summary>
-    /// Check if the list of links in parameter contains or not the pair formed by the two agents in parameter.
-    /// </summary>
-    /// <param name="agent">The first agent of the pair.</param>
-    /// <param name="neighbour">The second agent of the pair.</param>
-    /// <param name="links">The list of existing links</param>
-    /// <returns>True if the list already contains this pair, False otherwise.</returns>
-    private static bool ContainsLink(LogAgentData agent, LogAgentData neighbour, List<Tuple<LogAgentData, LogAgentData>> links)
-    {
-        bool exists = false;
-        foreach (Tuple<LogAgentData, LogAgentData> t in links)
-        {
-            if (System.Object.ReferenceEquals(t.Item1, agent) && System.Object.ReferenceEquals(t.Item2, neighbour)) exists = true;
-            if (System.Object.ReferenceEquals(t.Item1, neighbour) && System.Object.ReferenceEquals(t.Item2, agent)) exists = true;
-        }
-
-        return exists;
-    }
-
-    /// <summary>
-    /// Compute the adjacent matrix from the agents of the frame
-    /// </summary>
-    /// <param name="frame">The analysed frame.</param>
-    /// <returns>The adjacent matrix as a 2D array.</returns>    
-    public static bool[,] GetAdjacentMatrix(LogClipFrame frame)
-    {
-        List<LogAgentData> agents = frame.getAgentData();
-
-        float fovSize = frame.GetParameters().GetFieldOfViewSize();
-        float bsSize = frame.GetParameters().GetBlindSpotSize();
-
-        bool[,] adjacentMatrix = new bool[agents.Count, agents.Count];
-
-        //For each pair of agents
         for (int i = 0; i < agents.Count; i++)
         {
-            for (int j = 0; j < agents.Count; j++)
+            for (int j = i; j < agents.Count; j++)
             {
-                //If both agents are linked
-                if (i != j && Linked(agents[i], agents[j], fovSize, bsSize))
+                if (adjacentMatrix[i, j])
                 {
-                    adjacentMatrix[i, j] = true;
+                    Tuple<LogAgentData, LogAgentData> link = new Tuple<LogAgentData, LogAgentData>(agents[i], agents[j]);
+                    links.Add(link);
                 }
-                else
-                {
-                    adjacentMatrix[i, j] = false;
-                }
+
             }
         }
-        return adjacentMatrix;
+        return links;
     }
-
-
-    /// <summary>
-    /// Calculate the total number of edges of a graph from the adjacent matrix.
-    /// </summary>
-    /// <param name="adjacentMatrix">The adjacent matrix of a graph.</param>
-    /// <returns> The number of edges.</returns>
-    private static int GetNumberOfEdge(bool[,] adjacentMatrix)
-    {
-        int count = 0;
-
-        int width = adjacentMatrix.GetLength(0);
-        int height = adjacentMatrix.GetLength(1);
-
-        for (int i = 0; i < width - 1; i++)
-        {
-            for (int j = i + 1; j < height; j++)
-            {
-                if (adjacentMatrix[i, j]) count++;
-            }
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    /// Calculate the number of edges of one node from the adjacent matrix.
-    /// </summary>
-    /// <param name="node">The id of the node, referring to its line in the adjacent matrix.</param>
-    /// <param name="adjacentMatrix">The adejacent matrix of a graph.</param>
-    /// <returns>The number of edges of the node.</returns>
-    private static int GetNumberOfEdgeFromNode(int node, bool[,] adjacentMatrix)
-    {
-        int count = 0;
-
-        int height = adjacentMatrix.GetLength(1);
-
-        for (int i = 0; i < height; i++)
-        {
-            if (adjacentMatrix[node, i]) count++;
-        }
-
-        return count;
-
-    }
-
     #endregion
 
     #region Methods - Clusters (connected components)
@@ -578,6 +479,261 @@ public class ClipTools
             }
         }
         return score;
+    }
+
+    #endregion
+
+    #region Methods - Leaves, branches and trunk
+
+    /// <summary>
+    /// From a graph of agents, separate agents into 3 categories.
+    /// Leaves : agents that share no link with other agents
+    /// Branches :  agents from branches of the graph (only one way to reach them, and the graph end at the end of the branch)
+    /// Trunk : the lasting agents
+    /// </summary>
+    /// <param name="frame"> The frame analysed.</param>
+    /// <returns>A <see cref="Tuple"/> containing leaves, branches and trunk agents.</returns>
+    public static Tuple<List<LogAgentData>,List<LogAgentData>,List<LogAgentData>> SeparateLeavesBranchesAndTrunk(LogClipFrame frame)
+    {
+        return SeparateLeavesBranchesAndTrunk(frame.getAgentData(),GetAdjacentMatrix(frame));
+    }
+
+
+    /// <summary>
+    /// From a graph of agents, separate agents into 3 categories.
+    /// Leaves : agents that share no link with other agents
+    /// Branches :  agents from branches of the graph (only one way to reach them, and the graph end at the end of the branch)
+    /// Trunk : the lasting agents
+    /// </summary>
+    /// <param name="agents"> The agents of the graph.</param>
+    /// <param name="adjacentMatrix">The corresponding adjacent matrix of the graph.</param>
+    /// <returns>A <see cref="Tuple"/> containing leaves, branches and trunk agents.</returns>
+    public static Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> SeparateLeavesBranchesAndTrunk(List<LogAgentData> agents, bool[,] adjacentMatrix)
+    {
+        List<LogAgentData> leaves = new List<LogAgentData>();
+        List<LogAgentData> branches = new List<LogAgentData>();
+        List<LogAgentData> trunk = new List<LogAgentData>(agents);
+
+        Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> res = new Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>>(leaves, branches, trunk);
+
+        bool finished = false;
+        while(!finished)
+        {
+            finished = true;
+            int[] degreeMatrix = GetDegreeMatrix(adjacentMatrix);
+            for (int i=0; i<degreeMatrix.GetLength(0); i++)
+            {
+                if(degreeMatrix[i] == 0)
+                {
+                    leaves.Add(trunk[i]);
+                    trunk.RemoveAt(i);
+                    adjacentMatrix = RemoveIndexInSquareMatrix(adjacentMatrix, i);
+                    finished = false;
+                    break;
+                }
+            }
+        }
+
+
+        finished = false;
+        while (!finished)
+        {
+            finished = true;
+            int[] degreeMatrix = GetDegreeMatrix(adjacentMatrix);
+            for (int i = 0; i < degreeMatrix.GetLength(0); i++)
+            {
+                if (degreeMatrix[i] <= 1)
+                {
+                    branches.Add(trunk[i]);
+                    trunk.RemoveAt(i);
+                    finished = false;
+                    adjacentMatrix = RemoveIndexInSquareMatrix(adjacentMatrix, i);
+                    break;
+                }
+            }
+        }
+
+        int count = leaves.Count + branches.Count + trunk.Count;
+        if (count != agents.Count) Debug.LogError("Cette méthode duplique ou oublie des agents!") ;
+
+        return res;
+        
+    }
+
+
+
+    #endregion
+
+    #region Methods - Graph matrix
+
+    /// <summary>
+    /// Compute the adjacent matrix from the agents of the frame (undirected graph)
+    /// </summary>
+    /// <param name="frame">The analysed frame.</param>
+    /// <returns>The adjacent matrix as a 2D array.</returns>    
+    public static bool[,] GetAdjacentMatrix(LogClipFrame frame)
+    {
+        List<LogAgentData> agents = frame.getAgentData();
+
+        float fovSize = frame.GetParameters().GetFieldOfViewSize();
+        float bsSize = frame.GetParameters().GetBlindSpotSize();
+
+        bool[,] adjacentMatrix = new bool[agents.Count, agents.Count];
+
+        //For each pair of agents
+        for (int i = 0; i < agents.Count; i++)
+        {
+            for (int j = 0; j < agents.Count; j++)
+            {
+                //If both agents are linked
+                if (i != j && Linked(agents[i], agents[j], fovSize, bsSize))
+                {
+                    adjacentMatrix[i, j] = true;
+                }
+                else
+                {
+                    adjacentMatrix[i, j] = false;
+                }
+            }
+        }
+        return adjacentMatrix;
+    }
+
+    /// <summary>
+    /// Compute the degree matrix from the corresponding adjacent matrix.
+    /// </summary>
+    /// <param name="adjacentMatrix">The adjacent matrix of the graph.</param>
+    /// <returns>The corresponding degree matrix.</returns>
+    public static int[] GetDegreeMatrix(bool[,] adjacentMatrix)
+    {
+        int[] degreeMatrix = new int[adjacentMatrix.GetLength(0)];
+
+        for (int i = 0; i < adjacentMatrix.GetLength(0); i++)
+        {
+            int count = 0; //Count the number of links of the current node
+            for (int j = 0; j < adjacentMatrix.GetLength(1); j++)
+            {
+                if (adjacentMatrix[i, j])
+                {
+                    count++;
+                }
+            }
+            degreeMatrix[i] = count;
+        }
+        return degreeMatrix;
+    }
+
+    /// <summary>
+    /// Compute the Laplacian matrix from the adjacent matrix (undirected graph)
+    /// </summary>
+    /// <param name="adjacentMatrix">The adjacent matrix of the analysed graph.</param>
+    /// <returns>The Laplacian matrix as a 2D array.</returns>    
+    public static int[,] GetLaplacianMatrix(bool[,] adjacentMatrix)
+    {
+
+        int height = adjacentMatrix.GetLength(0);
+        int width = adjacentMatrix.GetLength(1);
+        int[,] laplacianMatrix = new int[height, width];
+
+        for (int i = 0; i < height; i++)
+        {
+            int count = 0; //Count the number of links of the current node
+            for (int j = 0; j < width; j++)
+            {
+                if (adjacentMatrix[i, j])
+                {
+                    count++;
+                    laplacianMatrix[i, j] = -1;
+                }
+            }
+            laplacianMatrix[i, i] = count;
+        }
+        return laplacianMatrix;
+    }
+
+
+    /// <summary>
+    /// Calculate the total number of edges of a graph from the adjacent matrix.
+    /// </summary>
+    /// <param name="adjacentMatrix">The adjacent matrix of a graph.</param>
+    /// <returns> The number of edges.</returns>
+    private static int GetNumberOfEdge(bool[,] adjacentMatrix)
+    {
+        int count = 0;
+
+        int width = adjacentMatrix.GetLength(0);
+        int height = adjacentMatrix.GetLength(1);
+
+        for (int i = 0; i < width - 1; i++)
+        {
+            for (int j = i + 1; j < height; j++)
+            {
+                if (adjacentMatrix[i, j]) count++;
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Calculate the number of edges of one node from the adjacent matrix.
+    /// </summary>
+    /// <param name="node">The id of the node, referring to its line in the adjacent matrix.</param>
+    /// <param name="adjacentMatrix">The adejacent matrix of a graph.</param>
+    /// <returns>The number of edges of the node.</returns>
+    private static int GetNumberOfEdgeFromNode(int node, bool[,] adjacentMatrix)
+    {
+        int count = 0;
+
+        int height = adjacentMatrix.GetLength(1);
+
+        for (int i = 0; i < height; i++)
+        {
+            if (adjacentMatrix[node, i]) count++;
+        }
+
+        return count;
+
+    }
+
+    /// <summary>
+    /// Remove a specified entry from a square matrix. Consequently remove a line and a column.
+    /// </summary>
+    /// <param name="squareMatrix">The square matrix whose size must be reduced.</param>
+    /// <param name="index">The index of the line/column that will be removed.</param>
+    /// <returns>The reduced square matrix (of 1).</returns>
+    private static bool[,] RemoveIndexInSquareMatrix(bool[,] squareMatrix, int index)
+    {
+        //Check possible issues
+        if (squareMatrix.GetLength(0) != squareMatrix.GetLength(1)) throw new Exception("The specified matrix is not square");
+        if (index >= squareMatrix.GetLength(0) || index < 0) throw new ArgumentOutOfRangeException("The specified index is out of the bound of the matrix.");
+        if (squareMatrix.GetLength(0) == 1) return new bool[0, 0];
+
+        //Compute the size of the resulting square matrix
+        int newSize = squareMatrix.GetLength(0) - 1;
+
+        //Create the new square matrix
+        bool[,] newMatrix = new bool[newSize, newSize];
+
+        //Fill the new square matrix, using the original matrix
+        int i2 = 0;
+        for (int i = 0; i < newSize; i++)
+        {
+            //Index line must be avoided
+            if (i2 == index) i2++;
+            int j2 = 0;
+            for (int j = 0; j < newSize; j++)
+            {
+                //Index column must be avoided
+                if (j2 == index) j2++;
+                newMatrix[i, j] = squareMatrix[i2, j2];
+                j2++;
+
+            }
+            i2++;
+        }
+
+        return newMatrix;
     }
 
     #endregion
