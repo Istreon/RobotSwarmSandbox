@@ -321,7 +321,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         int fractureDuration = 0;
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            List<List<LogAgentData>> clusters = ClipTools.GetClusters(f);
+            List<List<LogAgentData>> clusters = FrameTools.GetClusters(f);
             if (clusters.Count > 1)
             {
                 if (fractureDuration == 0)
@@ -383,7 +383,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
     private float SignificantDistanceBetweenClustersAtFrame(LogClip c, int frameNumber)
     {
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
 
         float dist = GetSignificantDistanceBetweenClusters(clusters);
 
@@ -495,7 +495,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
     private float MeanKNNDistanceAt(LogClip c, int frameNumber, int k)
     {
 
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
 
         float dist = MeanKNNDistance(clusters[0], k);
 
@@ -597,7 +597,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
         List<LogAgentData> agents = c.getClipFrames()[frame].getAgentData();
 
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         float maxSepSpeed = float.MinValue;
 
@@ -708,7 +708,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         List<LogAgentData> pastAgents = c.getClipFrames()[frame - k].getAgentData();
 
         //Identifying clusters
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         float maxSepSpeed = float.MinValue;
 
@@ -763,7 +763,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         List<LogAgentData> pastAgents = c.getClipFrames()[frame - k].getAgentData();
 
         //Identifying clusters
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         if (clusters.Count < 2) return float.MinValue;
 
@@ -855,7 +855,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         int i = 0;
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            if (ClipTools.GetClusters(f).Count > 1) break;
+            if (FrameTools.GetClusters(f).Count > 1) break;
 
             res += TowardsCenterOfMass(f);
             i++;
@@ -921,7 +921,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
     {
         if (frame < 1) return -1;
         if (frame >= c.getClipFrames().Count) return -1;
-        if (ClipTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
+        if (FrameTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
 
         float distCM = Vector3.Distance(CenterOfMass(c.getClipFrames()[frame].getAgentData()), CenterOfMass(c.getClipFrames()[frame - 1].getAgentData()));
 

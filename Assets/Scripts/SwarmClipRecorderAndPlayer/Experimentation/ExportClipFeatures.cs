@@ -152,7 +152,7 @@ public class ExportClipFeatures : MonoBehaviour
         int fractureDuration = 0;
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            List<List<LogAgentData>> clusters = ClipTools.GetClusters(f);
+            List<List<LogAgentData>> clusters = FrameTools.GetClusters(f);
             if (clusters.Count > 1)
             {
                 if(fractureDuration == 0)
@@ -218,7 +218,7 @@ public class ExportClipFeatures : MonoBehaviour
 
         List<LogAgentData> agents = c.getClipFrames()[frame].getAgentData();
 
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         float maxSepSpeed = float.MinValue;
 
@@ -328,7 +328,7 @@ public class ExportClipFeatures : MonoBehaviour
         List<LogAgentData> pastAgents = c.getClipFrames()[frame-k].getAgentData();
 
         //Identifying clusters
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         float maxSepSpeed = float.MinValue;
 
@@ -383,7 +383,7 @@ public class ExportClipFeatures : MonoBehaviour
         List<LogAgentData> pastAgents = c.getClipFrames()[frame - k].getAgentData();
 
         //Identifying clusters
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frame]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frame]);
 
         if (clusters.Count < 2) return float.MinValue;
 
@@ -659,7 +659,7 @@ public class ExportClipFeatures : MonoBehaviour
         int i = 0;
         foreach(LogClipFrame f in c.getClipFrames())
         {
-            if (ClipTools.GetClusters(f).Count > 1) break;
+            if (FrameTools.GetClusters(f).Count > 1) break;
 
             res += TowardsCenterOfMass(f);
             i++;
@@ -675,7 +675,7 @@ public class ExportClipFeatures : MonoBehaviour
         int i = 0;
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            if (ClipTools.GetClusters(f).Count > 1) break;
+            if (FrameTools.GetClusters(f).Count > 1) break;
 
             res += TowardsCenterOfMassStandardDeviation(f);
             i++;
@@ -691,7 +691,7 @@ public class ExportClipFeatures : MonoBehaviour
         List<float> l = new List<float>();
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            if (ClipTools.GetClusters(f).Count > 1) break;
+            if (FrameTools.GetClusters(f).Count > 1) break;
 
             float val= TowardsCenterOfMass(f);
             l.Add(val);
@@ -783,7 +783,7 @@ public class ExportClipFeatures : MonoBehaviour
         int max = 0;
         foreach(LogClipFrame f in c.getClipFrames())
         {
-            int val = ClipTools.GetClusters(f).Count;
+            int val = FrameTools.GetClusters(f).Count;
             if (max < val) max = val;
         }
 
@@ -797,7 +797,7 @@ public class ExportClipFeatures : MonoBehaviour
         int i = 0;
         foreach (LogClipFrame f in c.getClipFrames())
         {
-            int val = ClipTools.GetClusters(f).Count;
+            int val = FrameTools.GetClusters(f).Count;
             if (max < val)
             {
                 max = val;
@@ -806,7 +806,7 @@ public class ExportClipFeatures : MonoBehaviour
             i++;
         }
 
-        List<LogAgentData> mainCluster =ClipTools.GetOrderedClusters(c.getClipFrames()[frame])[0];
+        List<LogAgentData> mainCluster = FrameTools.GetOrderedClusters(c.getClipFrames()[frame])[0];
 
         return mainCluster.Count;
     }
@@ -1008,7 +1008,7 @@ public class ExportClipFeatures : MonoBehaviour
     {
         if (frame < 1) return -1;
         if (frame >= c.getClipFrames().Count) return -1;
-        if (ClipTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
+        if (FrameTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
 
         float distCM = Vector3.Distance(CenterOfMass(c.getClipFrames()[frame].getAgentData()), CenterOfMass(c.getClipFrames()[frame-1].getAgentData()));
 
@@ -1051,7 +1051,7 @@ public class ExportClipFeatures : MonoBehaviour
     {
         if (frame < 1) return -1;
         if (frame >= c.getClipFrames().Count) return -1;
-        if (ClipTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
+        if (FrameTools.GetClusters(c.getClipFrames()[frame]).Count > 1) return -1;
 
         Vector3 dirCM = CenterOfMass(c.getClipFrames()[frame].getAgentData()) - CenterOfMass(c.getClipFrames()[frame - 1].getAgentData());
 
@@ -1133,7 +1133,7 @@ public class ExportClipFeatures : MonoBehaviour
 
     private float SignificantDistanceBetweenClustersAtFrame(LogClip c, int frameNumber)
     {
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
 
         float dist = GetSignificantDistanceBetweenClusters(clusters);
 
@@ -1256,7 +1256,7 @@ public class ExportClipFeatures : MonoBehaviour
     {
 
 
-        List<List<LogAgentData>> clusters = ClipTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
+        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(c.getClipFrames()[frameNumber]);
 
         float dist = MeanKNNDistance(clusters[0], k);
 

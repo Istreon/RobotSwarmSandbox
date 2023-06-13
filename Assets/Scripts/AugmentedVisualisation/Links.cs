@@ -50,7 +50,7 @@ public class Links : Displayer
     {
         ClearVisual();
 
-        List<Tuple<LogAgentData, LogAgentData>> links = ClipTools.GetLinksList(frame);
+        List<Tuple<LogAgentData, LogAgentData>> links = FrameTools.GetLinksList(frame);
 
         float fovSize = frame.GetParameters().GetFieldOfViewSize();
 

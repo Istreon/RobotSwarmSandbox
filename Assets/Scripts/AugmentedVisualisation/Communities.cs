@@ -25,7 +25,7 @@ public class Communities : Displayer
     public override void DisplayVisual(LogClipFrame frame)
     {
         ClearVisual();
-        List<List<LogAgentData>> communities = ClipTools.GetOrderedCommunities(frame);
+        List<List<LogAgentData>> communities = FrameTools.GetOrderedCommunities(frame);
 
         for (int i = 0; i < communities.Count; i++)
         {

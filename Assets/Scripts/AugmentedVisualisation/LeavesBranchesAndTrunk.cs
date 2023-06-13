@@ -27,7 +27,7 @@ public class LeavesBranchesAndTrunk : Displayer
     public override void DisplayVisual(LogClipFrame frame)
     {
         ClearVisual();
-        Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> tuple = ClipTools.SeparateLeavesBranchesAndTrunk(frame);
+        Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> tuple = FrameTools.SeparateLeavesBranchesAndTrunk(frame);
 
 
         foreach (LogAgentData a in tuple.Item1)
