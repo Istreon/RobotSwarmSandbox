@@ -32,8 +32,7 @@ public class ExternalEnvelope : Displayer
 
         foreach(List<Vector3> pile in convexHuls)
         {
-            for (int i = 0; i < pile.Count; i++)
-            {
+
                 //For creating line renderer object
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
                 lineRenderer.startColor = Color.red;
@@ -41,19 +40,21 @@ public class ExternalEnvelope : Displayer
 
                 lineRenderer.startWidth = 0.01f; //If you need to change the width of line depending on the distance between both agents :  0.03f*(1-distOnMaxDistance) + 0.005f;
                 lineRenderer.endWidth = 0.01f;
-                lineRenderer.positionCount = 2;
+                lineRenderer.positionCount = pile.Count+1;
                 lineRenderer.useWorldSpace = true;
                 lineRenderer.material = material;
                 //lineRenderer.material.SetFloat("_Mode", 2);
                 lineRenderer.material.color = Color.red;
 
-                //For drawing line in the world space, provide the x,y,z values
-                int nextVal = (i + 1) % pile.Count;
-                lineRenderer.SetPosition(0, pile[i]); //x,y and z position of the starting point of the line
-                lineRenderer.SetPosition(1, pile[nextVal]); //x,y and z position of the end point of the line
-
+                for (int i = 0; i < pile.Count; i++)
+                {
+                    //For drawing line in the world space, provide the x,y,z values
+                    lineRenderer.SetPosition(i, pile[i]); //x,y and z position of the starting point of the line
+                }
+                lineRenderer.SetPosition(pile.Count, pile[0]);
+                lineRenderer.transform.parent = this.transform;
                 visualRenderer.Add(lineRenderer);
-            }
+            
         }
     }
 
@@ -133,7 +134,7 @@ public class ExternalEnvelope : Displayer
             pile.Add(positions[0]);
             pile.Add(positions[1]);
 
-            for (int i = 3; i < positions.Count; i++)
+            for (int i = 2; i < positions.Count; i++)
             {
                 while ((pile.Count >= 2) && VectorialProduct(pile[pile.Count - 2], pile[pile.Count - 1], positions[i]) <= 0 || pile[pile.Count - 1] == positions[i])
                 {
