@@ -68,7 +68,7 @@ public class AgentManager : MonoBehaviour
     void Update()
     {
         LogClipFrame frame = RecordFrame();
-        frameDisplayer.DisplayColoredClusterFrame(frame);
+        frameDisplayer.DisplaySimpleFrame(frame);
 
         foreach(Displayer d in displayers)
         {

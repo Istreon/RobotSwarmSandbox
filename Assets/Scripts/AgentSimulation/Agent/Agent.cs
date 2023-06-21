@@ -64,20 +64,6 @@ public class Agent : MonoBehaviour
 
     #endregion
 
-    #region Methods - MonoBehaviour callbacks
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    #endregion
-
     #region Methods - Agent's primary methods
 
     /// <summary>

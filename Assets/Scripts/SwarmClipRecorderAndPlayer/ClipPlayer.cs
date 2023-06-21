@@ -161,6 +161,8 @@ public class ClipPlayer : MonoBehaviour
 
         //Udpate UI
         DisplayFrame();
+
+        Debug.Log(clip.getClipFrames()[0].GetParameters().GetAlignmentIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetCohesionIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetSeparationIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetRandomMovementIntensity());
     }
 
     /// <summary>

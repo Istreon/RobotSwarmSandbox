@@ -2393,7 +2393,7 @@ MonoBehaviour:
   - {fileID: 1478953441}
   - {fileID: 1694269163}
   mapPrefab: {fileID: 3783447548660703854, guid: 5c36fc65e2a197449ad64be467ff1088, type: 3}
-  numberOfAgents: 40
+  numberOfAgents: 1
   mapSizeX: 7
   mapSizeZ: 7
 --- !u!4 &1638191335
@@ -2484,7 +2484,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341f2269914bc81409cf21bdc0348086, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  edge: 16
   material: {fileID: 2100000, guid: 340da2bab6f798748968523667cd7db5, type: 2}
+  color: {r: 0.4264507, g: 0.9339623, b: 0.45179468, a: 0}
 --- !u!4 &1694269164
 Transform:
   m_ObjectHideFlags: 0

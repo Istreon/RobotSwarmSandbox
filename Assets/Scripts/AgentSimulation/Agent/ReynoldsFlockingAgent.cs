@@ -37,8 +37,6 @@ public class ReynoldsFlockingAgent : Agent
 
     #endregion
 
-
-
     #region MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
@@ -81,7 +79,6 @@ public class ReynoldsFlockingAgent : Agent
         Alignment();
         //if(feelerEnable) AvoidingObstacles();
         EnvironmentalForce();
-
     }
 
     private void LateUpdate()

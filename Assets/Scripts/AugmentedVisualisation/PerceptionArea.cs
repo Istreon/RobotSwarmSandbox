@@ -10,6 +10,9 @@ public class PerceptionArea : Displayer
 
     [SerializeField]
     private Material material;
+
+    [SerializeField]
+    private Color color;
     #endregion
 
     #region Private fields
@@ -28,8 +31,15 @@ public class PerceptionArea : Displayer
         //Create a mesh renderer (need an upgrade in case of already axisting meshrenderer)
         MeshRenderer meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        meshRenderer.receiveShadows = false;
     }
     #endregion
+
+    private void Update()
+    {
+        material.color = this.color;
+    }
 
     #region Methods - Displayer override
     public override void ClearVisual()

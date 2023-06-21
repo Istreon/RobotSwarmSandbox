@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5761850916135990122}
   - component: {fileID: 591466295230053614}
   - component: {fileID: 1662316818127500688}
-  - component: {fileID: 6908145760232814276}
   m_Layer: 0
   m_Name: MonaVisual
   m_TagString: Untagged
@@ -85,27 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6908145760232814276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1330430590737956453}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b5e52e8c63e364195d750d707471ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fieldOfViewSize: 1
-  blindSpotSize: 30
-  moveForwardIntensity: 1
-  randomMovementIntensity: 20
-  frictionIntensity: 0.1
-  maxSpeed: 1
-  cohesionIntensity: 1
-  alignmentIntensity: 1
-  separationIntensity: 1
 --- !u!1 &1506832144459355871
 GameObject:
   m_ObjectHideFlags: 0
