@@ -34,12 +34,12 @@ public class PerceptionArea : Displayer
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         meshRenderer.receiveShadows = false;
     }
-    #endregion
-
     private void Update()
     {
         material.color = this.color;
     }
+
+    #endregion
 
     #region Methods - Displayer override
     public override void ClearVisual()
@@ -69,7 +69,7 @@ public class PerceptionArea : Displayer
 
             //Get the mesh for one agent
             List<Vector3> v = GetCircumferencePoints(edge, fovSize, bsSize, position, direction);
-            List<int> t = DrawFilledTriangles(v.ToArray());
+            List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
 
             //Prepare to merge the new mesh to the other meshes (in order to correct the index)
             for(int i=0; i<t.Count; i++)
@@ -140,26 +140,6 @@ public class PerceptionArea : Displayer
             points.Add(newPoint);
         }
         return points;
-    }
-
-
-    /// <summary>
-    /// From a list of vertices, prepare the triangles array that will be use in a mesh. 
-    /// The vertices are intendented to come from <see cref="GetCircumferencePoints"/> methods
-    /// </summary>
-    /// <param name="points"> The list of vertices obtained using <see cref="GetCircumferencePoints"/> method.</param>
-    /// <returns> The list of index to form mesh triangles</returns>
-    private List<int> DrawFilledTriangles(Vector3[] points)
-    {
-        int triangleAmount = points.Length - 2;
-        List<int> newTriangles = new List<int>();
-        for (int i = 0; i < triangleAmount; i++)
-        {
-            newTriangles.Add(0);
-            newTriangles.Add(i + 2);
-            newTriangles.Add(i + 1);
-        }
-        return newTriangles;
     }
 
     #endregion
