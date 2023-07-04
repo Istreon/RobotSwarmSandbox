@@ -114,8 +114,8 @@ public class ReynoldsFlockingAgent : Agent
         }
     }
 
-
-    /*private void Separation() //Une separation trouvée sur internet fonctionne pas trop. Plus l'agent est proche, moins la repulsion est forte, alors que plus il est loin, plus elle l'est. ce n'est pas très logique
+    /*
+    private void Separation() //Une separation trouvée sur internet fonctionne pas trop. Plus l'agent est proche, moins la repulsion est forte, alors que plus il est loin, plus elle l'est. ce n'est pas très logique
     {
         int count = 0;
         Vector3 totalForce = Vector3.zero;
@@ -124,7 +124,7 @@ public class ReynoldsFlockingAgent : Agent
         {
             count += 1;
             //Vector3 force = this.transform.position - NearestPositionInInfiniteArea(o.transform.position);
-            Vector3 force =  o.transform.position - this.transform.position;
+            Vector3 force = this.transform.position - o.transform.position;
 
             totalForce += force;
         }
@@ -132,12 +132,12 @@ public class ReynoldsFlockingAgent : Agent
         if (count > 0)
         {
             totalForce.y = 0.0f; //To stay in 2D
-            totalForce = - totalForce;
             totalForce *= separationIntensity;
             addForce(totalForce);
         }
     }*/
 
+    
     /// <summary>
     /// Add to the current acceleration a separation force based on current neighbours. This force moves this agent away to its detected neighbours.
     /// </summary>

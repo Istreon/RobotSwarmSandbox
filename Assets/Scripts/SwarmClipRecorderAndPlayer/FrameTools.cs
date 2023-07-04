@@ -105,16 +105,28 @@ public class FrameTools
     #region Methods - Agents links
     /// <summary>
     /// From a clip frame, get all unique pairs of agents based on their perception.
+    /// This method uses <see cref="GetLinksList(List{LogAgentData}, float, float)"/> method.
     /// </summary>
     /// <param name="frame">The analysed frame</param>
     /// <returns>The <see cref="List{T}"/> of pairs of agents.</returns>
     public static List<Tuple<LogAgentData, LogAgentData>> GetLinksList(LogClipFrame frame)
     {
+        List<Tuple<LogAgentData, LogAgentData>> links = GetLinksList(frame.getAgentData(), frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
+        return links;
+    }
+
+    /// <summary>
+    /// From a list of agents and their parameters, get all unique pairs of agents based on their perception.
+    /// </summary>
+    /// <param name="agents">The list of agents</param>
+    /// <param name="fovSize">The field of view size in meters</param>
+    /// <param name="bsSize">The blind spot size in degree</param>
+    /// <returns>The <see cref="List{T}"/> of pairs of agents.</returns>
+    public static List<Tuple<LogAgentData, LogAgentData>> GetLinksList(List<LogAgentData> agents, float fovSize, float bsSize)
+    {
         List<Tuple<LogAgentData, LogAgentData>> links = new List<Tuple<LogAgentData, LogAgentData>>();
 
-        List<LogAgentData> agents = frame.getAgentData();
-
-        bool[,] adjacentMatrix = GetAdjacentMatrix(frame);
+        bool[,] adjacentMatrix = GetAdjacentMatrix(agents, fovSize, bsSize);
 
         for (int i = 0; i < agents.Count; i++)
         {
@@ -125,7 +137,6 @@ public class FrameTools
                     Tuple<LogAgentData, LogAgentData> link = new Tuple<LogAgentData, LogAgentData>(agents[i], agents[j]);
                     links.Add(link);
                 }
-
             }
         }
         return links;
@@ -517,7 +528,8 @@ public class FrameTools
     #region Methods - Graph matrix
 
     /// <summary>
-    /// Compute the adjacent matrix from the agents of the frame (undirected graph)
+    /// Compute the adjacent matrix from the agents of the frame (undirected graph). 
+    /// This method uses <see cref="GetAdjacentMatrix(List{LogAgentData}, float, float)"/> method.
     /// </summary>
     /// <param name="frame">The analysed frame.</param>
     /// <returns>The adjacent matrix as a 2D array.</returns>    
@@ -528,6 +540,20 @@ public class FrameTools
         float fovSize = frame.GetParameters().GetFieldOfViewSize();
         float bsSize = frame.GetParameters().GetBlindSpotSize();
 
+        bool[,] adjacentMatrix = GetAdjacentMatrix(agents, fovSize, bsSize);
+
+        return adjacentMatrix;
+    }
+
+    /// <summary>
+    /// Compute the adjacent matrix from the agents, based on the field of view size and the blind spot size set in parameters
+    /// </summary>
+    /// <param name="agents">The list of agents</param>
+    /// <param name="fovSize">The field of view size in meters</param>
+    /// <param name="bsSize">The blind spot size in degree</param>
+    /// <returns>The adjacent matrix as a 2D array.</returns>
+    public static bool[,] GetAdjacentMatrix(List<LogAgentData> agents, float fovSize, float bsSize)
+    {
         bool[,] adjacentMatrix = new bool[agents.Count, agents.Count];
 
         //For each pair of agents

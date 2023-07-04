@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AgentManager : MonoBehaviour
@@ -37,6 +38,10 @@ public class AgentManager : MonoBehaviour
 
     private FrameDisplayer frameDisplayer;
 
+    private Displayer[] existingDisplayers;
+
+    private LogClipFrame frame;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,13 +67,20 @@ public class AgentManager : MonoBehaviour
         if (parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
 
         frameDisplayer = new FrameDisplayer(agentVisualPrefab);
+
+        existingDisplayers = FindObjectsOfType<Displayer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        LogClipFrame frame = RecordFrame();
+        this.frame = RecordFrame();
         frameDisplayer.DisplaySimpleFrame(frame);
+
+        foreach(Displayer d in existingDisplayers)
+        {
+            d.ClearVisual();
+        }
 
         foreach(Displayer d in displayers)
         {
@@ -108,5 +120,10 @@ public class AgentManager : MonoBehaviour
     public float GetMapSizeZ()
     {
         return mapSizeZ;
+    }
+
+    public LogClipFrame getFrame()
+    {
+        return this.frame;
     }
 }
