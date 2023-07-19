@@ -125,3 +125,12 @@ Update Mode: updateDependencies
 The following packages were updated:
   com.unity.ide.rider from version 3.0.20 to 3.0.21
   com.unity.timeline from version 1.6.4 to 1.6.5
+
+=== Wed Jul 19 16:11:26 2023
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.ide.rider from version 3.0.21 to 3.0.24
+  com.unity.inputsystem from version 1.5.1 to 1.6.1
