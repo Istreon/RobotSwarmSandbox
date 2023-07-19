@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using SFB;
 using System;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(ClipPlayer))]
 public class ClipEditor : MonoBehaviour
@@ -212,5 +213,19 @@ public class ClipEditor : MonoBehaviour
     {
         Application.Quit();
     }
+    #endregion
+
+    #region Methods - Simulation
+    public void BackToSimulation()
+    {
+        LogClipFrame frame = clipPlayer.GetCurrentFrame();
+
+        GameObject go = new GameObject();
+        FrameTransmitter frameTransmitter = go.AddComponent<FrameTransmitter>();
+        frameTransmitter.SetFrame(frame);
+        SceneManager.LoadScene("Scenes/SimulationScene");
+        
+    }
+
     #endregion
 }

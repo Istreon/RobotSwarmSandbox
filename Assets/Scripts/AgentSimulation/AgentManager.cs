@@ -54,14 +54,6 @@ public class AgentManager : MonoBehaviour
         mainCamera.transform.position= new Vector3(mapSizeX / 2.0f, Mathf.Max(mapSizeZ,mapSizeX), mapSizeZ / 2.0f);
         mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
 
-        agents = new List<GameObject>();
-        for(int i=0; i<numberOfAgents; i++)
-        {
-            GameObject newAgent=GameObject.Instantiate(prefab);
-            newAgent.transform.position = new Vector3(Random.Range(0.0f, mapSizeX), 0.001f, Random.Range(0.0f, mapSizeZ));
-            newAgent.transform.rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 359.0f), 0.0f);
-            agents.Add(newAgent);
-        }
 
         parameterManager = FindObjectOfType<ParameterManager>();
         if (parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
@@ -69,6 +61,51 @@ public class AgentManager : MonoBehaviour
         frameDisplayer = new FrameDisplayer(agentVisualPrefab);
 
         existingDisplayers = FindObjectsOfType<Displayer>();
+
+        agents = new List<GameObject>();
+
+        FrameTransmitter frameTransmitter = FindObjectOfType<FrameTransmitter>();
+
+
+        if (frameTransmitter!=null)
+        {
+            LogClipFrame frame = frameTransmitter.GetFrameAndDestroy();
+            this.numberOfAgents = frame.getAgentData().Count;
+
+            for (int i = 0; i < numberOfAgents; i++)
+            {
+                GameObject newAgent = GameObject.Instantiate(prefab);
+                newAgent.transform.position = frame.getAgentData()[i].getPosition();
+                Agent a = newAgent.GetComponent<Agent>();
+                a.SetSpeed(frame.getAgentData()[i].getSpeed());                
+                agents.Add(newAgent);
+            }
+            LogParameters parameters = frame.GetParameters();
+            
+            parameterManager.SetAlignmentIntensity(parameters.GetAlignmentIntensity());
+            parameterManager.SetCohesionIntensity(parameters.GetCohesionIntensity());
+            parameterManager.SetSeparationIntensity(parameters.GetSeparationIntensity());
+
+            parameterManager.SetBlindSpotSize(parameters.GetBlindSpotSize());
+            parameterManager.SetFieldOfViewSize(parameters.GetFieldOfViewSize());
+            parameterManager.SetDistanceBetweenAgents(parameters.GetDistanceBetweenAgents());
+
+            parameterManager.SetFrictionIntensity(parameters.GetFrictionIntensity());
+            parameterManager.SetMaxSpeed(parameters.GetMaxSpeed());
+            parameterManager.SetMoveForwardIntensity(parameters.GetMoveForwardIntensity());
+            parameterManager.SetRandomMovementIntensity(parameters.GetRandomMovementIntensity());
+
+        } else
+        {
+            
+            for (int i = 0; i < numberOfAgents; i++)
+            {
+                GameObject newAgent = GameObject.Instantiate(prefab);
+                newAgent.transform.position = new Vector3(Random.Range(0.0f, mapSizeX), 0.001f, Random.Range(0.0f, mapSizeZ));
+                newAgent.transform.rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 359.0f), 0.0f);
+                agents.Add(newAgent);
+            }
+        }
     }
 
     // Update is called once per frame

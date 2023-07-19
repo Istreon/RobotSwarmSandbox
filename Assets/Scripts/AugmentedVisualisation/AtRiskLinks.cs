@@ -8,7 +8,7 @@ public class AtRiskLinks : Displayer
     #region Serialized fields
 
     [SerializeField]
-    [Range(1,10)]
+    [Range(1,39)]
     private int nbLinks = 3; //Number of links expected
 
     [SerializeField]

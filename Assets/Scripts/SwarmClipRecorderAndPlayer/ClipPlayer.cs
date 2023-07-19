@@ -336,6 +336,12 @@ public class ClipPlayer : MonoBehaviour
         float res = (float)this.frameNumber / (float)(this.nbFrames - 1);
         return res;
     }
+
+    public LogClipFrame GetCurrentFrame()
+    {
+        return clip.getClipFrames()[frameNumber];
+    }
+
     #endregion
 
 }

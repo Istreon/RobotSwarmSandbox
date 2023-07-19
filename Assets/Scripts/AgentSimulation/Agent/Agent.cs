@@ -369,4 +369,10 @@ public class Agent : MonoBehaviour
     }
     #endregion
 
+    #region Methods - Setter
+    public void SetSpeed(Vector3 newSpeed)
+    {
+        this.speed = newSpeed;
+    }
+    #endregion
 }
