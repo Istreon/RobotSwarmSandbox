@@ -34,13 +34,15 @@ public class ReynoldsFlockingAgent : Agent
     private float avoidingObstaclesIntensity = 1.0f;*/
 
 
-
     #endregion
 
     #region MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
     {
+        //Set agentType;
+        agentType = LogAgentData.AgentType.Reynolds;
+
         agentManager = FindObjectOfType<AgentManager>();
         mapSizeX = agentManager.GetMapSizeX();
         mapSizeZ = agentManager.GetMapSizeZ();
@@ -70,13 +72,13 @@ public class ReynoldsFlockingAgent : Agent
         UpdateParameters();
         getAgentsInFieldOfView();
         //if (feelerEnable) getObstacles();
-        RandomMovement();
-        MoveForward();
-        Friction();
-        AvoidCollisionWithNeighbors();
-        Cohesion();
-        Separation();
-        Alignment();
+        this.forces.Add(RandomMovement());  //0
+        this.forces.Add(MoveForward());     //1
+        this.forces.Add(Friction());        //2
+        this.forces.Add(AvoidCollisionWithNeighbors()); //3
+        this.forces.Add(Cohesion());    //4
+        this.forces.Add(Separation());  //5
+        this.forces.Add(Alignment());   //6
         //if(feelerEnable) AvoidingObstacles();
         EnvironmentalForce();
     }
@@ -92,7 +94,7 @@ public class ReynoldsFlockingAgent : Agent
     /// <summary>
     /// Add to the current acceleration a cohesion force based on current neighbours. This force brings this agent closer to its detected neighbours.
     /// </summary>
-    private void Cohesion()
+    private Vector3 Cohesion()
     {
         int count = 0;
         Vector3 g = Vector3.zero;
@@ -111,6 +113,10 @@ public class ReynoldsFlockingAgent : Agent
             Vector3 force = g - transform.position;
             force *= this.cohesionIntensity;
             addForce(force);
+            return force;
+        } else
+        {
+            return Vector3.zero;
         }
     }
 
@@ -141,7 +147,7 @@ public class ReynoldsFlockingAgent : Agent
     /// <summary>
     /// Add to the current acceleration a separation force based on current neighbours. This force moves this agent away to its detected neighbours.
     /// </summary>
-    private void Separation() // Bonne version
+    private Vector3 Separation() // Bonne version
     {
         int count = 0;
         Vector3 totalForce = Vector3.zero;
@@ -162,6 +168,11 @@ public class ReynoldsFlockingAgent : Agent
             totalForce /= count;
             totalForce *= separationIntensity;
             addForce(totalForce);
+            return totalForce;
+        }
+        else
+        {
+            return Vector3.zero;
         }
     }
 
@@ -197,7 +208,7 @@ public class ReynoldsFlockingAgent : Agent
     /// <summary>
     /// Add to the current acceleration a alignment force based on current neighbours. This force align this agent to match its detected neighbours speed (direction and intensity).
     /// </summary>
-    private void Alignment()
+    private Vector3 Alignment()
     {
         int count = 0;
         Vector3 vm = Vector3.zero;
@@ -219,6 +230,11 @@ public class ReynoldsFlockingAgent : Agent
             vm *= alignmentIntensity;
 
             addForce(vm);
+            return vm;
+        }
+        else
+        {
+            return Vector3.zero;
         }
     }
 

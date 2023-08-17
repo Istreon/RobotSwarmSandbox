@@ -16,6 +16,9 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     #region Serialize fields
     [SerializeField]
     private GameObject answerMenu;
+
+    [SerializeField]
+    private GameObject startingMenu;
     #endregion
 
     #region Private fields
@@ -51,8 +54,11 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Disable gameobject
+        //Disable gameObject
         answerMenu.SetActive(false); //Answering menu
+
+        //Enable gameObject
+        startingMenu.SetActive(true);
 
         //Get the path of the clip files
         filePath = Application.dataPath + filePath;
@@ -114,11 +120,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(currentClip == -1) //If no clip was display
-        {
-            NextClip();
-        } 
-        else if (clipPlayer.IsClipFinished()) //If the current clip ended
+        if (clipPlayer.IsClipFinished() && currentClip !=-1) //If the current clip ended
         {
             //Display answering menu
             answerMenu.SetActive(true);
@@ -133,6 +135,21 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         else
         {
             answerMenu.SetActive(false);
+        }
+    }
+
+    public void StartExperimentation()
+    {
+        if (currentClip == -1) //If no clip was display
+        {
+            //Disable starting menu
+            startingMenu.SetActive(false);
+
+            //Launch the first clip
+            NextClip();
+        } else
+        {
+            Debug.LogError("Can't start the experiment.",this);
         }
     }
 
@@ -202,6 +219,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         Debug.Log("Results saved.");
     }
 
+    #region Methods - Load clips
 
     public void LoadFirstClips()
     {
@@ -241,4 +259,6 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
                 Debug.LogError("Clip can't be load from " + s, this);
         }
     }
+
+    #endregion
 }

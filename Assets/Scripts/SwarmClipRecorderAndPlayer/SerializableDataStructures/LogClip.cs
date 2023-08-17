@@ -12,7 +12,6 @@ public class LogClip
     private float mapSizeZ;
     #endregion
 
-
     #region Methods - Constructor
     public LogClip(List<LogClipFrame> clipFrames, int fps, float mapSizeX, float mapSizeZ)
     {

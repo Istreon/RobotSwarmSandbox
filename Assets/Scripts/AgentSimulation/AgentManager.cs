@@ -136,7 +136,7 @@ public class AgentManager : MonoBehaviour
         foreach (GameObject o in agents)
         {
             Agent a = o.GetComponent<Agent>();
-            LogAgentData log = new LogAgentData(a.transform.position, a.GetSpeed());
+            LogAgentData log = new LogAgentData(a.transform.position, a.GetSpeed(), a.GetAcceleration(), a.GetForces(), a.GetAgentType());
             agentData.Add(log);
         }
         LogParameters parameters = new LogParameters(parameterManager.GetFieldOfViewSize(), parameterManager.GetBlindSpotSize(), parameterManager.GetMoveForwardIntensity(), parameterManager.GetRandomMovementIntensity(), parameterManager.GetFrictionIntensity(), parameterManager.GetMaxSpeed(), parameterManager.GetCohesionIntensity(), parameterManager.GetAlignmentIntensity(), parameterManager.GetSeparationIntensity(), parameterManager.GetDistanceBetweenAgents());

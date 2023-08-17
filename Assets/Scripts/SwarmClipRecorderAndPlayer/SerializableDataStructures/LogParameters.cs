@@ -5,10 +5,10 @@ public class LogParameters
     //Agent parameters
     private float fieldOfViewSize;
     private float blindSpotSize;
-    float moveForwardIntensity;
-    float randomMovementIntensity;
-    float frictionIntensity;
-    float maxSpeed;
+    private float moveForwardIntensity;
+    private float randomMovementIntensity;
+    private float frictionIntensity;
+    private float maxSpeed;
     //Other parameters
     private float cohesionIntensity;
     private float alignmentIntensity;

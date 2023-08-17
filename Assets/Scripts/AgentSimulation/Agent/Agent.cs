@@ -41,11 +41,11 @@ public class Agent : MonoBehaviour
     //private SphereCollider feelerCollider;
 
     //private List<GameObject> detectedObstacles;
-
+    protected LogAgentData.AgentType agentType = LogAgentData.AgentType.None;
 
     protected Vector3 acceleration = Vector3.zero; //the current acceleration of this agent, in m/s^2
     protected Vector3 speed = Vector3.zero; //The current speed of this agent, in m/s
-
+    protected List<Vector3> forces = new List<Vector3>(); 
 
     protected List<GameObject> detectedAgents;
 
@@ -96,6 +96,9 @@ public class Agent : MonoBehaviour
 
         //Reset acceleration
         this.acceleration = Vector3.zero;
+
+        //Reset forces list
+        this.forces.Clear();
 
         //Limit speed vector based on agent max speed
         float temp = this.speed.sqrMagnitude; //faster than Vector3.Magnitude(this.speed);
@@ -151,7 +154,7 @@ public class Agent : MonoBehaviour
     /// It aim to allow an agent to move randomly.
     /// The greater the intensity (<see cref="Agent.randomMovementIntensity"/>), the greater the force.
     /// </summary>
-    protected void RandomMovement()
+    protected Vector3 RandomMovement()
     {
         float alea = 0.1f;
         if (Random.value < alea)
@@ -165,6 +168,10 @@ public class Agent : MonoBehaviour
             force *= randomMovementIntensity;
 
             addForce(force);
+            return force;
+        } else
+        {
+            return Vector3.zero;
         }
     }
 
@@ -173,7 +180,7 @@ public class Agent : MonoBehaviour
     /// It aim to allow an agent to move forward, depending of the move forward intensity.
     /// The greater the intensity (<see cref="Agent.moveForwardIntensity"/>), the greater the force.
     /// </summary>
-    protected void MoveForward()
+    protected Vector3 MoveForward()
     {
         Vector3 force = speed.normalized;
 
@@ -181,26 +188,30 @@ public class Agent : MonoBehaviour
         force *= moveForwardIntensity;
 
         addForce(force);
+
+        return force;
     }
 
     /// <summary>
     /// This method create a force opposite to the current speed, added to the acceleration of the agent.
     /// It aim to reduce the agent speed, depending of the friction intensity (<see cref="Agent.frictionIntensity"/>).
     /// </summary> 
-    protected void Friction()
+    protected Vector3 Friction()
     {
         float k = frictionIntensity;
         Vector3 force = this.speed;
         force *= -k;
         addForce(force);
+        return force;
     }
 
     /// <summary>
     /// This method create a force opposite to the neighbours that are too close, added to the acceleration of the agent.
     /// It aim to avoid collision between agents.
     /// </summary>
-    protected void AvoidCollisionWithNeighbors()
+    protected Vector3 AvoidCollisionWithNeighbors()
     {
+        Vector3 totalForce = Vector3.zero;
         float safetyDistance = 0.09f;
         foreach(GameObject g in detectedAgents)
         {
@@ -208,9 +219,11 @@ public class Agent : MonoBehaviour
                 Vector3 force = this.transform.position - g.transform.position;
                 force.Normalize();
                 force *= 20*this.maxSpeed;
-                addForce(force);
+                totalForce += force;
             }
         }
+        addForce(totalForce);
+        return totalForce;
     }
 
     /// <summary> 
@@ -332,9 +345,24 @@ public class Agent : MonoBehaviour
     #endregion
 
     #region Methods - Getter
+    public LogAgentData.AgentType GetAgentType()
+    {
+        return this.agentType;
+    }
+
     public Vector3 GetSpeed()
     {
         return speed;
+    }
+
+    public Vector3 GetAcceleration()
+    {
+        return acceleration;
+    }
+
+    public List<Vector3> GetForces()
+    {
+        return this.forces;
     }
 
     public virtual float GetFieldOfViewSize()
