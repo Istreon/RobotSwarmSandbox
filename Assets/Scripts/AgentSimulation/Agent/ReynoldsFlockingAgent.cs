@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -41,7 +40,7 @@ public class ReynoldsFlockingAgent : Agent
     void Start()
     {
         //Set agentType;
-        agentType = LogAgentData.AgentType.Reynolds;
+        agentBehaviour = LogAgentData.AgentBehaviour.Reynolds;
 
         agentManager = FindObjectOfType<AgentManager>();
         mapSizeX = agentManager.GetMapSizeX();

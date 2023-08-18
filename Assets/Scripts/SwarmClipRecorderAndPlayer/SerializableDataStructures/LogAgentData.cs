@@ -6,14 +6,14 @@ using UnityEngine;
 public class LogAgentData
 {
     #region Private fields
-    public enum AgentType
+    public enum AgentBehaviour
     {
         None,
         Reynolds,
         Couzin
     }
 
-    private AgentType agentType;
+    private AgentBehaviour agentBehaviour;
 
     private SerializableVector3 position;
     private SerializableVector3 speed;
@@ -23,7 +23,7 @@ public class LogAgentData
     #endregion
 
     #region Methods - Constructor
-    public LogAgentData(Vector3 position, Vector3 speed, Vector3 acceleration, List<Vector3> forces, AgentType type) //Il faut ajouter l'acceleration
+    public LogAgentData(Vector3 position, Vector3 speed, Vector3 acceleration, List<Vector3> forces, AgentBehaviour behaviour) //Il faut ajouter l'acceleration
     {
         this.position = position;
         this.speed = speed;
@@ -35,7 +35,7 @@ public class LogAgentData
             this.forces.Add(v);
         }
 
-        this.agentType = type;
+        this.agentBehaviour = behaviour;
     }
     #endregion
 

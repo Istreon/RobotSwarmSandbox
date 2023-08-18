@@ -1,12 +1,13 @@
 using UnityEngine;
 
+
 public class ParameterManager : MonoBehaviour
 {
     [Header("Field of view size")]
     [SerializeField]
     [Range(0.0f, 5.0f)]
     [Tooltip("This is the size of the radius.")]
-    private float fieldOfViewSize = 1.0f;
+    public float fieldOfViewSize = 1.0f;
     [SerializeField]
     [Range(0, 360)]
     [Tooltip("This is the size of blind spot of the agent (in degrees)")]
@@ -92,20 +93,6 @@ public class ParameterManager : MonoBehaviour
         return repulsionZoneSize;
     }
 
-    /*public bool IsFeelerEnable()
-    {
-        return feelerEnable;
-    }
-    public float GetFeelerDistance()
-    {
-        return feelerDistance;
-    }
-
-    public float GetFeelerSize()
-    {
-        return feelerSize;
-    }*/
-
     public float GetSeparationIntensity()
     {
         return separationIntensity;
@@ -120,11 +107,6 @@ public class ParameterManager : MonoBehaviour
     {
         return cohesionIntensity;
     }
-
-    /*public float GetAvoidingObstaclesIntensity()
-    {
-        return avoidingObstaclesIntensity;
-    }*/
 
     public float GetMoveForwardIntensity()
     {

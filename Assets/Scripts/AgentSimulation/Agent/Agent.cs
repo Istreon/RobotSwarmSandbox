@@ -41,7 +41,7 @@ public class Agent : MonoBehaviour
     //private SphereCollider feelerCollider;
 
     //private List<GameObject> detectedObstacles;
-    protected LogAgentData.AgentType agentType = LogAgentData.AgentType.None;
+    protected LogAgentData.AgentBehaviour agentBehaviour = LogAgentData.AgentBehaviour.None;
 
     protected Vector3 acceleration = Vector3.zero; //the current acceleration of this agent, in m/s^2
     protected Vector3 speed = Vector3.zero; //The current speed of this agent, in m/s
@@ -274,7 +274,7 @@ public class Agent : MonoBehaviour
         {
             float dist = Mathf.Abs(this.transform.position.z);
             //temp.z = 0.0f;
-            z = 10*this.maxSpeed * safetyDistance / dist;
+            z = 1*this.maxSpeed * safetyDistance / dist;
         }
         Vector3 rebond = new Vector3(x, 0.0f, z);
         //rebond *= 50;
@@ -345,9 +345,9 @@ public class Agent : MonoBehaviour
     #endregion
 
     #region Methods - Getter
-    public LogAgentData.AgentType GetAgentType()
+    public LogAgentData.AgentBehaviour GetAgentBehaviour()
     {
-        return this.agentType;
+        return this.agentBehaviour;
     }
 
     public Vector3 GetSpeed()
