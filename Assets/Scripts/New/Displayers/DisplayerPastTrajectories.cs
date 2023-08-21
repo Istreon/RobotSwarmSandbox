@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PastTrajectories : Displayer
+public class DisplayerPastTrajectories : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -63,13 +63,15 @@ public class PastTrajectories : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
-        if (pastPositions.Count!= frame.getAgentData().Count)
+        int nbAgents = swarmData.GetAgentsData().Count;
+
+        if (pastPositions.Count!= nbAgents)
         {
-            for(int i=0; i< frame.getAgentData().Count;i++)
+            for(int i=0; i< nbAgents; i++)
             {
                 pastPositions.Add(new List<Vector3>());
             }
@@ -80,11 +82,13 @@ public class PastTrajectories : Displayer
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
-        for (int i = 0; i < frame.getAgentData().Count; i++)
+        List<AgentData> agents = swarmData.GetAgentsData();
+
+        for (int i = 0; i < nbAgents; i++)
         {
             if(count >= saveAvoid)
             {
-                pastPositions[i].Add(frame.getAgentData()[i].getPosition());
+                pastPositions[i].Add(agents[i].GetPosition());
                 if (pastPositions[i].Count > nbPositionsSaved) pastPositions[i].RemoveAt(0);
                 count = 0;
             } else
@@ -92,7 +96,7 @@ public class PastTrajectories : Displayer
                 count++;
             }
 
-            pastPositions[i].Add(frame.getAgentData()[i].getPosition());
+            pastPositions[i].Add(agents[i].GetPosition());
             for (int j=0;j<pastPositions[i].Count-1; j++)
             {
                 float width = startLineWidth - ((float)(pastPositions[i].Count - j) * step);

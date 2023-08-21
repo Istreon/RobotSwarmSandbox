@@ -24,34 +24,34 @@ public class LeavesBranchesAndTrunk : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
-        Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> tuple = FrameTools.SeparateLeavesBranchesAndTrunk(frame);
+        Tuple<List<AgentData>, List<AgentData>, List<AgentData>> tuple = SwarmTools.SeparateLeavesBranchesAndTrunk(swarmData);
 
 
-        foreach (LogAgentData a in tuple.Item1)
+        foreach (AgentData a in tuple.Item1)
         {
             GameObject temp = GameObject.Instantiate(prefab);
-            temp.transform.position = a.getPosition();
+            temp.transform.position = a.GetPosition();
             temp.GetComponent<Renderer>().material.color = colorPalette[0];
             temp.transform.parent = this.transform;
             displayCube.Add(temp);
         }
 
-        foreach (LogAgentData a in tuple.Item2)
+        foreach (AgentData a in tuple.Item2)
         {
             GameObject temp = GameObject.Instantiate(prefab);
-            temp.transform.position = a.getPosition();
+            temp.transform.position = a.GetPosition();
             temp.GetComponent<Renderer>().material.color = colorPalette[1];
             temp.transform.parent = this.transform;
             displayCube.Add(temp);
         }
 
-        foreach (LogAgentData a in tuple.Item3)
+        foreach (AgentData a in tuple.Item3)
         {
             GameObject temp = GameObject.Instantiate(prefab);
-            temp.transform.position = a.getPosition();
+            temp.transform.position = a.GetPosition();
             temp.GetComponent<Renderer>().material.color = colorPalette[2];
             temp.transform.parent = this.transform;
             displayCube.Add(temp);

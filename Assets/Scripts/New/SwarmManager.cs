@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,11 +7,25 @@ public class SwarmManager : MonoBehaviour
     #region Serialized fields
     [SerializeField]
     private GameObject mapPrefab;
+
+    [SerializeField]
+    private float numberOfAgents;
+
+    [SerializeField]
+    EditorParametersInterface parametersInterface;
+
+    [SerializeField]
+    private List<Displayer> displayers;
     #endregion
 
     private SwarmData swarm;
 
     private GameObject map;
+
+    private Displayer[] existingDisplayers;
+
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,35 +33,89 @@ public class SwarmManager : MonoBehaviour
         map = Instantiate(mapPrefab);
         map.transform.parent = null;
 
-        /*SwarmParameters parameters = FindObjectOfType<SwarmParameters>();
-        if (parameters == null) {
+        existingDisplayers = FindObjectsOfType<Displayer>();
+
+        parametersInterface = FindObjectOfType<EditorParametersInterface>();
+        if (parametersInterface == null) {
             Debug.LogError("ParameterManager is missing in the scene", this);
-            parameters = new SwarmParameters();
         }
-        swarm.SetParameters(parameters);*/
+
+        SwarmParameters parameters = parametersInterface.GetParameters();
+
+        List<AgentData> agents = new List<AgentData>();
+        for (int i = 0; i < numberOfAgents; i++)
+        {
+            
+            Vector3 position = new Vector3(UnityEngine.Random.Range(0.0f, parameters.GetMapSizeX()), 0.0f, UnityEngine.Random.Range(0.0f, parameters.GetMapSizeZ()));
+            Vector3 direction = new Vector3(UnityEngine.Random.Range(-1.0f,1.0f ), 0.0f, UnityEngine.Random.Range(-1.0f, 1.0f));
+            
+            AgentData agent = new AgentData(position, direction.normalized);
+            agents.Add(agent);
+        }
+
+        swarm = new SwarmData(agents,parameters);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Pour chaque agent
-        //Mise à 0 de l'accéleration
+        //Update swarm parameters
+        SwarmParameters parameters = parametersInterface.GetParameters();
+        swarm.SetParameters(parameters);
 
-        //Mets à jour la position des agents (en utilisant le manager de mouvement)
+        List<AgentData> agents = swarm.GetAgentsData();
 
-        //Corrige la position des agents avec le manager de map
+        //Update Position, direction
+        foreach (AgentData a in agents)
+        {
+            Tuple<Vector3, Vector3> positionAndDirection = MovementManager.ApplyAgentMovement(parameters.GetAgentMovement(), a, Time.deltaTime);
 
-        //Pour chaque agent
-        //Application du comportement sur les agents
+            Vector3 position = CorrectPosition(positionAndDirection.Item1, 0.04f);
+            //Vector3 position = positionAndDirection.Item1;
 
-        //Pour chaque agent
-        //Calcul de l'acceleration
+            a.SetPosition(position);
+            a.SetDirection(positionAndDirection.Item2);
+        }
 
-        //Calcul de la vitesse
+        //Reset forces and apply agent's behaviour
+        foreach (AgentData a in agents)
+        {
+            //Clear forces
+            a.ClearForces();
 
-        //Reduction de la vitesse en fonction de la vitesse maximale
+            //Get new agent's forces
+            List<Vector3> forces = BehaviourManager.ApplySocialBehaviour(parameters.GetAgentBehaviour(), a, swarm);
+            a.SetForces(forces);
+        }
 
-        //Affichage
+        foreach (AgentData a in agents)
+        {
+            a.UdpateAcceleration();
+            Vector3 speed = a.UpdateSpeed(Time.deltaTime);
+
+            //Limit speed vector based on agent max speed
+            float maxSpeed = parameters.GetMaxSpeed();
+            float temp = speed.sqrMagnitude; //faster than Vector3.Magnitude(this.speed);
+            if (temp > (maxSpeed * maxSpeed)) // Temp is squared, so it's necessary to compare whith "maxSpeed" squared too
+            {
+                speed.Normalize();
+                speed *= maxSpeed;
+                a.SetSpeed(speed);
+            }
+        }
+
+
+        //--Affichage--//
+        foreach (Displayer d in existingDisplayers)
+        {
+            if(!displayers.Contains(d))
+                d.ClearVisual();
+        }
+
+        foreach (Displayer d in displayers)
+        {
+            d.DisplayVisual(swarm);
+        }
 
         UpdateMap();
     }
@@ -55,11 +123,6 @@ public class SwarmManager : MonoBehaviour
     #region Methods - Map
     private void UpdateMap()
     {
-        if (swarm.GetParameters() == null)
-        {
-            Debug.Log("meeeh");
-            return;
-        }
         float x = swarm.GetParameters().GetMapSizeX();
         float z = swarm.GetParameters().GetMapSizeZ();
         map.transform.position = new Vector3(x / 2.0f, 0.0f, z / 2.0f);
@@ -70,9 +133,11 @@ public class SwarmManager : MonoBehaviour
     {
         float mapSizeX = swarm.GetParameters().GetMapSizeX();
         float mapSizeZ = swarm.GetParameters().GetMapSizeZ();
-        float x = 0.0f;
-        float z = 0.0f;
-        Vector3 temp = this.transform.position;
+  
+
+        float x = position.x;
+        float z = position.z;
+
         if (position.x > mapSizeX - objectRadius)
         {
             x = mapSizeX - objectRadius;
@@ -93,6 +158,13 @@ public class SwarmManager : MonoBehaviour
         Vector3 newPosition = new Vector3(x, 0.0f, z);
 
         return newPosition;
+    }
+    #endregion
+
+    #region Methods - 
+    public SwarmData CloneFrame()
+    {
+        return swarm.Clone();
     }
     #endregion
 }

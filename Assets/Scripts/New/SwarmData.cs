@@ -16,6 +16,8 @@ public class SwarmData
     }
     #endregion
 
+
+
     #region Methods - Getter
     public List<AgentData> GetAgentsData()
     {
@@ -25,6 +27,18 @@ public class SwarmData
     public SwarmParameters GetParameters()
     {
         return this.parameters;
+    }
+
+    public SwarmData Clone()
+    {
+        List<AgentData> agentsClone = new List<AgentData>();
+        foreach(AgentData a in this.agentsData)
+        {
+            agentsClone.Add(a.Clone());
+        }
+        SwarmData clone = new SwarmData(agentsClone, parameters.Clone());
+
+        return clone;
     }
     #endregion
 

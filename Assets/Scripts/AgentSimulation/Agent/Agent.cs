@@ -274,7 +274,7 @@ public class Agent : MonoBehaviour
         {
             float dist = Mathf.Abs(this.transform.position.z);
             //temp.z = 0.0f;
-            z = 1*this.maxSpeed * safetyDistance / dist;
+            z = 1 * safetyDistance / dist;
         }
         Vector3 rebond = new Vector3(x, 0.0f, z);
         //rebond *= 50;

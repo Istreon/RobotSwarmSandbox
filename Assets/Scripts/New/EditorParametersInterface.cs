@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwarmParametersEditorInterface : MonoBehaviour
+public class EditorParametersInterface : MonoBehaviour
 {
     [Header("Swarm behaviour")]
     [SerializeField]
@@ -29,7 +29,7 @@ public class SwarmParametersEditorInterface : MonoBehaviour
     [SerializeField]
     [Range(0, 360)]
     [Tooltip("This is the size of blind spot of the agent (in degrees)")]
-    protected float blindSpotSize = 30;
+    private float blindSpotSize = 30;
 
     [Header("Intensity parameters")]
     [SerializeField]
@@ -40,7 +40,7 @@ public class SwarmParametersEditorInterface : MonoBehaviour
     private float moveForwardIntensity = 1.0f;
     [SerializeField]
     [Range(0.0f, 5.0f)]
-    private float randomMovementIntensity = 20.0f;
+    private float randomMovementIntensity = 0.0f;
     [SerializeField]
     [Range(0.0f, 1.0f)]
     private float frictionIntensity = 0.1f;
@@ -82,6 +82,24 @@ public class SwarmParametersEditorInterface : MonoBehaviour
 
     public SwarmParameters GetParameters()
     {
-        return null; //TO DO
+        SwarmParameters parameters = new SwarmParameters(agentBehaviour,
+                                                        agentMovement,
+                                                        mapSizeX,
+                                                        mapSizeZ,
+                                                        fieldOfViewSize,
+                                                        blindSpotSize,
+                                                        maxSpeed,
+                                                        moveForwardIntensity,
+                                                        randomMovementIntensity,
+                                                        frictionIntensity,
+                                                        avoidCollisionWithNeighboursIntensity,
+                                                        cohesionIntensity,
+                                                        alignmentIntensity,
+                                                        separationIntensity,
+                                                        attractionZoneSize,
+                                                        alignmentZoneSize,
+                                                        repulsionZoneSize,
+                                                        distanceBetweenAgents);
+        return parameters;
     }
 }

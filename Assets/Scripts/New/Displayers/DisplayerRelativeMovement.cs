@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RelativeMovement : Displayer
+public class DisplayerRelativeMovement : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -28,25 +28,25 @@ public class RelativeMovement : Displayer
     #endregion
 
     #region Methods - Displayer Override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
-        List<List<LogAgentData>> clusters =  FrameTools.GetClusters(frame);
+        List<List<AgentData>> clusters =  SwarmTools.GetClusters(swarmData);
 
 
-        foreach (List<LogAgentData> c in clusters)
+        foreach (List<AgentData> c in clusters)
         {
             Vector3 meanSwarmSpeed = Vector3.zero;
-            foreach (LogAgentData a in c)
+            foreach (AgentData a in c)
             {
-                meanSwarmSpeed += a.getSpeed();
+                meanSwarmSpeed += a.GetSpeed();
             }
             meanSwarmSpeed = meanSwarmSpeed / c.Count;
 
-            foreach (LogAgentData a in c)
+            foreach (AgentData a in c)
             {
-                Vector3 individualMouvement = a.getSpeed() - meanSwarmSpeed;
+                Vector3 individualMouvement = a.GetSpeed() - meanSwarmSpeed;
 
                 //For creating line renderer object
                 LineRenderer lineRenderer = new GameObject("Line").AddComponent<LineRenderer>();
@@ -62,9 +62,9 @@ public class RelativeMovement : Displayer
                 lineRenderer.material.color = Color.red;
 
 
-                Vector3 temp = a.getPosition() + (individualMouvement * intensity);
+                Vector3 temp = a.GetPosition() + (individualMouvement * intensity);
                 //For drawing line in the world space, provide the x,y,z values
-                lineRenderer.SetPosition(0, a.getPosition()); //x,y and z position of the starting point of the line
+                lineRenderer.SetPosition(0, a.GetPosition()); //x,y and z position of the starting point of the line
                 lineRenderer.SetPosition(1, temp); //x,y and z position of the end point of the line
 
                 lineRenderer.transform.parent = this.transform;

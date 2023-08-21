@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Links : Displayer
+public class DisplayerLinks : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -41,31 +41,31 @@ public class Links : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
         //GetLinks within the swarm
-        List<Tuple<LogAgentData, LogAgentData>> links = FrameTools.GetLinksList(frame);
+        List<Tuple<AgentData, AgentData>> links = SwarmTools.GetLinksList(swarmData);
 
         //Get the size of the field of view of the swarm's agent
-        float fovSize = frame.GetParameters().GetFieldOfViewSize();
+        float fovSize = swarmData.GetParameters().GetFieldOfViewSize();
 
         //Initialise lists of vertices and triangles for the mesh
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
 
-        foreach (Tuple<LogAgentData,LogAgentData> l in links)
+        foreach (Tuple<AgentData,AgentData> l in links)
         {
             //Calculate the rapport between the current link size and the field of view size
-            float distOnMaxDistance = Vector3.Distance(l.Item1.getPosition(), l.Item2.getPosition()) / fovSize;
+            float distOnMaxDistance = Vector3.Distance(l.Item1.GetPosition(), l.Item2.GetPosition()) / fovSize;
 
             //Calculate the width of the displayed link based on the rapport between the link size and fov
             float width = maxWidth - (maxWidth-minWidth) * distOnMaxDistance;
 
             //Get the vertices of the line
-            List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.getPosition(), l.Item2.getPosition(), width);
+            List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width);
             //Get the triangles from the vertices of the line
             List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
 

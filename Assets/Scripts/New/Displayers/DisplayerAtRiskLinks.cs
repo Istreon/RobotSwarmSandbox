@@ -3,16 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AtRiskLinks : Displayer
+
+public class DisplayerAtRiskLinks : Displayer
 {
     #region Serialized fields
 
     [SerializeField]
-    [Range(1,39)]
+    [Range(1, 39)]
     private int nbLinks = 3; //Number of links expected
 
     [SerializeField]
-    [Range(0.01f,0.08f)]
+    [Range(0.01f, 0.08f)]
     private float width = 0.03f;
 
     [SerializeField]
@@ -43,34 +44,31 @@ public class AtRiskLinks : Displayer
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
-        List<Tuple<LogAgentData, LogAgentData>> res = new List<Tuple<LogAgentData, LogAgentData>>();
+        List<Tuple<AgentData, AgentData>> res = new List<Tuple<AgentData, AgentData>>();
 
         //Get the clusters in the swarm
-        List<List<LogAgentData>> clusters = FrameTools.GetOrderedClusters(frame);
+        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
 
-        foreach (List<LogAgentData> cluster in clusters)
+        foreach (List<AgentData> cluster in clusters)
         {
             if (cluster.Count < 2) continue;
 
-            List<Tuple<LogAgentData, LogAgentData>> links = FrameTools.GetLinksList(cluster, frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
+            List<Tuple<AgentData, AgentData>> links = SwarmTools.GetLinksList(cluster, swarmData.GetParameters().GetFieldOfViewSize(), swarmData.GetParameters().GetBlindSpotSize());
 
+            List<List<AgentData>> groups = new List<List<AgentData>>();
 
-
-
-            List<List<LogAgentData>> groups = new List<List<LogAgentData>>();
-
-            foreach (LogAgentData a in cluster)
+            foreach (AgentData a in cluster)
             {
-                List<LogAgentData> group = new List<LogAgentData>();
+                List<AgentData> group = new List<AgentData>();
                 group.Add(a);
                 groups.Add(group);
             }
@@ -80,11 +78,11 @@ public class AtRiskLinks : Displayer
             while (groups.Count > 1)
             {
                 //Get the closest duo in the links list
-                Tuple<LogAgentData, LogAgentData> closestDuo = null;
+                Tuple<AgentData, AgentData> closestDuo = null;
                 float minDist = float.MaxValue;
-                foreach (Tuple<LogAgentData, LogAgentData> t in links)
+                foreach (Tuple<AgentData, AgentData> t in links)
                 {
-                    float dist = Vector3.Distance(t.Item1.getPosition(), t.Item2.getPosition());
+                    float dist = Vector3.Distance(t.Item1.GetPosition(), t.Item2.GetPosition());
                     if (dist < minDist)
                     {
                         minDist = dist;
@@ -95,9 +93,9 @@ public class AtRiskLinks : Displayer
                 if (groups.Count <= (nbLinks + 1)) res.Add(closestDuo);
 
                 //Merge the closest duo
-                List<LogAgentData> group1 = null;
-                List<LogAgentData> group2 = null;
-                foreach (List<LogAgentData> g in groups)
+                List<AgentData> group1 = null;
+                List<AgentData> group2 = null;
+                foreach (List<AgentData> g in groups)
                 {
                     if (g.Contains(closestDuo.Item1)) group1 = g;
                     if (g.Contains(closestDuo.Item2)) group2 = g;
@@ -110,10 +108,10 @@ public class AtRiskLinks : Displayer
                 }
 
                 //Remove all the links inter group
-                List<Tuple<LogAgentData, LogAgentData>> linkToRemove = new List<Tuple<LogAgentData, LogAgentData>>();
-                foreach (Tuple<LogAgentData, LogAgentData> t in links)
+                List<Tuple<AgentData, AgentData>> linkToRemove = new List<Tuple<AgentData, AgentData>>();
+                foreach (Tuple<AgentData, AgentData> t in links)
                 {
-                    foreach (List<LogAgentData> g in groups)
+                    foreach (List<AgentData> g in groups)
                     {
                         if (g.Contains(t.Item1) && g.Contains(t.Item2))
                         {
@@ -123,7 +121,7 @@ public class AtRiskLinks : Displayer
                     }
                 }
 
-                foreach (Tuple<LogAgentData, LogAgentData> t in linkToRemove)
+                foreach (Tuple<AgentData, AgentData> t in linkToRemove)
                 {
                     links.Remove(t);
                 }
@@ -134,10 +132,10 @@ public class AtRiskLinks : Displayer
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
-        foreach (Tuple<LogAgentData, LogAgentData> l in res)
+        foreach (Tuple<AgentData, AgentData> l in res)
         {
             //Get the vertices of the line
-            List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.getPosition(), l.Item2.getPosition(), width);
+            List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width);
             //Get the triangles from the vertices of the line
             List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
 
@@ -166,5 +164,4 @@ public class AtRiskLinks : Displayer
         mesh.Clear();
     }
     #endregion
-
 }

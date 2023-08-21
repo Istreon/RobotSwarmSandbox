@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public class SwarmParameters
 {
     //--Swarm behaviour--//
@@ -9,37 +10,85 @@ public class SwarmParameters
     private MovementManager.AgentMovement agentMovement; //Defines how the agent moves
 
     //--Map parameters--//
-    private float mapSizeX = 7.0f;
-    private float mapSizeZ = 7.0f;
+    private float mapSizeX;
+    private float mapSizeZ;
 
     //--Field of view size--//
-    private float fieldOfViewSize = 1.0f; //This is the size of the radius
-    protected float blindSpotSize = 30; //This is the size of blind spot of the agent (in degrees)
+    private float fieldOfViewSize; //This is the size of the radius
+    private float blindSpotSize; //This is the size of blind spot of the agent (in degrees)
 
     //--Intensity parameters--//
-    private float maxSpeed = 1.0f;
-    private float moveForwardIntensity = 1.0f;
-    private float randomMovementIntensity = 20.0f;
-    private float frictionIntensity = 0.1f;
-    private float avoidCollisionWithNeighboursIntensity = 20.0f;
+    private float maxSpeed;
+    private float moveForwardIntensity;
+    private float randomMovementIntensity;
+    private float frictionIntensity;
+    private float avoidCollisionWithNeighboursIntensity;
 
 
     //--Reynolds model parameters--//
-    private float cohesionIntensity = 1.0f;
-    private float alignmentIntensity = 1.0f;
-    private float separationIntensity = 1.0f;
+    private float cohesionIntensity;
+    private float alignmentIntensity;
+    private float separationIntensity;
 
 
     //--Couzin model parameters--//
-    private float attractionZoneSize = 0.3f; //This is the size of the radius
-    private float alignmentZoneSize = 0.3f; //This is the size of the radius
-    private float repulsionZoneSize = 0.3f; //This is the size of the radius
+    private float attractionZoneSize; //This is the size of the radius
+    private float alignmentZoneSize; //This is the size of the radius
+    private float repulsionZoneSize; //This is the size of the radius
 
     //--Preservation of connectivity parameters--//
-    private float distanceBetweenAgents = 1.0f;
+    private float distanceBetweenAgents;
 
+    #region Methods - Constructor
+    public SwarmParameters(
+        BehaviourManager.AgentBehaviour agentBehaviour,
+        MovementManager.AgentMovement agentMovement, 
+        float mapSizeX,
+        float mapSizeZ,
+        float fieldOfViewSize, 
+        float blindSpotSize,
+        float maxSpeed,
+        float moveForwardIntensity,
+        float randomMovementIntensity,
+        float frictionIntensity,
+        float avoidCollisionWithNeighboursIntensity,
+        float cohesionIntensity,
+        float alignmentIntensity,
+        float separationIntensity,
+        float attractionZoneSize,
+        float alignmentZoneSize,
+        float repulsionZoneSize,
+        float distanceBetweenAgents)
+    {
+        this.agentBehaviour = agentBehaviour;
+        this.agentMovement = agentMovement;
+        this.mapSizeX = mapSizeX;
+        this.mapSizeZ = mapSizeZ;
+        this.fieldOfViewSize = fieldOfViewSize;
+        this.blindSpotSize = blindSpotSize;
+        this.maxSpeed = maxSpeed;
+        this.moveForwardIntensity = moveForwardIntensity;
+        this.randomMovementIntensity = randomMovementIntensity;
+        this.frictionIntensity = frictionIntensity;
+        this.avoidCollisionWithNeighboursIntensity = avoidCollisionWithNeighboursIntensity;
+        this.cohesionIntensity = cohesionIntensity;
+        this.alignmentIntensity = alignmentIntensity;
+        this.separationIntensity = separationIntensity;
+        this.attractionZoneSize = attractionZoneSize;
+        this.alignmentZoneSize = alignmentZoneSize;
+        this.repulsionZoneSize = repulsionZoneSize;
+        this.distanceBetweenAgents = distanceBetweenAgents;
+    }
+    #endregion
 
     #region Methods - Getter
+    public SwarmParameters Clone()
+    {
+        SwarmParameters parameters = (SwarmParameters)this.MemberwiseClone();
+
+        return parameters;
+    }
+
     //--Agent behaviour--//
     public BehaviourManager.AgentBehaviour GetAgentBehaviour()
     {

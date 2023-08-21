@@ -193,4 +193,45 @@ public class BehaviourRules
             return Vector3.zero;
         }
     }
+
+    /// <summary>
+    /// Create a bouncing force that push back inside the area. This force allow to keep the position inside the area.
+    /// </summary>
+    /// <param name="position"> The position of the agent that will receive the force. </param>
+    /// <param name="maxSpeed"> The maximum allowed speed of the agent. </param>
+    /// <param name="mapSizeX"> The size (in x axes) of the map in meters.</param>
+    /// <param name="mapSizeZ"> The size (in z axes) of the map in meters.</param>
+    /// <param name="safetyDistance"> The distance from the wall at which the rule will starts to be applied. </param>
+    /// <returns> A force pushing back inside the map limits.</returns>
+    public static Vector3 BouncesOffWall(Vector3 position, float maxSpeed, float mapSizeX, float mapSizeZ, float safetyDistance = 0.3f)
+    {
+        float x = 0.0f;
+        float z = 0.0f;
+   
+        if (position.x > mapSizeX - safetyDistance)
+        {
+            float dist = Mathf.Abs(mapSizeX - position.x);
+            x = -maxSpeed * safetyDistance / dist;
+        }
+        if (position.x < safetyDistance)
+        {
+            float dist = Mathf.Abs(position.x);
+            x = maxSpeed * safetyDistance / dist;
+        }
+
+        if (position.z > mapSizeZ - safetyDistance)
+        {
+            float dist = Mathf.Abs(mapSizeZ - position.z);
+            z = -maxSpeed * safetyDistance / dist;
+        }
+        if (position.z < safetyDistance)
+        {
+            float dist = Mathf.Abs(position.z);
+            z = maxSpeed * safetyDistance / dist;
+        }
+        Vector3 rebond = new Vector3(x, 0.0f, z);
+
+        return rebond;
+    }
+    
 }

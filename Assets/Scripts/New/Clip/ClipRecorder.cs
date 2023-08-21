@@ -9,27 +9,23 @@ public class ClipRecorder : MonoBehaviour
     #endregion
 
     #region Private fields
-    private AgentManager agentManager;
-    private ParameterManager parameterManager;
+    private SwarmManager swarmManager;
 
     private bool recording = false;
 
     float timer = 0.0f;
 
-    private List<LogClipFrame> frames;
+    private List<SwarmData> frames;
     #endregion
 
     #region MonoBehaviour callbacks
     // Start is called before the first frame update
     void Start()
     {
-        agentManager = FindObjectOfType<AgentManager>();
-        if (agentManager == null) Debug.LogError("AgentManager is missing in the scene", this);
+        swarmManager = FindObjectOfType<SwarmManager>();
+        if (swarmManager == null) Debug.LogError("AgentManager is missing in the scene", this);
 
-        parameterManager = FindObjectOfType<ParameterManager>();
-        if (parameterManager == null) Debug.LogError("ParameterManager is missing in the scene", this);
-
-        frames = new List<LogClipFrame>();
+        frames = new List<SwarmData>();
     }
 
     // Update is called once per frame
@@ -39,7 +35,7 @@ public class ClipRecorder : MonoBehaviour
         {
             if (timer >= (1.0f / fps))
             {
-                frames.Add(agentManager.RecordFrame());
+                frames.Add(swarmManager.CloneFrame());
                 Debug.Log("--frame");
                 timer = timer - (1.0f / fps);
             }
@@ -50,7 +46,7 @@ public class ClipRecorder : MonoBehaviour
             if (frames.Count > 0)
             {
                 Debug.Log("Clip Saved");
-                LogClip clip = new LogClip(frames, fps, agentManager.GetMapSizeX(), agentManager.GetMapSizeZ());
+                SwarmClip clip = new SwarmClip(frames, fps);
                 //Create filename based on current date time
                 string date = System.DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
                 string filename = "/" + "clip_" + date + ".dat";

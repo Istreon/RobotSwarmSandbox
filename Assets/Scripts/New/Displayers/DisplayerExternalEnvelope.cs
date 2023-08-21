@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExternalEnvelope : Displayer
+public class DisplayerExternalEnvelope : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -24,11 +24,11 @@ public class ExternalEnvelope : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
-        List<List<Vector3>> convexHuls = GetConvexHul(frame);
+        List<List<Vector3>> convexHuls = GetConvexHul(swarmData);
 
         foreach(List<Vector3> pile in convexHuls)
         {
@@ -70,19 +70,19 @@ public class ExternalEnvelope : Displayer
     #endregion
 
     #region Methods - Convex hul
-    private List<List<Vector3>> GetConvexHul(LogClipFrame frame)
+    private List<List<Vector3>> GetConvexHul(SwarmData swarmData)
     {
         List<List<Vector3>> convexHuls = new List<List<Vector3>>();
-        List<List<LogAgentData>> clusters = FrameTools.GetClusters(frame);
+        List<List<AgentData>> clusters = SwarmTools.GetClusters(swarmData);
 
-        foreach (List<LogAgentData> c in clusters)
+        foreach (List<AgentData> c in clusters)
         {
             if (c.Count < 3) continue;
             List<Vector3> positions = new List<Vector3>();
 
-            foreach (LogAgentData g in c)
+            foreach (AgentData g in c)
             {
-                positions.Add(g.getPosition());
+                positions.Add(g.GetPosition());
             }
 
             //Calcul du point pivot

@@ -22,17 +22,17 @@ public class Communities : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
-        List<List<LogAgentData>> communities = FrameTools.GetOrderedCommunities(frame);
+        List<List<AgentData>> communities = SwarmTools.GetOrderedCommunities(swarmData);
 
         for (int i = 0; i < communities.Count; i++)
         {
-            foreach (LogAgentData a in communities[i])
+            foreach (AgentData a in communities[i])
             {
                 GameObject temp = GameObject.Instantiate(prefab);
-                temp.transform.position = a.getPosition();
+                temp.transform.position = a.GetPosition();
                 temp.GetComponent<Renderer>().material.color = colorPalette[i % 10];
                 temp.transform.parent = this.transform;
                 displayCube.Add(temp);

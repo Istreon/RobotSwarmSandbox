@@ -27,7 +27,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     string[] filePaths;
 
-    private List<LogClip> clips = new List<LogClip>();
+    private List<SwarmClip> clips = new List<SwarmClip>();
 
     Thread backgroundThread;
 
@@ -227,7 +227,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         string s = filePaths[0];
 
         //Loading clip from full file path
-        LogClip clip = ClipTools.LoadClip(s);
+        SwarmClip clip = ClipTools.LoadClip(s);
 
         if (clip != null)
         {

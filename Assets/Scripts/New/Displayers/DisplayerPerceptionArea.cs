@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PerceptionArea : Displayer
+public class DisplayerPerceptionArea : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -48,24 +48,24 @@ public class PerceptionArea : Displayer
     }
 
 
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
-        
 
-        float fovSize = frame.GetParameters().GetFieldOfViewSize();
-        float bsSize = frame.GetParameters().GetBlindSpotSize();
+        SwarmParameters parameters = swarmData.GetParameters();
+        float fovSize = parameters.GetFieldOfViewSize();
+        float bsSize = parameters.GetBlindSpotSize();
 
 
         List<Vector3> vertices = new List<Vector3>(); ;
 
         List<int> triangles = new List<int>();
 
-        foreach (LogAgentData a in frame.getAgentData())
+        foreach (AgentData a in swarmData.GetAgentsData())
         {
-            Vector3 position = a.getPosition();
+            Vector3 position = a.GetPosition();
 
-            Vector3 direction = a.getSpeed();
+            Vector3 direction = a.GetSpeed();
 
             //Get the mesh for one agent
             List<Vector3> v = GetCircumferencePoints(edge, fovSize, bsSize, position, direction);

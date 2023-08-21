@@ -117,10 +117,10 @@ public class AgentManager : MonoBehaviour
             d.ClearVisual();
         }
 
-        foreach(Displayer d in displayers)
+      /*  foreach(Displayer d in displayers)
         {
             d.DisplayVisual(frame);
-        }
+        }*/
         
     }
 

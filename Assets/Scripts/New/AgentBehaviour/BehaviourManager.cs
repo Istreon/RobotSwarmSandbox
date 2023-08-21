@@ -56,6 +56,7 @@ public class BehaviourManager
         forces.Add(BehaviourRules.Cohesion(parameters.GetCohesionIntensity(),agent.GetPosition(), neighboursPositions));
         forces.Add(BehaviourRules.Separation(parameters.GetSeparationIntensity(), agent.GetPosition(), neighboursPositions));
         forces.Add(BehaviourRules.Alignment(parameters.GetAlignmentIntensity(), neighboursSpeeds));
+        forces.Add(BehaviourRules.BouncesOffWall(agent.GetPosition(),parameters.GetMaxSpeed(),parameters.GetMapSizeX(), parameters.GetMapSizeZ()));
 
         return forces;
     }

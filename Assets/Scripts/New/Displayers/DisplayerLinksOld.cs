@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LinksOld : Displayer
+public class DisplayerLinksOld : Displayer
 {
     #region Serialized fields
     [SerializeField]
@@ -46,17 +46,17 @@ public class LinksOld : Displayer
     #endregion
 
     #region Methods - Displayer override
-    public override void DisplayVisual(LogClipFrame frame)
+    public override void DisplayVisual(SwarmData swarmData)
     {
         ClearVisual();
 
-        List<Tuple<LogAgentData, LogAgentData>> links = FrameTools.GetLinksList(frame);
+        List<Tuple<AgentData, AgentData>> links = SwarmTools.GetLinksList(swarmData);
 
-        float fovSize = frame.GetParameters().GetFieldOfViewSize();
+        float fovSize = swarmData.GetParameters().GetFieldOfViewSize();
 
-        foreach(Tuple<LogAgentData,LogAgentData> l in links)
+        foreach(Tuple<AgentData,AgentData> l in links)
         {
-            float distOnMaxDistance = Vector3.Distance(l.Item1.getPosition(), l.Item2.getPosition()) / fovSize;
+            float distOnMaxDistance = Vector3.Distance(l.Item1.GetPosition(), l.Item2.GetPosition()) / fovSize;
             Color lineColor = gradient.Evaluate(distOnMaxDistance);
 
 
@@ -74,8 +74,8 @@ public class LinksOld : Displayer
             lineRenderer.material.color = lineColor;
 
             //For drawing line in the world space, provide the x,y,z values
-            lineRenderer.SetPosition(0, l.Item1.getPosition()); //x,y and z position of the starting point of the line
-            lineRenderer.SetPosition(1, l.Item2.getPosition()); //x,y and z position of the end point of the line
+            lineRenderer.SetPosition(0, l.Item1.GetPosition()); //x,y and z position of the starting point of the line
+            lineRenderer.SetPosition(1, l.Item2.GetPosition()); //x,y and z position of the end point of the line
 
 
             lineRenderer.receiveShadows = false;
