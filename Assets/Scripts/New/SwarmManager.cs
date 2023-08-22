@@ -40,20 +40,35 @@ public class SwarmManager : MonoBehaviour
             Debug.LogError("ParameterManager is missing in the scene", this);
         }
 
-        SwarmParameters parameters = parametersInterface.GetParameters();
 
-        List<AgentData> agents = new List<AgentData>();
-        for (int i = 0; i < numberOfAgents; i++)
+        FrameTransmitter frameTransmitter = FindObjectOfType<FrameTransmitter>();
+
+        if (frameTransmitter != null)
         {
-            
-            Vector3 position = new Vector3(UnityEngine.Random.Range(0.0f, parameters.GetMapSizeX()), 0.0f, UnityEngine.Random.Range(0.0f, parameters.GetMapSizeZ()));
-            Vector3 direction = new Vector3(UnityEngine.Random.Range(-1.0f,1.0f ), 0.0f, UnityEngine.Random.Range(-1.0f, 1.0f));
-            
-            AgentData agent = new AgentData(position, direction.normalized);
-            agents.Add(agent);
+            SwarmData frame = frameTransmitter.GetFrameAndDestroy();
+            swarm = frame.Clone();
+            parametersInterface.SetParameters(swarm.GetParameters());
+        }
+        else
+        {
+            SwarmParameters parameters = parametersInterface.GetParameters();
+
+            List<AgentData> agents = new List<AgentData>();
+            for (int i = 0; i < numberOfAgents; i++)
+            {
+
+                Vector3 position = new Vector3(UnityEngine.Random.Range(0.0f, parameters.GetMapSizeX()), 0.0f, UnityEngine.Random.Range(0.0f, parameters.GetMapSizeZ()));
+                Vector3 direction = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), 0.0f, UnityEngine.Random.Range(-1.0f, 1.0f));
+
+                AgentData agent = new AgentData(position, direction.normalized);
+                agents.Add(agent);
+            }
+            swarm = new SwarmData(agents, parameters);
         }
 
-        swarm = new SwarmData(agents,parameters);
+            
+
+        
     }
 
     // Update is called once per frame

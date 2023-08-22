@@ -4,7 +4,6 @@ using UnityEngine;
 
 //Behaviour based on Heroes and Cowards behaviour from : http://www.netlogoweb.org/launch#http://www.netlogoweb.org/assets/modelslib/IABM%20Textbook/chapter%202/Heroes%20and%20Cowards.nlogo
 
-[RequireComponent(typeof(MonaRobot))]
 public class HeroesAndCowardsAgent : MonoBehaviour
 {
 

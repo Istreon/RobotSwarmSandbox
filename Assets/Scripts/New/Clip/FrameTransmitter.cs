@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FrameTransmitter : MonoBehaviour
 {
-    private LogClipFrame frame;
+    private SwarmData frame;
     // Start is called before the first frame update
     void Start()
     {
@@ -12,17 +10,17 @@ public class FrameTransmitter : MonoBehaviour
         this.gameObject.name = "FrameTransmitter";
     }
 
-    public void SetFrame(LogClipFrame frame)
+    public void SetFrame(SwarmData frame)
     {
         this.frame = frame;
     }
 
-    public LogClipFrame GetFrame()
+    public SwarmData GetFrame()
     {
         return this.frame;
     }
 
-    public LogClipFrame GetFrameAndDestroy()
+    public SwarmData GetFrameAndDestroy()
     {
         Destroy(this.gameObject);
         return GetFrame();

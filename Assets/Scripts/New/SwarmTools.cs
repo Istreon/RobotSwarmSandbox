@@ -189,8 +189,8 @@ public class SwarmTools
     }
 
     /// <summary>
-    /// From a swarm get the différent groups based on agent perception and graph theory. Those groups are sorted by size.
-    /// An agent belong to only one cluster.
+    /// From a swarm get the different groups based on agent perception and graph theory. Those groups are sorted by size.
+    /// An agent belongs to only one cluster.
     /// </summary>
     /// <returns> 
     /// A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="AgentData"/>. 
@@ -711,6 +711,66 @@ public class SwarmTools
 
         return newMatrix;
     }
+
+    #endregion
+
+    #region Methods - Others
+    /// <summary>
+    /// Compute the center of mass of the swarm.
+    /// </summary>
+    /// <param name="swarmData"> The swarm data.</param>
+    /// <returns>The center of mass of the swarm.</returns>
+    public static Vector3 GetCenterOfMass(SwarmData swarmData)
+    {
+        Vector3 centerOfMass = Vector3.zero;
+        List<AgentData> agents = swarmData.GetAgentsData();
+        foreach (AgentData a in agents)
+        {
+            centerOfMass += a.GetPosition();
+        }
+        centerOfMass /= agents.Count;
+
+        return centerOfMass;
+    }
+
+    public static List<AgentData> KNN(AgentData agent, List<AgentData> l, int n)
+    {
+        List<AgentData> agents = new List<AgentData>(l);
+        List<AgentData> knn = new List<AgentData>();
+
+        if (agents.Count < n) n = agents.Count;
+
+        for (int i = 0; i < n; i++)
+        {
+            AgentData nearest = NearestAgent(agent, agents);
+            knn.Add(nearest);
+            agents.Remove(nearest);
+        }
+
+        return knn;
+    }
+
+
+    public static AgentData NearestAgent(AgentData agent, List<AgentData> l)
+    {
+        float min = float.MaxValue;
+        AgentData minAgent = null;
+        foreach (AgentData a in l)
+        {
+            if (System.Object.ReferenceEquals(a, agent)) continue;
+
+            float dist = Vector3.Distance(a.GetPosition(), agent.GetPosition());
+
+            if (dist < min)
+            {
+                min = dist;
+                minAgent = a;
+            }
+        }
+
+        return minAgent;
+    }
+
 
     #endregion
 }

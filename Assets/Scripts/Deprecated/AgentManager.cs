@@ -64,9 +64,9 @@ public class AgentManager : MonoBehaviour
 
         FrameTransmitter frameTransmitter = FindObjectOfType<FrameTransmitter>();
 
-
         if (frameTransmitter!=null)
         {
+            /*
             LogClipFrame frame = frameTransmitter.GetFrameAndDestroy();
             this.numberOfAgents = frame.getAgentData().Count;
 
@@ -91,7 +91,7 @@ public class AgentManager : MonoBehaviour
             parameterManager.SetFrictionIntensity(parameters.GetFrictionIntensity());
             parameterManager.SetMaxSpeed(parameters.GetMaxSpeed());
             parameterManager.SetMoveForwardIntensity(parameters.GetMoveForwardIntensity());
-            parameterManager.SetRandomMovementIntensity(parameters.GetRandomMovementIntensity());
+            parameterManager.SetRandomMovementIntensity(parameters.GetRandomMovementIntensity());*/
 
         } else
         {

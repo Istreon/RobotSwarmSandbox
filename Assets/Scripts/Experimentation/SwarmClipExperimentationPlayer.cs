@@ -10,35 +10,34 @@ using System;
 using System.Text;
 
 [RequireComponent(typeof(ClipPlayer))]
-
-public class ExperimentationAnticipationPlayer : MonoBehaviour
+public class SwarmClipExperimentationPlayer : MonoBehaviour
 {
     #region Serialize fields
     [SerializeField]
-    private GameObject answerMenu;
+    private GameObject nextClipMenu;
 
     [SerializeField]
-    private GameObject startingMenu;
+    private Slider slider;
+
+    [SerializeField]
+    private TMP_Text feedback;
     #endregion
 
     #region Private fields
-    //--Clip loading--//
+    //string filePath = "C:/Users/hmaym/OneDrive/Bureau/UnityBuild/Clip/"; //The folder containing clip files
     string filePath = "/Clips/"; //The folder containing clip files
+
 
     string[] filePaths;
 
+
     private List<SwarmClip> clips = new List<SwarmClip>();
-
-    Thread backgroundThread;
-
-    //--Clip player--//
 
     private int currentClip = 0;
 
     private ClipPlayer clipPlayer;
 
-    //--Results--//
-    private Exp2AnticipationResult experimentationResult = new Exp2AnticipationResult();
+    private ExperimentationResult experimentationResult = new ExperimentationResult();
 
     string resultFilePathCSV = "";
     string resultFilePathDat = "";
@@ -47,6 +46,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     private bool resultSaved = false;
 
+    Thread backgroundThread;
+
     StringBuilder sb = new StringBuilder();
     #endregion
 
@@ -54,60 +55,50 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Disable gameObject
-        answerMenu.SetActive(false); //Answering menu
-
-        //Enable gameObject
-        startingMenu.SetActive(true);
-
-        //Get the path of the clip files
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
 
-        //Get the files path from the clip folder
+        //Clips
         filePaths = Directory.GetFiles(filePath, "*.dat",
                                          SearchOption.TopDirectoryOnly);
 
-        //Prepare the name of the result files
-        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss"); 
-        string resultFilename = "/" + "resultXP_" + date; //it uses the date to obtain a unique name
+        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+        string resultFilename = "/" + "resultXP_" + date;
         string resultFolderPath = Application.dataPath + "/Results";
         resultFilePathDat = resultFolderPath + resultFilename + ".dat";
         resultFilePathCSV = resultFolderPath + resultFilename + ".csv";
 
-        //Check if the result folder exists. If not, create one
         if (!Directory.Exists(resultFolderPath))
         {
             Directory.CreateDirectory(resultFolderPath);
         }
 
         //Prepare csv result file
-        string line = "Filename,Result\r";
+        string line = "Filename,Framenumber,Result\r";
         sb.Append(line);
 
-        //Find the clip player in the scene
+        slider.gameObject.SetActive(false);
+
         clipPlayer = FindObjectOfType<ClipPlayer>();
 
-        //Shuffle the list of clip files
+
+
+
+        //Shuffle list
         var rnd = new System.Random();
         List<string> l = filePaths.ToList();
         l = l.OrderBy(item => rnd.Next()).ToList<string>();
         filePaths = l.ToArray();
 
-
-        //Load the first clip before continue
         LoadFirstClips();
-        
-        //Prepare the thread that will load the other clips
         backgroundThread = new Thread(new ThreadStart(LoadOtherClips));
-
         // Start thread loading the other clips
         backgroundThread.Start();
 
- 
+       
         if (clips.Count > 0)
         {
-            currentClip = -1;
+           currentClip = -1;
         }
     }
 
@@ -120,42 +111,39 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (clipPlayer.IsClipFinished() && currentClip !=-1) //If the current clip ended
+        slider.value = clipPlayer.GetClipAdvancement();
+
+        if (clipPlayer.IsClipFinished() || currentClip == -1)
         {
-            //Display answering menu
-            answerMenu.SetActive(true);
+            //Display interclip menu and hide slider
+            nextClipMenu.SetActive(true);
+            slider.gameObject.SetActive(false);
+
+            //Check if a response has been given
+            if(!answered && !(currentClip ==-1))
+            {
+                GiveAnswer(false);
+                answered = true;
+            }
 
             //Check if the experimentation is ended to save the results
-            if (currentClip >= clips.Count - 1 && !resultSaved)
+            if(currentClip >= clips.Count - 1 && !resultSaved)
             {
-                answerMenu.GetComponentInChildren<TMP_Text>().text = "Finish";
+                nextClipMenu.GetComponentInChildren<TMP_Text>().text = "Finish";
                 SaveResult();
+                
             }
         }
         else
         {
-            answerMenu.SetActive(false);
+            nextClipMenu.SetActive(false);
         }
     }
 
-    public void StartExperimentation()
+    public void NextClip()
     {
-        if (currentClip == -1) //If no clip was display
+        if (clipPlayer.IsClipFinished())
         {
-            //Disable starting menu
-            startingMenu.SetActive(false);
-
-            //Launch the first clip
-            NextClip();
-        } else
-        {
-            Debug.LogError("Can't start the experiment.",this);
-        }
-    }
-
-    private void NextClip()
-    {
-
             if (currentClip >= clips.Count - 1)
             {
                 Debug.Log("Experimentation finished");
@@ -164,19 +152,22 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
             {
                 currentClip++;
                 clipPlayer.SetClip(clips[currentClip]);
-                Debug.Log("Next clip " + (currentClip + 1));
+                Debug.Log("Next clip" + (currentClip + 1));
                 clipPlayer.Play();
+                slider.gameObject.SetActive(true);
                 answered = false;
+                feedback.text = "";
             }
-        
+        }     
     }
 
 
     //Choice = true   => fracture
     public void GiveAnswer(bool choice)
-    {
-        if (!answered && clipPlayer.IsClipFinished())
+    {   if(!answered)
         {
+            feedback.text = choice ? "You answered \"Fracture\"" : "You answered \"No fracture\"";
+
             //Get file name from file path
             string s = filePaths[currentClip];
             int pos = s.IndexOf("/");
@@ -186,12 +177,11 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
                 pos = s.IndexOf("/");
             }
 
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, choice);
-            Debug.Log(res.filename + "    " + res.fracture);
+            ClipResult res = new ClipResult(s, choice, clipPlayer.GetFrameNumber());
+            Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
             experimentationResult.AddClipResult(res);
         }
         answered = true;
-        NextClip();
     }
 
 
@@ -205,10 +195,10 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
 
         //Save result : format .csv
-        foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
+        foreach (ClipResult cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename +  "," + cr.fracture + "\r";
+            line = cr.filename + "," + cr.frameNumber + "," + cr.fracture + "\r";
             sb.Append(line);
         }
 
@@ -219,7 +209,6 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         Debug.Log("Results saved.");
     }
 
-    #region Methods - Load clips
 
     public void LoadFirstClips()
     {
@@ -242,13 +231,13 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     public void LoadOtherClips()
     {
         //Load all clip
-        for (int i = 1; i < filePaths.Length; i++)
+        for (int i = 1; i< filePaths.Length; i++)
         {
             //Concatenation of file path and file name
             string s = this.filePaths[i];
 
             //Loading clip from full file path
-            LogClip clip = ClipTools.LoadClip(s);
+            SwarmClip clip = ClipTools.LoadClip(s);
 
             if (clip != null)
             {
@@ -260,5 +249,4 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
     }
 
-    #endregion
 }

@@ -27,7 +27,7 @@ public class ClipEditor : MonoBehaviour
     #region Private fields - clip parameters
     
 
-    private LogClip clip;
+    private SwarmClip clip;
 
     private string filePath = "";
     #endregion
@@ -115,16 +115,6 @@ public class ClipEditor : MonoBehaviour
             }  
         }
     }
-
-    /// <summary>
-    /// Change the visualisation type of the clip. 
-    /// Each call of this methods will pass the visualisation to the next one as define in <see cref="ClipPlayer"/>.
-    /// </summary>
-    public void ChangeVisualization()
-    {
-        clipPlayer.NextDisplayType();
-    }
-
     #endregion
 
     #region Methods - Clip editor
@@ -140,20 +130,20 @@ public class ClipEditor : MonoBehaviour
     public void RemoveClipPart(bool firstPart)
     {
         //If there are enough frame to cut the clip
-        if (clip.getClipFrames().Count > 2)
+        if (clip.GetFrames().Count > 2)
         {
             if (firstPart) //Remove the first part of the clip
             {
-                clip.getClipFrames().RemoveRange(0,clipPlayer.GetFrameNumber());
+                clip.GetFrames().RemoveRange(0,clipPlayer.GetFrameNumber());
                 clipPlayer.SetClip(clip);
                 clipPlayer.SetFrameNumber(0);
                 
             }
             else //Remove the last part of the clip
             {
-                clip.getClipFrames().RemoveRange(clipPlayer.GetFrameNumber(), clip.getClipFrames().Count - clipPlayer.GetFrameNumber());
+                clip.GetFrames().RemoveRange(clipPlayer.GetFrameNumber(), clip.GetFrames().Count - clipPlayer.GetFrameNumber());
                 clipPlayer.SetClip(clip);
-                clipPlayer.SetFrameNumber(clip.getClipFrames().Count - 1);
+                clipPlayer.SetFrameNumber(clip.GetFrames().Count - 1);
             }
             modifiedClip = true;
         }
@@ -218,13 +208,12 @@ public class ClipEditor : MonoBehaviour
     #region Methods - Simulation
     public void BackToSimulation()
     {
-        LogClipFrame frame = clipPlayer.GetCurrentFrame();
+        SwarmData frame = clipPlayer.GetCurrentFrame();
 
         GameObject go = new GameObject();
         FrameTransmitter frameTransmitter = go.AddComponent<FrameTransmitter>();
         frameTransmitter.SetFrame(frame);
-        SceneManager.LoadScene("Scenes/SimulationScene");
-        
+        SceneManager.LoadScene("Scenes/SimulationScene"); 
     }
 
     #endregion

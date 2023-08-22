@@ -17,12 +17,12 @@ public class SwarmClip
     #endregion
 
     #region Methods - Getter
-    public int getFps()
+    public int GetFps()
     {
         return this.fps;
     }
 
-    public List<SwarmData> getFrames()
+    public List<SwarmData> GetFrames()
     {
         return frames;
     }

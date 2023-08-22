@@ -10,34 +10,35 @@ using System;
 using System.Text;
 
 [RequireComponent(typeof(ClipPlayer))]
-public class SwarmClipExperimentationPlayer : MonoBehaviour
+
+public class ExperimentationAnticipationPlayer : MonoBehaviour
 {
     #region Serialize fields
     [SerializeField]
-    private GameObject nextClipMenu;
+    private GameObject answerMenu;
 
     [SerializeField]
-    private Slider slider;
-
-    [SerializeField]
-    private TMP_Text feedback;
+    private GameObject startingMenu;
     #endregion
 
     #region Private fields
-    //string filePath = "C:/Users/hmaym/OneDrive/Bureau/UnityBuild/Clip/"; //The folder containing clip files
+    //--Clip loading--//
     string filePath = "/Clips/"; //The folder containing clip files
-
 
     string[] filePaths;
 
+    private List<SwarmClip> clips = new List<SwarmClip>();
 
-    private List<LogClip> clips = new List<LogClip>();
+    Thread backgroundThread;
+
+    //--Clip player--//
 
     private int currentClip = 0;
 
     private ClipPlayer clipPlayer;
 
-    private ExperimentationResult experimentationResult = new ExperimentationResult();
+    //--Results--//
+    private Exp2AnticipationResult experimentationResult = new Exp2AnticipationResult();
 
     string resultFilePathCSV = "";
     string resultFilePathDat = "";
@@ -46,8 +47,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
     private bool resultSaved = false;
 
-    Thread backgroundThread;
-
     StringBuilder sb = new StringBuilder();
     #endregion
 
@@ -55,50 +54,60 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Disable gameObject
+        answerMenu.SetActive(false); //Answering menu
+
+        //Enable gameObject
+        startingMenu.SetActive(true);
+
+        //Get the path of the clip files
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
 
-        //Clips
+        //Get the files path from the clip folder
         filePaths = Directory.GetFiles(filePath, "*.dat",
                                          SearchOption.TopDirectoryOnly);
 
-        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-        string resultFilename = "/" + "resultXP_" + date;
+        //Prepare the name of the result files
+        string date = System.DateTime.Now.ToString("yyyyMMddHHmmss"); 
+        string resultFilename = "/" + "resultXP_" + date; //it uses the date to obtain a unique name
         string resultFolderPath = Application.dataPath + "/Results";
         resultFilePathDat = resultFolderPath + resultFilename + ".dat";
         resultFilePathCSV = resultFolderPath + resultFilename + ".csv";
 
+        //Check if the result folder exists. If not, create one
         if (!Directory.Exists(resultFolderPath))
         {
             Directory.CreateDirectory(resultFolderPath);
         }
 
         //Prepare csv result file
-        string line = "Filename,Framenumber,Result\r";
+        string line = "Filename,Result\r";
         sb.Append(line);
 
-        slider.gameObject.SetActive(false);
-
+        //Find the clip player in the scene
         clipPlayer = FindObjectOfType<ClipPlayer>();
 
-
-
-
-        //Shuffle list
+        //Shuffle the list of clip files
         var rnd = new System.Random();
         List<string> l = filePaths.ToList();
         l = l.OrderBy(item => rnd.Next()).ToList<string>();
         filePaths = l.ToArray();
 
+
+        //Load the first clip before continue
         LoadFirstClips();
+        
+        //Prepare the thread that will load the other clips
         backgroundThread = new Thread(new ThreadStart(LoadOtherClips));
+
         // Start thread loading the other clips
         backgroundThread.Start();
 
-       
+ 
         if (clips.Count > 0)
         {
-           currentClip = -1;
+            currentClip = -1;
         }
     }
 
@@ -111,39 +120,42 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        slider.value = clipPlayer.GetClipAdvancement();
-
-        if (clipPlayer.IsClipFinished() || currentClip == -1)
+        if (clipPlayer.IsClipFinished() && currentClip !=-1) //If the current clip ended
         {
-            //Display interclip menu and hide slider
-            nextClipMenu.SetActive(true);
-            slider.gameObject.SetActive(false);
-
-            //Check if a response has been given
-            if(!answered && !(currentClip ==-1))
-            {
-                GiveAnswer(false);
-                answered = true;
-            }
+            //Display answering menu
+            answerMenu.SetActive(true);
 
             //Check if the experimentation is ended to save the results
-            if(currentClip >= clips.Count - 1 && !resultSaved)
+            if (currentClip >= clips.Count - 1 && !resultSaved)
             {
-                nextClipMenu.GetComponentInChildren<TMP_Text>().text = "Finish";
+                answerMenu.GetComponentInChildren<TMP_Text>().text = "Finish";
                 SaveResult();
-                
             }
         }
         else
         {
-            nextClipMenu.SetActive(false);
+            answerMenu.SetActive(false);
         }
     }
 
-    public void NextClip()
+    public void StartExperimentation()
     {
-        if (clipPlayer.IsClipFinished())
+        if (currentClip == -1) //If no clip was display
         {
+            //Disable starting menu
+            startingMenu.SetActive(false);
+
+            //Launch the first clip
+            NextClip();
+        } else
+        {
+            Debug.LogError("Can't start the experiment.",this);
+        }
+    }
+
+    private void NextClip()
+    {
+
             if (currentClip >= clips.Count - 1)
             {
                 Debug.Log("Experimentation finished");
@@ -152,22 +164,19 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
             {
                 currentClip++;
                 clipPlayer.SetClip(clips[currentClip]);
-                Debug.Log("Next clip" + (currentClip + 1));
+                Debug.Log("Next clip " + (currentClip + 1));
                 clipPlayer.Play();
-                slider.gameObject.SetActive(true);
                 answered = false;
-                feedback.text = "";
             }
-        }     
+        
     }
 
 
     //Choice = true   => fracture
     public void GiveAnswer(bool choice)
-    {   if(!answered)
+    {
+        if (!answered && clipPlayer.IsClipFinished())
         {
-            feedback.text = choice ? "You answered \"Fracture\"" : "You answered \"No fracture\"";
-
             //Get file name from file path
             string s = filePaths[currentClip];
             int pos = s.IndexOf("/");
@@ -177,11 +186,12 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
                 pos = s.IndexOf("/");
             }
 
-            ClipResult res = new ClipResult(s, choice, clipPlayer.GetFrameNumber());
-            Debug.Log(res.filename + "    " + res.fracture + "   " + res.frameNumber);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, choice);
+            Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
         }
         answered = true;
+        NextClip();
     }
 
 
@@ -195,10 +205,10 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
 
         //Save result : format .csv
-        foreach (ClipResult cr in experimentationResult.results)
+        foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename + "," + cr.frameNumber + "," + cr.fracture + "\r";
+            line = cr.filename +  "," + cr.fracture + "\r";
             sb.Append(line);
         }
 
@@ -209,6 +219,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         Debug.Log("Results saved.");
     }
 
+    #region Methods - Load clips
 
     public void LoadFirstClips()
     {
@@ -216,7 +227,7 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         string s = filePaths[0];
 
         //Loading clip from full file path
-        LogClip clip = ClipTools.LoadClip(s);
+        SwarmClip clip = ClipTools.LoadClip(s);
 
         if (clip != null)
         {
@@ -231,13 +242,13 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     public void LoadOtherClips()
     {
         //Load all clip
-        for (int i = 1; i< filePaths.Length; i++)
+        for (int i = 1; i < filePaths.Length; i++)
         {
             //Concatenation of file path and file name
             string s = this.filePaths[i];
 
             //Loading clip from full file path
-            LogClip clip = ClipTools.LoadClip(s);
+            SwarmClip clip = ClipTools.LoadClip(s);
 
             if (clip != null)
             {
@@ -249,4 +260,5 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
         }
     }
 
+    #endregion
 }

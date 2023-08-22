@@ -163,8 +163,9 @@ public class BehaviourRules
         }
     }
 
+
     /// <summary>
-    /// Create an alignment force based on current neighbours. This force align speed to match its neighbours speed (direction and intensity).
+    /// Create an alignment force based on current neighbours speeds. This force align speed to match its neighbours speed (direction and intensity).
     /// </summary>
     /// <param name="intensity"> The intensity of the resulted force.</param>
     /// <param name="neighboursSpeeds"> The speeds of the agent's neigbours. </param>
@@ -192,6 +193,34 @@ public class BehaviourRules
         {
             return Vector3.zero;
         }
+    }
+
+    /// <summary>
+    /// Create an alignment force based on difference between current neighbours speeds and agen current speed.
+    /// This force align speed to match its neighbours speed (direction and intensity).
+    /// </summary>
+    /// <param name="intensity"> The intensity of the resulted force.</param>
+    /// <param name="speed"> The speed of the agent.</param>
+    /// <param name="neighboursSpeeds"> The speeds of the agent's neigbours.</param>
+    /// <returns>  A force aligning a speed to its neighbours. </returns>
+    public static Vector3 AlignmentUsingDifference(float intensity, Vector3 speed, List<Vector3> neighboursSpeeds)
+    {
+        int count = 0;
+        Vector3 a = Vector3.zero;
+
+        foreach (Vector3 s in neighboursSpeeds)
+        {
+            count += 1;
+            a += (speed - s);
+        }
+
+        if (count > 0)
+        {
+            a.y = 0.0f; //To stay in 2D
+            a *= intensity;
+            a = -a;
+        }
+        return a;
     }
 
     /// <summary>
@@ -233,5 +262,33 @@ public class BehaviourRules
 
         return rebond;
     }
-    
+
+
+    /// <summary>
+    /// Create a force that maintains a specific distance between positions, based on current neighbours.
+    /// </summary>
+    /// <param name="distanceBetweenAgents"> The desired distance. </param>
+    /// <param name="position"> The position of the agent that will receive the force. </param>
+    /// <param name="neighboursPositions"> The positions of the agent's neigbours. </param>
+    /// <returns> A force that maintains a specific distance between positions.</returns>
+    public static Vector3 PotentialFunction(float distanceBetweenAgents, Vector3 position, List<Vector3> neighboursPositions)
+    {
+        int count = 0;
+
+        Vector3 g = Vector3.zero;
+        foreach (Vector3 p in neighboursPositions)
+        {
+
+            Vector3 rij = position - p;
+            rij /= distanceBetweenAgents;
+            float uX = (-2 * position.x * rij.x + 2 * position.x * rij.x * (Mathf.Pow(rij.x, 2) + Mathf.Pow(rij.z, 2))) / Mathf.Pow((Mathf.Pow(rij.x, 2) + Mathf.Pow(rij.z, 2)), 2);
+            float uZ = (-2 * position.z * rij.z + 2 * position.x * rij.z * (Mathf.Pow(rij.x, 2) + Mathf.Pow(rij.z, 2))) / Mathf.Pow((Mathf.Pow(rij.x, 2) + Mathf.Pow(rij.z, 2)), 2);
+
+            g += new Vector3(uX, 0.0f, uZ);
+
+            count ++;
+        }
+        return -g;
+    }
+
 }

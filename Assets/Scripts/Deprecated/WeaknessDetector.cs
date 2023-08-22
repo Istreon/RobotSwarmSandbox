@@ -79,12 +79,11 @@ public class WeaknessDetector : MonoBehaviour
 
         //List<Tuple<Agent, Agent, float>> criticalLinks = GetCriticalLinks(links,agents);
 
-        List<List<Agent>> communities = ModularityOptimisation.GetCommunities(agents);
+        //List<List<Agent>> communities = ModularityOptimisation.GetCommunities(agents);
+        List<List<Agent>> communities = new List<List<Agent>>();
 
 
-
-
-        foreach(List<Agent> c in communities)
+        foreach (List<Agent> c in communities)
         {
             Vector3 meanSpeed = Vector3.zero;
             Vector3 meanPos = Vector3.zero;

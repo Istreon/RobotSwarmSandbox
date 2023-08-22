@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EditorParametersInterface : MonoBehaviour
@@ -34,10 +32,10 @@ public class EditorParametersInterface : MonoBehaviour
     [Header("Intensity parameters")]
     [SerializeField]
     [Range(0.0f, 1.0f)]
-    private float maxSpeed = 1.0f;
+    private float maxSpeed = 0.1f;
     [SerializeField]
     [Range(0.0f, 5.0f)]
-    private float moveForwardIntensity = 1.0f;
+    private float moveForwardIntensity = 0.0f;
     [SerializeField]
     [Range(0.0f, 5.0f)]
     private float randomMovementIntensity = 0.0f;
@@ -78,7 +76,7 @@ public class EditorParametersInterface : MonoBehaviour
     [Header("Preservation of connectivity parameters")]
     [SerializeField]
     [Range(0.01f, 2.0f)]
-    private float distanceBetweenAgents = 1.0f;
+    private float distanceBetweenAgents = 0.6f;
 
     public SwarmParameters GetParameters()
     {
@@ -101,5 +99,27 @@ public class EditorParametersInterface : MonoBehaviour
                                                         repulsionZoneSize,
                                                         distanceBetweenAgents);
         return parameters;
+    }
+
+    public void SetParameters(SwarmParameters parameters)
+    {
+        this.agentBehaviour = parameters.GetAgentBehaviour();
+        this.agentMovement = parameters.GetAgentMovement();
+        this.mapSizeX = parameters.GetMapSizeX();
+        this.mapSizeZ = parameters.GetMapSizeZ();
+        this.fieldOfViewSize = parameters.GetFieldOfViewSize();
+        this.blindSpotSize = parameters.GetBlindSpotSize();
+        this.maxSpeed = parameters.GetMaxSpeed();
+        this.moveForwardIntensity = parameters.GetMoveForwardIntensity();
+        this.randomMovementIntensity = parameters.GetRandomMovementIntensity();
+        this.frictionIntensity = parameters.GetFrictionIntensity();
+        this.avoidCollisionWithNeighboursIntensity = parameters.GetAvoidCollisionWithNeighboursIntensity();
+        this.cohesionIntensity = parameters.GetCohesionIntensity();
+        this.alignmentIntensity = parameters.GetAlignmentIntensity();
+        this.separationIntensity = parameters.GetSeparationIntensity();
+        this.attractionZoneSize = parameters.GetAttractionZoneSize();
+        this.alignmentZoneSize = parameters.GetAlignmentZoneSize();
+        this.repulsionZoneSize = parameters.GetRepulsionZoneSize();
+        this.distanceBetweenAgents = parameters.GetDistanceBetweenAgents();
     }
 }

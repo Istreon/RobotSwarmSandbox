@@ -3,17 +3,16 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class ClipPlayer : MonoBehaviour
-{ 
+{
     #region Serialized fields
     [SerializeField]
-    private GameObject actorPrefab;
-
+    private bool automaticCameraPositioning = false;
     [SerializeField]
     private List<Displayer> displayers;
     #endregion
 
     #region Private fields - clip parameters
-    private LogClip clip;
+    private SwarmClip clip;
 
     private int fps;
     private int nbFrames;
@@ -21,23 +20,11 @@ public class ClipPlayer : MonoBehaviour
     #endregion
 
     #region Private fields - player parameters
-
-    private FrameDisplayer frameDisplayer;
-
     private bool playing = false;
 
     private bool loopClip = false;
 
     private float timer = 0.0f;
-
-    public enum DisplayType
-    {
-        Simple,
-        ColoredCluster
-    }
-    private static readonly int DisplayTypeCount = Enum.GetNames(typeof(DisplayType)).Length;
-
-    private DisplayType displayType = DisplayType.Simple;
 
     private int frameNumber
     {
@@ -53,6 +40,10 @@ public class ClipPlayer : MonoBehaviour
 
     #endregion
 
+    #region Private fields - others
+    private Camera mainCamera;
+    #endregion
+
     #region Event - Frame number changed
     public event EventHandler FrameChanged;
 
@@ -65,6 +56,15 @@ public class ClipPlayer : MonoBehaviour
     #endregion
 
     #region Methods - MonoBehaviour callbacks
+    private void Start()
+    {
+        mainCamera = FindObjectOfType<Camera>();
+        if(mainCamera == null)
+        {
+            Debug.Log("Missing main camera in the scene.");
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -72,6 +72,7 @@ public class ClipPlayer : MonoBehaviour
         {
             if (timer >= (1.0f / this.fps))
             {
+                UpdateCameraPositioning();
                 DisplayFrame();
                 UpdateFrameNumber();
 
@@ -110,29 +111,29 @@ public class ClipPlayer : MonoBehaviour
  
 
     /// <summary>
-    /// This method displays the current frame of the loaded <see cref="LogClip"/>.
+    /// This method displays the current frame of the loaded <see cref="SwarmClip"/>.
     /// By displaying the position of saved agents in the clip using actors.
-    /// There is differents possiblities, depending on <see cref="ClipPlayer.displayType"/> value : 
-    /// <see cref="DisplayType.Simple"/> : displays the frame in the simpliest way possible, meaning that all actor are the same color using <see cref="FrameDisplayer.DisplaySimpleFrame"/>.
-    /// <see cref="DisplayType.ColoredCluster"/> : displays the frame coloring actors from the same clusters in an unique color, allowing an user to identify groups visually using <see cref="FrameDisplayer.DisplayColoredClusterFrame"/>.
     /// </summary>
     private void DisplayFrame()
     {
-        switch(displayType)
+
+        SwarmData frame = clip.GetFrames()[frameNumber];
+
+
+        Displayer[] existingDisplayers = FindObjectsOfType<Displayer>();
+
+        //--Clear display for unused displayer--//
+        foreach (Displayer d in existingDisplayers)
         {
-            case DisplayType.Simple:
-                frameDisplayer.DisplaySimpleFrame(clip.getClipFrames()[frameNumber]);
-                break;
-            case DisplayType.ColoredCluster:
-                frameDisplayer.DisplayColoredClusterFrame(clip.getClipFrames()[frameNumber]);
-                break;
+            if (!displayers.Contains(d))
+                d.ClearVisual();
         }
 
-        //TEMP : TO IMPROVE TO SELECT THE DISPLAYER TO USE USING BOOL
-     /*   foreach(Displayer d in displayers)
+        //--Refresh the display--//
+        foreach (Displayer d in displayers)
         {
-            d.DisplayVisual(clip.getClipFrames()[frameNumber]);
-        }*/
+            d.DisplayVisual(frame);
+        }
     }
 
 
@@ -145,24 +146,20 @@ public class ClipPlayer : MonoBehaviour
         //Pause clip player
         Pause();
 
-        if(this.frameDisplayer == null) frameDisplayer = new FrameDisplayer(actorPrefab);
+
 
         //Reset values for a new clip
         this.frameNumber = 0;
 
         //Get clip informations
-        this.fps = clip.getFps();
-        this.nbFrames = clip.getClipFrames().Count;
+        this.fps = clip.GetFps();
+        this.nbFrames = clip.GetFrames().Count;
 
-        //Camera positionning
-        Camera mainCamera = FindObjectOfType<Camera>();
-        mainCamera.transform.position = new Vector3(clip.GetMapSizeX() / 2.0f, Mathf.Max(clip.GetMapSizeZ(), clip.GetMapSizeX()), clip.GetMapSizeZ() / 2.0f);
-        mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
 
         //Udpate UI
         DisplayFrame();
 
-        Debug.Log(clip.getClipFrames()[0].GetParameters().GetAlignmentIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetCohesionIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetSeparationIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetRandomMovementIntensity());
+        //Debug.Log(clip.getClipFrames()[0].GetParameters().GetAlignmentIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetCohesionIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetSeparationIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetRandomMovementIntensity());
     }
 
     /// <summary>
@@ -172,7 +169,7 @@ public class ClipPlayer : MonoBehaviour
     /// The clip to play. A <see cref="NullReferenceException"/> will be raised if the value is null.
     /// </param>
     /// <exception cref="NullReferenceException"> Raised if the clip in parameter is null.</exception>
-    public void SetClip(LogClip clip)
+    public void SetClip(SwarmClip clip)
     {
         if (clip != null)
         {
@@ -239,27 +236,20 @@ public class ClipPlayer : MonoBehaviour
     #endregion
 
     #region Methods - Clip control - Display
-    public DisplayType NextDisplayType()
+
+    private void UpdateCameraPositioning()
     {
-
-        int i = (int)displayType;
-        i = (i + 1) % DisplayTypeCount;
-        displayType = (DisplayType)i;
-        DisplayFrame();
-
-        return displayType;
+        if(automaticCameraPositioning)
+        {
+            //Camera positionning
+            SwarmParameters parameters = clip.GetFrames()[frameNumber].GetParameters();
+            mainCamera.transform.position = new Vector3(parameters.GetMapSizeX() / 2.0f, Mathf.Max(parameters.GetMapSizeZ(), parameters.GetMapSizeX()), parameters.GetMapSizeZ() / 2.0f);
+            mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
+        }
     }
 
-    /// <summary>
-    /// Set the display type. Several possibilities are defined by <see cref="DisplayType"/>. 
-    /// See <see cref="DisplayFrame"/> method for more informations.
-    /// </summary>
-    /// <param name="type"> The visualisation mode to display.</param>
-    public void SetDisplayMode(DisplayType type)
-    {
-        this.displayType = type;
-        DisplayFrame();
-    }
+
+
     #endregion
 
     #region Methods - Clip control - Frame
@@ -337,11 +327,10 @@ public class ClipPlayer : MonoBehaviour
         return res;
     }
 
-    public LogClipFrame GetCurrentFrame()
+    public SwarmData GetCurrentFrame()
     {
-        return clip.getClipFrames()[frameNumber];
+        return clip.GetFrames()[frameNumber];
     }
 
     #endregion
-
 }
