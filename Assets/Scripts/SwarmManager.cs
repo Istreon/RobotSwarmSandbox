@@ -176,10 +176,15 @@ public class SwarmManager : MonoBehaviour
     }
     #endregion
 
-    #region Methods - 
+    #region Methods - Getter
     public SwarmData CloneFrame()
     {
         return swarm.Clone();
+    }
+
+    public SwarmData GetSwarmData()
+    {
+        return swarm;
     }
     #endregion
 }

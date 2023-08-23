@@ -171,25 +171,6 @@ public class SwarmMetrics
 
     #endregion
 
-    #region Methods - Neighbourhood
-    public static float AverageNeighbourhood(SwarmData swarmData)
-    {
-        //Create a clone of the agents list, to manipulate it
-        List<AgentData> agents = swarmData.GetAgentsData();
-
-        float total = 0.0f;
-        foreach (AgentData a in agents)
-        {
-            List<AgentData> temp = SwarmTools.GetNeighbours(a,agents,swarmData.GetParameters().GetFieldOfViewSize(), swarmData.GetParameters().GetBlindSpotSize());
-            total += temp.Count;
-
-        }
-        total = total / agents.Count;
-
-        return total;
-    }
-    #endregion
-
     #region Methods - Swarm direction
 
     public static float TowardsCenterOfMass(SwarmData swarmData)
@@ -199,7 +180,7 @@ public class SwarmMetrics
 
         Vector3 centerOfMass = SwarmTools.GetCenterOfMass(swarmData);
         float b = 0.0f;
-        
+
         foreach (AgentData a in agents)
         {
             Vector3 speed = a.GetSpeed();
@@ -219,6 +200,33 @@ public class SwarmMetrics
         }
         float res = 1 - ((b / n) / 180);
         return res;
+    }
+
+    public static float TowardsCenterOfMassStandardDeviation(SwarmData s)
+    {
+        List<AgentData> agents = s.GetAgentsData();
+
+        Vector3 centerOfMass = SwarmTools.GetCenterOfMass(s);
+        List<float> l = new List<float>();
+
+        foreach (AgentData a in agents)
+        {
+            Vector3 speed = a.GetSpeed();
+            Vector3 temp = centerOfMass - a.GetPosition();
+            float angle = 0.0f;
+            if (speed.magnitude == 0.0f)
+            {
+                angle = 90; //Represent the neutral angle, if the agent isn't moving.
+            }
+            else
+            {
+                angle = Vector3.Angle(speed, temp);
+            }
+
+
+            l.Add(1 - (angle / 180));
+        }
+        return ListTools.StandardDeviation(l);
     }
 
     public static float Order(SwarmData swarmData)
@@ -246,6 +254,43 @@ public class SwarmMetrics
             averageOrientation += a.GetSpeed();
         }
         return (Mathf.Atan2(averageOrientation.z, averageOrientation.x) / Mathf.PI) * 180;
+    }
+
+    public static float StandardDeviationOfKnnDirection(SwarmData f)
+    {
+        List<AgentData> agents = f.GetAgentsData();
+        List<float> directionDiff = new List<float>();
+
+        foreach (AgentData a in agents)
+        {
+            List<AgentData> knn = SwarmTools.KNN(a, agents, 3);
+            foreach (AgentData n in knn)
+            {
+                float angleDiff = Vector3.Angle(a.GetSpeed(), n.GetSpeed()) / 180.0f;
+                directionDiff.Add(angleDiff);
+            }
+        }
+
+        return ListTools.StandardDeviation(directionDiff);
+    }
+    #endregion
+
+    #region Methods - Neighbourhood
+    public static float AverageNeighbourhood(SwarmData swarmData)
+    {
+        //Create a clone of the agents list, to manipulate it
+        List<AgentData> agents = swarmData.GetAgentsData();
+
+        float total = 0.0f;
+        foreach (AgentData a in agents)
+        {
+            List<AgentData> temp = SwarmTools.GetNeighbours(a,agents,swarmData.GetParameters().GetFieldOfViewSize(), swarmData.GetParameters().GetBlindSpotSize());
+            total += temp.Count;
+
+        }
+        total = total / agents.Count;
+
+        return total;
     }
     #endregion
 
@@ -305,7 +350,7 @@ public class SwarmMetrics
 
 
         //Sort list
-        distances.Sort(new GFG());
+        distances.Sort(new ListTools.GFG());
 
 
         //Get the knn
@@ -424,68 +469,18 @@ public class SwarmMetrics
     }
     #endregion
 
-    #region Methods - Others
+    #region Methods - Fracture
 
-    private float StandardDeviation(List<float> l)
+    public static float FractureVisibilityScore(SwarmData swarmData)
     {
-        //Calcul de la moyenne
-        float mean = 0.0f;
+        float meanDist = SwarmMetrics.MeanKNNDistanceBiggerCluster(swarmData, 3);
 
-        foreach (float v in l)
-        {
-            mean += v;
-        }
+        float dist = GetSignificantDistanceBetweenClusters(swarmData);
+        float ratio = dist / meanDist;
 
-        mean /= l.Count;
-
-        float variance = 0.0f;
-        foreach (float v in l)
-        {
-            float val = (v - mean);
-            val = Mathf.Pow(val, 2);
-            variance += val;
-        }
-
-        variance /= (l.Count - 1);
-
-        float standardDeviation = Mathf.Sqrt(variance);
-        return standardDeviation;
+        return ratio;
     }
 
-
-    private float Median(List<float> l)
-    {
-        float median;
-        l.Sort(new GFG());
-
-        int n = l.Count;
-        if (n % 2 != 0)
-        {
-            n = n + 1;
-            median = l[n / 2 - 1];
-        }
-        else
-        {
-            median = (l[n / 2 - 1] + l[n / 2]) / 2;
-        }
-
-
-        return median;
-    }
-
-    //Class allowing to sort float in a list using : list.Sort(new GFG());  
-    class GFG : IComparer<float>
-    {
-        public int Compare(float x, float y)
-        {
-            if (x == 0 || y == 0)
-            {
-                return 0;
-            }
-
-            // CompareTo() method
-            return x.CompareTo(y);
-        }
-    }
     #endregion
+
 }

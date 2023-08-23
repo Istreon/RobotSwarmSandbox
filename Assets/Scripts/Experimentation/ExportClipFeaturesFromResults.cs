@@ -138,7 +138,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         //Analyse part
         foreach (SwarmClip c in clips)
         {
-            int fractureFrame = GetFractureFrame(c);
+            int fractureFrame = ClipMetrics.GetFractureFrame(c);
             
 
             string s = clipFilesPaths[currentClip];
@@ -160,20 +160,20 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
             if (fractureFrame != -1)
             {
-                bestDistanceScore = BestFractureVisibilityScore(c, fractureFrame);
+                bestDistanceScore = ClipMetrics.BestFractureVisibilityScore(c);
                 bestSepSpeed = BestSeparationSpeed(c);
                 bestSepSpeed2 = BestSeparationSpeed2(c, 10);
                 bestSepSpeed3 = BestSeparationSpeed3(c, 10);
-                distanceScoreAtFracture = FractureVisibilityScore(c, fractureFrame);
+                distanceScoreAtFracture = SwarmMetrics.FractureVisibilityScore(c.GetFrames()[fractureFrame]);
                 sepSpeedAtFracture = SeparationSpeed(c, fractureFrame);
                 sepSpeed2AtFracture = SeparationSpeed2(c, fractureFrame,10);
                 sepSpeed3AtFracture = SeparationSpeed3(c, fractureFrame,10);
             }
 
 
-            float meanTowardCenterOfMass = MeanTowardsCenterOfMass(c);
-            float meanEffectiveGroupMotion = MeanEffectiveGroupMotion(c);
-            float STDKNNDirection = StandardDeviationOfKnnDirection(c);
+            float meanTowardCenterOfMass = ClipMetrics.MeanTowardsCenterOfMass(c);
+            float meanEffectiveGroupMotion = ClipMetrics.MeanEffectiveGroupMotion(c);
+            float STDKNNDirection = ClipMetrics.MeanStandardDeviationOfKnnDirection(c);
 
             int currentParticipant = 0;
             foreach (ExperimentationResult result in results)
@@ -207,7 +207,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
                 {
                     if(fractureFrame != -1)
                     {
-                        score = FractureVisibilityScore(c, frameNumber);
+                        score = SwarmMetrics.FractureVisibilityScore(c.GetFrames()[frameNumber]);
                         sepSpeed = SeparationSpeed(c, frameNumber);
                         sepSpeed2 = SeparationSpeed2(c, frameNumber, 10);
                         sepSpeed3 = SeparationSpeed3(c, frameNumber, 10);
@@ -312,269 +312,12 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
         throw new Exception("Clip " + filename +" not found in participant results.");
     }
 
-    private int GetFractureFrame(SwarmClip c)
-    {
-        int res = -1;
-        int i = 0;
-
-        int validationTime = 120;
-        int fractureDuration = 0;
-        foreach (SwarmData f in c.GetFrames())
-        {
-            List<List<AgentData>> clusters = SwarmTools.GetClusters(f);
-            if (clusters.Count > 1)
-            {
-                if (fractureDuration == 0)
-                    res = i;
-
-                fractureDuration++;
-
-                if (fractureDuration > validationTime)
-                    break;
-            }
-            else
-            {
-                fractureDuration = 0;
-                res = -1;
-            }
-            i++;
-        }
-        return res;
-    }
-
-
-
-
-
-    #region Methods - Fracture visibility score
-
-
-    private float FractureVisibilityScore(SwarmClip c, int frame)
-    {
-        float meanDist = MeanKNNDistanceAt(c, frame, 3);
-
-        float dist = SignificantDistanceBetweenClustersAtFrame(c, frame);
-        float ratio = dist / meanDist;
-
-        return ratio;
-    }
-
-    private float BestFractureVisibilityScore(SwarmClip c, int startFrame)
-    {
-        float bestScore = -1;
-
-        for (int i = startFrame; i < c.GetFrames().Count; i++)
-        {
-            float score = FractureVisibilityScore(c, i);
-            if (score > bestScore)
-            {
-                bestScore = score;
-            }
-        }
-
-        return bestScore;
-    }
-
-    #endregion
-
-
-    #region Methods - Distance inter cluster
-
-
-    private float SignificantDistanceBetweenClustersAtFrame(SwarmClip c, int frameNumber)
-    {
-        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(c.GetFrames()[frameNumber]);
-
-        float dist = GetSignificantDistanceBetweenClusters(clusters);
-
-        return dist;
-    }
-
-    private float GetSignificantDistanceBetweenClusters(List<List<AgentData>> clusters)
-    {
-        //If there is not enough cluster, exit
-        if (clusters.Count < 2) return -1;
-
-        float significantDistance = -1;
-
-        List<List<List<AgentData>>> superList = new List<List<List<AgentData>>>();
-        //Creer des superlist des cluster
-        foreach (List<AgentData> c in clusters)
-        {
-            List<List<AgentData>> temp = new List<List<AgentData>>();
-            temp.Add(c);
-            superList.Add(temp);
-        }
-
-        //Tant que le nombre de superlist est supérieur à 2
-        while (superList.Count > 2)
-        {
-            //Calculer la distance plus petite entre deux clusters
-            float minDist = float.MaxValue;
-            List<List<AgentData>> minCs1 = null;
-            List<List<AgentData>> minCs2 = null;
-
-            for (int i = 0; i < superList.Count; i++)
-            {
-                List<List<AgentData>> cs1 = superList[i];
-                for (int j = i; j < superList.Count; j++)
-                {
-                    if (i == j) continue;
-
-                    List<List<AgentData>> cs2 = superList[j];
-
-                    float dist = MinDistanceBetweenTwoClusterSets(cs1, cs2);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        minCs1 = cs1;
-                        minCs2 = cs2;
-                    }
-                }
-            }
-
-            //Fusionner les superlists des clusters concernés
-            minCs1.AddRange(minCs2);
-            //Supprimer de la liste le cluster fusionné
-            superList.Remove(minCs2);
-        }
-
-        //Normalement ici, il ne reste que deux clusters
-        //Calculer la min dist entre les deux
-        significantDistance = MinDistanceBetweenTwoClusterSets(superList[0], superList[1]);
-        //la retourner
-
-
-        return significantDistance;
-    }
-
-    private float MinDistanceBetweenTwoClusterSets(List<List<AgentData>> clusterSet1, List<List<AgentData>> clusterSet2)
-    {
-        float minDist = float.MaxValue;
-        foreach (List<AgentData> c1 in clusterSet1)
-        {
-            foreach (List<AgentData> c2 in clusterSet2)
-            {
-                float dist = MinDistanceBetweenTwoClusters(c1, c2);
-                if (dist < minDist)
-                    minDist = dist;
-            }
-        }
-        return minDist;
-    }
-
-
-
-
-    /// <summary>
-    /// Compute the min distance between two cluster, and return it.
-    /// </summary>
-    /// <param name="cluster1">The first cluster</param>
-    /// <param name="cluster2">The other cluster</param>
-    /// <returns>The min distance between the two clusters set in parameter.</returns>
-    private float MinDistanceBetweenTwoClusters(List<AgentData> cluster1, List<AgentData> cluster2)
-    {
-        float minDist = float.MaxValue;
-
-        foreach (AgentData l1 in cluster1)
-        {
-            foreach (AgentData l2 in cluster2)
-            {
-                float dist = Vector3.Distance(l1.GetPosition(), l2.GetPosition());
-                if (dist < minDist)
-                    minDist = dist;
-            }
-        }
-        return minDist;
-    }
-    #endregion
-
-
-    #region Methods - Distance intra cluster
-
-    private float MeanKNNDistanceAt(SwarmClip c, int frameNumber, int k)
-    {
-
-        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(c.GetFrames()[frameNumber]);
-
-        float dist = MeanKNNDistance(clusters[0], k);
-
-        return dist;
-    }
-
-
-
-
-    private float MeanKNNDistance(List<AgentData> cluster, int k)
-    {
-        float meanDist = 0.0f;
-        List<float> distances = new List<float>();
-
-        foreach (AgentData g in cluster)
-        {
-            distances.AddRange(GetKNNDistances(cluster, g, k));
-        }
-
-        foreach (float d in distances)
-        {
-            meanDist += d;
-        }
-
-        meanDist /= distances.Count;
-
-        return meanDist;
-    }
-
-
-    /// <summary>
-    /// Calculate the k nearest distances from the agent set in parameter, to the other agents from the list set in paramter.
-    /// </summary>
-    /// <param name="cluster"> The set of agents from which the k nearest distances of the agent set in parameter will be calculated. </param>
-    /// <param name="agent"> The agent reference to calculate the distances.</param>
-    /// <param name="k">The maximum number of distances returned. </param>
-    /// <returns>The k nearest distances to other agents, possibly less if there is not enough other agents.</returns>
-    private List<float> GetKNNDistances(List<AgentData> cluster, AgentData agent, int k)
-    {
-        //Compute every distance from parameter agent to other agents
-        List<float> distances = new List<float>();
-
-        //Compare current agent with all agents
-        foreach (AgentData g in cluster)
-        {
-            //Check if the current agent is compared with itself
-            if (System.Object.ReferenceEquals(g, agent)) continue;
-
-            //Compute distance
-            float dist = Vector3.Distance(g.GetPosition(), agent.GetPosition());
-
-            distances.Add(dist);
-        }
-
-
-        //Sort list
-        distances.Sort(new GFG());
-
-
-        //Get the knn
-        List<float> knnDistances = new List<float>();
-
-        if (distances.Count < k) k = distances.Count;
-        for (int i = 0; i < k; i++)
-        {
-            knnDistances.Add(distances[i]);
-        }
-
-        return knnDistances;
-    }
-
-    #endregion
-
 
     #region Methods - Separation speed
 
     private float BestSeparationSpeed(SwarmClip c)
     {
-        int fracFrame = GetFractureFrame(c);
+        int fracFrame = ClipMetrics.GetFractureFrame(c);
         if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
 
         float maxSepSpeed = float.MinValue;
@@ -676,8 +419,8 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
             temp.Remove(a);
         }
 
-        Vector3 clusterCM = CenterOfMass(cluster);
-        Vector3 remSwarmCM = CenterOfMass(temp);
+        Vector3 clusterCM = SwarmTools.GetCenterOfMass(cluster);
+        Vector3 remSwarmCM = SwarmTools.GetCenterOfMass(temp);
 
         float dist = Vector3.Distance(clusterCM, remSwarmCM);
 
@@ -737,7 +480,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
     private float BestSeparationSpeed2(SwarmClip c, int k)
     {
-        int fracFrame = GetFractureFrame(c);
+        int fracFrame = ClipMetrics.GetFractureFrame(c);
         if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
 
         float maxSepSpeed = float.MinValue;
@@ -812,7 +555,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
     private float MeanDistFromCM(List<AgentData> cluster)
     {
-        Vector3 cm = CenterOfMass(cluster);
+        Vector3 cm = SwarmTools.GetCenterOfMass(cluster);
 
         float meanDist = 0.0f;
 
@@ -828,7 +571,7 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
     private float BestSeparationSpeed3(SwarmClip c, int k)
     {
-        int fracFrame = GetFractureFrame(c);
+        int fracFrame = ClipMetrics.GetFractureFrame(c);
         if (fracFrame == -1) throw new System.Exception("Il n'y a pas de fracture dans ce clip");
 
         float maxSepSpeed = float.MinValue;
@@ -847,236 +590,6 @@ public class ExportClipFeaturesFromResults : MonoBehaviour
 
     #endregion
 
-
-    #region Methods - Towards center of mass
-    private float MeanTowardsCenterOfMass(SwarmClip c)
-    {
-        float res = 0.0f;
-        int i = 0;
-        foreach (SwarmData f in c.GetFrames())
-        {
-            if (SwarmTools.GetClusters(f).Count > 1) break;
-
-            res += TowardsCenterOfMass(f);
-            i++;
-        }
-        res /= i;
-
-        return res;
-    }
-
-    private float TowardsCenterOfMass(SwarmData f)
-    {
-        List<AgentData> agents = f.GetAgentsData();
-        int n = agents.Count;
-
-        Vector3 centerOfMass = CenterOfMass(agents);
-        float b = 0.0f;
-        int i;
-        for (i = 0; i < n; i++)
-        {
-            Vector3 speed = agents[i].GetSpeed();
-            Vector3 temp = centerOfMass - agents[i].GetPosition();
-            float angle = 0.0f;
-            if (speed.magnitude == 0.0f)
-            {
-                angle = 90; //Represent the neutral angle, if the agent isn't moving.
-            }
-            else
-            {
-                angle = Vector3.Angle(speed, temp);
-            }
-
-
-            b += angle;
-        }
-        float res = 1 - ((b / n) / 180);
-        return res;
-    }
-    #endregion
-
-
-    #region Methods - effective group motion
-    private float MeanEffectiveGroupMotion(SwarmClip c)
-    {
-        int nbFrames = c.GetFrames().Count;
-        float meanValue = 0.0f;
-        int i = 1;
-        while (true)
-        {
-            float temp = EffectiveGroupMotionAtFrame(c, i);
-            if (temp == -1) break;
-
-            meanValue += temp;
-            i++;
-        }
-
-        meanValue /= (i - 1);
-
-        return meanValue;
-    }
-
-
-    private float EffectiveGroupMotionAtFrame(SwarmClip c, int frame)
-    {
-        if (frame < 1) return -1;
-        if (frame >= c.GetFrames().Count) return -1;
-        if (SwarmTools.GetClusters(c.GetFrames()[frame]).Count > 1) return -1;
-
-        float distCM = Vector3.Distance(CenterOfMass(c.GetFrames()[frame].GetAgentsData()), CenterOfMass(c.GetFrames()[frame - 1].GetAgentsData()));
-
-        float meanDist = 0.0f;
-
-        List<AgentData> currentPositions = c.GetFrames()[frame].GetAgentsData();
-        int nbAgent = currentPositions.Count;
-        List<AgentData> pastPositions = c.GetFrames()[frame - 1].GetAgentsData();
-        for (int i = 0; i < nbAgent; i++)
-        {
-            meanDist += Vector3.Distance(pastPositions[i].GetPosition(), currentPositions[i].GetPosition());
-        }
-
-        meanDist /= nbAgent;
-
-        if (meanDist == 0.0f) return 0.0f; //Protect from division by 0
-        else return (distCM / meanDist);
-    }
-
-    #endregion
-
-
-    #region Methods - STD KNN Direction
-
-
-    private float StandardDeviationOfKnnDirection(SwarmClip c)
-    {
-        List<SwarmData> frames = c.GetFrames();
-        int n = GetFractureFrame(c);
-
-        if (n == -1) n = frames.Count;
-
-        float mean = 0.0f;
-        for (int i = 0; i < n; i++)
-        {
-            mean += StandardDeviationOfKnnDirection(frames[i]);
-        }
-
-        return (mean / (float)n);
-
-
-    }
-
-
-    private float StandardDeviationOfKnnDirection(SwarmData f)
-    {
-        List<AgentData> agents = f.GetAgentsData();
-        List<float> directionDiff = new List<float>();
-
-        foreach (AgentData a in agents)
-        {
-            List<AgentData> knn = KNN(a, agents, 3);
-            foreach (AgentData n in knn)
-            {
-                float angleDiff = Vector3.Angle(a.GetSpeed(), n.GetSpeed()) / 180.0f;
-                directionDiff.Add(angleDiff);
-            }
-        }
-
-        return StandardDeviation(directionDiff);
-    }
-    #endregion
-
-
-    #region Methods - tools
-    private Vector3 CenterOfMass(List<AgentData> agents)
-    {
-        Vector3 centerOfMass = Vector3.zero;
-        foreach (AgentData a in agents)
-        {
-            centerOfMass += a.GetPosition();
-        }
-        centerOfMass /= agents.Count;
-        return centerOfMass;
-    }
-
-    private AgentData NearestAgent(AgentData agent, List<AgentData> l)
-    {
-        float min = float.MaxValue;
-        AgentData minAgent = null;
-        foreach (AgentData a in l)
-        {
-            if (System.Object.ReferenceEquals(a, agent)) continue;
-
-            float dist = Vector3.Distance(a.GetPosition(), agent.GetPosition());
-
-            if (dist < min)
-            {
-                min = dist;
-                minAgent = a;
-            }
-        }
-
-        return minAgent;
-    }
-
-    //Class allowing to sort float in a list using : list.Sort(new GFG());  
-    class GFG : IComparer<float>
-    {
-        public int Compare(float x, float y)
-        {
-            if (x == 0 || y == 0)
-            {
-                return 0;
-            }
-
-            // CompareTo() method
-            return x.CompareTo(y);
-        }
-    }
-
-    private float StandardDeviation(List<float> l)
-    {
-        //Calcul de la moyenne
-        float mean = 0.0f;
-
-        foreach (float v in l)
-        {
-            mean += v;
-        }
-
-        mean /= l.Count;
-
-        float variance = 0.0f;
-        foreach (float v in l)
-        {
-            float val = (v - mean);
-            val = Mathf.Pow(val, 2);
-            variance += val;
-        }
-
-        variance /= (l.Count - 1);
-
-        float standardDeviation = Mathf.Sqrt(variance);
-        return standardDeviation;
-    }
-
-
-    private List<AgentData> KNN(AgentData agent, List<AgentData> l, int n)
-    {
-        List<AgentData> agents = new List<AgentData>(l);
-        List<AgentData> knn = new List<AgentData>();
-
-        if (agents.Count < n) n = agents.Count;
-
-        for (int i = 0; i < n; i++)
-        {
-            AgentData nearest = NearestAgent(agent, agents);
-            knn.Add(nearest);
-            agents.Remove(nearest);
-        }
-
-        return knn;
-    }
-    #endregion
 
 }
 

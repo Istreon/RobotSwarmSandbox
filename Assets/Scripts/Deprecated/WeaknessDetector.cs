@@ -4,7 +4,8 @@ using System;
 
 public class WeaknessDetector : MonoBehaviour
 {
-    AgentManager agentManager;
+    /*
+    SwarmManager swarmManager;
 
     public GameObject prefab;
     public GameObject prefabArrow;
@@ -26,8 +27,8 @@ public class WeaknessDetector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        agentManager = FindObjectOfType<AgentManager>();
-        if (agentManager == null) Debug.LogError("AgentManager is missing in the scene", this);
+        swarmManager = FindObjectOfType<SwarmManager>();
+        if (swarmManager == null) Debug.LogError("AgentManager is missing in the scene", this);
 
 
         gradient = new Gradient();
@@ -64,15 +65,7 @@ public class WeaknessDetector : MonoBehaviour
         }
         displayCube.Clear();
 
-        List<GameObject> agentsGO = agentManager.GetAgents();
-
-        List<Agent> agents = new List<Agent>();
-
-        foreach (GameObject g in agentsGO)
-        {
-            agents.Add(g.GetComponent<Agent>());
-        }
-
+        List<AgentData> agents = swarmManager.GetSwarmData().GetAgentsData();
 
 
         UpdateLinksList(agentsGO);
@@ -106,7 +99,7 @@ public class WeaknessDetector : MonoBehaviour
         }
 
         
-
+    */
 
         /*
         
@@ -118,7 +111,7 @@ public class WeaknessDetector : MonoBehaviour
             displayCube.Add(temp);
         }
         */
-
+        /*
 
         foreach (GameObject g in agentsGO)
         {
@@ -287,6 +280,7 @@ public class WeaknessDetector : MonoBehaviour
 
         return exists;
     }
+        */
 
     /*
     private float ComputeAgentScore(Agent agent, List<GameObject> agents)
@@ -305,6 +299,8 @@ public class WeaknessDetector : MonoBehaviour
         return score;
     }
     */
+
+    /*
 
     private float ComputeLinkTensionScore(Agent agent, Agent neighbour)
     {
@@ -335,6 +331,7 @@ public class WeaknessDetector : MonoBehaviour
 
         return ratio;
     }
+    */
 
     /*
     public List<List<GameObject>> GetAgentLinks(Agent agent)

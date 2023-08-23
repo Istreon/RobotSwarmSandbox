@@ -41,7 +41,6 @@ public class Agent : MonoBehaviour
     //private SphereCollider feelerCollider;
 
     //private List<GameObject> detectedObstacles;
-    protected LogAgentData.AgentBehaviour agentBehaviour = LogAgentData.AgentBehaviour.None;
 
     protected Vector3 acceleration = Vector3.zero; //the current acceleration of this agent, in m/s^2
     protected Vector3 speed = Vector3.zero; //The current speed of this agent, in m/s
@@ -52,9 +51,6 @@ public class Agent : MonoBehaviour
 
     protected float mapSizeX = 5.0f;
     protected float mapSizeZ = 5.0f;
-
-    protected ParameterManager parameterManager;
-    protected AgentManager agentManager;
 
     protected Vector3 savedPosition;
 
@@ -126,7 +122,7 @@ public class Agent : MonoBehaviour
     protected virtual void getAgentsInFieldOfView()
     {
 
-        List<GameObject> agents = agentManager.GetAgents();
+        List<GameObject> agents = new List<GameObject>(); //FALSE
         detectedAgents = new List<GameObject>();
 
         foreach (GameObject g in agents)
@@ -345,10 +341,6 @@ public class Agent : MonoBehaviour
     #endregion
 
     #region Methods - Getter
-    public LogAgentData.AgentBehaviour GetAgentBehaviour()
-    {
-        return this.agentBehaviour;
-    }
 
     public Vector3 GetSpeed()
     {

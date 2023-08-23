@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+
 public class DisplayerSwarm : Displayer
 {
     private enum DisplayType
@@ -155,10 +156,10 @@ public class DisplayerSwarm : Displayer
             foreach (AgentData a in l)
             {
                 //Update actor position and direction
-                UpdateActorPositionAndDirection(i, a.GetPosition(),a.GetDirection());
+                UpdateActorPositionAndDirection(i, a.GetPosition(), a.GetDirection());
 
-                actors[i].GetComponent<Renderer>().material.color = communitiesPalette[c% nbColorCommunities];
-                
+                actors[i].GetComponent<Renderer>().material.color = communitiesPalette[c % nbColorCommunities];
+
                 i++;
             }
             c++;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FrameTools
+public class SwarmTools
 {
     #region Methods - Agent perception
     /// <summary>
@@ -13,13 +13,13 @@ public class FrameTools
     /// <param name="fieldOfViewSize">The distance of perception of the agent.</param>
     /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived.</param>
     /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
-    private static bool Perceive(LogAgentData agent, LogAgentData potentialNeighbour, float fieldOfViewSize, float blindSpotSize)
+    private static bool Perceive(AgentData agent, AgentData potentialNeighbour, float fieldOfViewSize, float blindSpotSize)
     {
         //Check whether the potential neighbour is close enough (at a distance shorter than the perception distance).
-        if (Vector3.Distance(potentialNeighbour.getPosition(), agent.getPosition()) <= fieldOfViewSize)
+        if (Vector3.Distance(potentialNeighbour.GetPosition(), agent.GetPosition()) <= fieldOfViewSize)
         {
-            Vector3 dir = potentialNeighbour.getPosition() - agent.getPosition();
-            float angle = Vector3.Angle(agent.getSpeed(), dir);
+            Vector3 dir = potentialNeighbour.GetPosition() - agent.GetPosition();
+            float angle = Vector3.Angle(agent.GetSpeed(), dir);
             //Check whether the potential neighbour is visible by the current agent (not in the blind spot of the current agent)
             if (angle <= 180 - (blindSpotSize / 2))
             {
@@ -35,10 +35,10 @@ public class FrameTools
     /// </summary>
     /// <param name="agent1">The first agent tested.</param>
     /// <param name="agent2"> The second agent tested.</param>
-    /// <param name="fieldOfViewSize">The distance of perception of both agent. If different, use <see cref="Perceive(LogAgentData, LogAgentData, float, float)"/> instead </param>
-    /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived. If different, use <see cref="Perceive(LogAgentData, LogAgentData, float, float)"/> instead</param>
+    /// <param name="fieldOfViewSize">The distance of perception of both agent. If different, use <see cref="Perceive(AgentData, AgentData, float, float)"/> instead </param>
+    /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived. If different, use <see cref="Perceive(AgentData, AgentData, float, float)"/> instead</param>
     /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
-    public static bool Linked(LogAgentData agent1, LogAgentData agent2, float fieldOfViewSize, float blindSpotSize)
+    public static bool Linked(AgentData agent1, AgentData agent2, float fieldOfViewSize, float blindSpotSize)
     {
         return (Perceive(agent1, agent2, fieldOfViewSize, blindSpotSize) || Perceive(agent2, agent1, fieldOfViewSize, blindSpotSize));
     }
@@ -46,18 +46,18 @@ public class FrameTools
     /// <summary>
     /// Detect all perceived agents of an agent based on its perception, and return them.
     /// </summary>
-    /// <param name="agent"> A <see cref="LogAgentData"/> representing the agent searching its perceveid agents.</param>
+    /// <param name="agent"> A <see cref="AgentData"/> representing the agent searching its perceveid agents.</param>
     /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible perceveid agents.</param>
     /// <param name="fieldOfViewSize"> A <see cref="float"/> value representing the distance of perception of the agent.</param>
     /// <param name="blindSpotSize"> A <see cref="float"/> value representing the blind angle behind the agent where neigbours are not perceived.</param>
     /// <returns> The <see cref="List{T}"/> of perceived agent.</returns>
-    public static List<LogAgentData> GetPerceivedAgents(LogAgentData agent, List<LogAgentData> agentList, float fieldOfViewSize, float blindSpotSize)
+    public static List<AgentData> GetPerceivedAgents(AgentData agent, List<AgentData> agentList, float fieldOfViewSize, float blindSpotSize)
     {
         //Create a list that will store the perceived agent
-        List<LogAgentData> detectedAgents = new List<LogAgentData>();
+        List<AgentData> detectedAgents = new List<AgentData>();
 
         //Compare current agent with all agents
-        foreach (LogAgentData g in agentList)
+        foreach (AgentData g in agentList)
         {
             //Check if the current agent is compared with itself
             if (System.Object.ReferenceEquals(g, agent)) continue;
@@ -76,18 +76,18 @@ public class FrameTools
     /// Detect all neighbours of an agent based on its perception, and return them.
     /// A neighbour here mean that the agent perceived, or is perceived by the neighbour.
     /// </summary>
-    /// <param name="agent"> A <see cref="LogAgentData"/> representing the agent searching its neighbours.</param>
+    /// <param name="agent"> A <see cref="AgentData"/> representing the agent searching its neighbours.</param>
     /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible neighbours.</param>
     /// <param name="fieldOfViewSize"> A <see cref="float"/> value representing the distance of perception of the agent.</param>
     /// <param name="blindSpotSize"> A <see cref="float"/> value representing the blind angle behind the agent where neigbours are not perceived.</param>
     /// <returns> The <see cref="List{T}"/> of neighbours.</returns>
-    public static List<LogAgentData> GetNeighbours(LogAgentData agent, List<LogAgentData> agentList, float fieldOfViewSize, float blindSpotSize)
+    public static List<AgentData> GetNeighbours(AgentData agent, List<AgentData> agentList, float fieldOfViewSize, float blindSpotSize)
     {
         //Create a list that will store the perceived agent
-        List<LogAgentData> neighbours = new List<LogAgentData>();
+        List<AgentData> neighbours = new List<AgentData>();
 
         //Compare current agent with all agents
-        foreach (LogAgentData g in agentList)
+        foreach (AgentData g in agentList)
         {
             //Check if the current agent is compared with itself
             if (System.Object.ReferenceEquals(g, agent)) continue;
@@ -104,14 +104,14 @@ public class FrameTools
 
     #region Methods - Agents links
     /// <summary>
-    /// From a clip frame, get all unique pairs of agents based on their perception.
-    /// This method uses <see cref="GetLinksList(List{LogAgentData}, float, float)"/> method.
+    /// From a swarm, get all unique pairs of agents based on their perception.
+    /// This method uses <see cref="GetLinksList(List{AgentData}, float, float)"/> method.
     /// </summary>
-    /// <param name="frame">The analysed frame</param>
+    /// <param name="swarm">The analysed swarm</param>
     /// <returns>The <see cref="List{T}"/> of pairs of agents.</returns>
-    public static List<Tuple<LogAgentData, LogAgentData>> GetLinksList(LogClipFrame frame)
+    public static List<Tuple<AgentData, AgentData>> GetLinksList(SwarmData swarm)
     {
-        List<Tuple<LogAgentData, LogAgentData>> links = GetLinksList(frame.getAgentData(), frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
+        List<Tuple<AgentData, AgentData>> links = GetLinksList(swarm.GetAgentsData(), swarm.GetParameters().GetFieldOfViewSize(), swarm.GetParameters().GetBlindSpotSize());
         return links;
     }
 
@@ -122,9 +122,9 @@ public class FrameTools
     /// <param name="fovSize">The field of view size in meters</param>
     /// <param name="bsSize">The blind spot size in degree</param>
     /// <returns>The <see cref="List{T}"/> of pairs of agents.</returns>
-    public static List<Tuple<LogAgentData, LogAgentData>> GetLinksList(List<LogAgentData> agents, float fovSize, float bsSize)
+    public static List<Tuple<AgentData, AgentData>> GetLinksList(List<AgentData> agents, float fovSize, float bsSize)
     {
-        List<Tuple<LogAgentData, LogAgentData>> links = new List<Tuple<LogAgentData, LogAgentData>>();
+        List<Tuple<AgentData, AgentData>> links = new List<Tuple<AgentData, AgentData>>();
 
         bool[,] adjacentMatrix = GetAdjacentMatrix(agents, fovSize, bsSize);
 
@@ -134,7 +134,7 @@ public class FrameTools
             {
                 if (adjacentMatrix[i, j])
                 {
-                    Tuple<LogAgentData, LogAgentData> link = new Tuple<LogAgentData, LogAgentData>(agents[i], agents[j]);
+                    Tuple<AgentData, AgentData> link = new Tuple<AgentData, AgentData>(agents[i], agents[j]);
                     links.Add(link);
                 }
             }
@@ -145,24 +145,24 @@ public class FrameTools
 
     #region Methods - Clusters (connected components)
     /// <summary>
-    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory from a single frame.
+    /// From a swarm, get the différent groups based on agent perception and graph theory.
     /// An agent belong to only one cluster.
     /// </summary>
-    /// <returns> A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="LogAgentData"/>.</returns>
-    public static List<List<LogAgentData>> GetClusters(LogClipFrame frame)
+    /// <returns> A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="AgentData"/>.</returns>
+    public static List<List<AgentData>> GetClusters(SwarmData swarm)
     {
         //Create the list that will store the different clusters
-        List<List<LogAgentData>> clusters = new List<List<LogAgentData>>();
+        List<List<AgentData>> clusters = new List<List<AgentData>>();
 
         //Create a clone of the log agent data list, to manipulate it
-        List<LogAgentData> agentsClone = new List<LogAgentData>(frame.getAgentData());
+        List<AgentData> agentsClone = new List<AgentData>(swarm.GetAgentsData());
 
         while (agentsClone.Count > 0)
         {
             //Create the list representing the first cluster
-            List<LogAgentData> newCluster = new List<LogAgentData>();
+            List<AgentData> newCluster = new List<AgentData>();
             //The first agent will be choose by default
-            LogAgentData firstAgent = agentsClone[0];
+            AgentData firstAgent = agentsClone[0];
             //Remove the first agent from the list containing all agents (it now belongs to a cluster)
             agentsClone.Remove(firstAgent);
             //Add first agent in the new cluster
@@ -171,8 +171,8 @@ public class FrameTools
             int i = 0;
             while (i < newCluster.Count)
             {
-                List<LogAgentData> temp = GetNeighbours(newCluster[i], frame.getAgentData(), frame.GetParameters().GetFieldOfViewSize(), frame.GetParameters().GetBlindSpotSize());
-                foreach (LogAgentData g in temp)
+                List<AgentData> temp = GetNeighbours(newCluster[i], swarm.GetAgentsData(), swarm.GetParameters().GetFieldOfViewSize(), swarm.GetParameters().GetBlindSpotSize());
+                foreach (AgentData g in temp)
                 {
                     //Check if the neighbour does not already belong to the current cluster
                     if (!newCluster.Contains(g))
@@ -189,25 +189,25 @@ public class FrameTools
     }
 
     /// <summary>
-    /// Analyse the loaded clip and get the différent groups based on agent perception and graph theory from a single frame. Those groups are sorted by size.
-    /// An agent belong to only one cluster.
+    /// From a swarm get the different groups based on agent perception and graph theory. Those groups are sorted by size.
+    /// An agent belongs to only one cluster.
     /// </summary>
     /// <returns> 
-    /// A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="LogAgentData"/>. 
+    /// A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="AgentData"/>. 
     /// They are sorted by size, from the largest group to the smallest.
     /// </returns>
-    public static List<List<LogAgentData>> GetOrderedClusters(LogClipFrame frame)
+    public static List<List<AgentData>> GetOrderedClusters(SwarmData swarm)
     {
-        List<List<LogAgentData>> orderedClusters = new List<List<LogAgentData>>();
+        List<List<AgentData>> orderedClusters = new List<List<AgentData>>();
 
-        List<List<LogAgentData>> clusters = GetClusters(frame);
+        List<List<AgentData>> clusters = GetClusters(swarm);
 
         while (clusters.Count > 0)
         {
             int maxSize = -1;
-            List<LogAgentData> biggerCluster = null;
+            List<AgentData> biggerCluster = null;
 
-            foreach (List<LogAgentData> c in clusters)
+            foreach (List<AgentData> c in clusters)
             {
                 if (c.Count > maxSize)
                 {
@@ -229,20 +229,20 @@ public class FrameTools
     /// <param name="linksList">The list of connected agents.</param>
     /// <param name="agents">The list of agents.</param>
     /// <returns>The list containing all clusters.</returns>
-    private List<List<LogAgentData>> GetClustersFromLinks(List<Tuple<LogAgentData, LogAgentData>> linksList, List<LogAgentData> agents)
+    private List<List<AgentData>> GetClustersFromLinks(List<Tuple<AgentData, AgentData>> linksList, List<AgentData> agents)
     {
         //Clone the links list to modify it
-        List<Tuple<LogAgentData, LogAgentData>> clone = new List<Tuple<LogAgentData, LogAgentData>>(linksList);
+        List<Tuple<AgentData, AgentData>> clone = new List<Tuple<AgentData, AgentData>>(linksList);
 
 
         //Create the list that will store the different clusters
-        List<List<LogAgentData>> clusters = new List<List<LogAgentData>>();
+        List<List<AgentData>> clusters = new List<List<AgentData>>();
 
 
         while (clone.Count > 0)
         {
             //Take the first link to start a new cluster
-            List<LogAgentData> newCluster = new List<LogAgentData>();
+            List<AgentData> newCluster = new List<AgentData>();
 
             //Add the two agents of the link
             newCluster.Add(clone[0].Item1);
@@ -258,8 +258,8 @@ public class FrameTools
             int i = 0;
             while (i < newCluster.Count)
             {
-                List<Tuple<LogAgentData, LogAgentData>> temp = new List<Tuple<LogAgentData, LogAgentData>>();
-                foreach (Tuple<LogAgentData, LogAgentData> l in clone)
+                List<Tuple<AgentData, AgentData>> temp = new List<Tuple<AgentData, AgentData>>();
+                foreach (Tuple<AgentData, AgentData> l in clone)
                 {
                     if (System.Object.ReferenceEquals(l.Item1, newCluster[i]))
                     {
@@ -282,7 +282,7 @@ public class FrameTools
                     }
                 }
 
-                foreach (Tuple<LogAgentData, LogAgentData> t in temp)
+                foreach (Tuple<AgentData, AgentData> t in temp)
                 {
                     clone.Remove(t);
                 }
@@ -293,9 +293,9 @@ public class FrameTools
 
         //Now, all the clusters are defined from the links. However, some agents are missing because they are isolated.
         //Complete the list of cluster by adding isolated agents
-        foreach (LogAgentData a in agents)
+        foreach (AgentData a in agents)
         {
-            List<LogAgentData> temp = new List<LogAgentData>();
+            List<AgentData> temp = new List<AgentData>();
             temp.Add(a);
             clusters.Add(temp);
         }
@@ -308,16 +308,16 @@ public class FrameTools
 
     #region Methods - Communities
     /// <summary>
-    /// This method compute agents' communities from a list of agents (from a frame) based on their links with other agents and a modularity score using the Louvain algorithm.
+    /// This method compute agents' communities from a list of agents (from a swarm) based on their links with other agents and a modularity score using the Louvain algorithm.
     /// </summary>
-    /// <param name="frame"> Le current frame analysed.</param>
-    /// <returns> A <see cref="List{T}"/> of communities (<see cref="List{}"/> of <see cref="LogAgentData"/>)</returns>
-    public static List<List<LogAgentData>> GetCommunities(LogClipFrame frame)
+    /// <param name="swarm"> Le current swarm analysed.</param>
+    /// <returns> A <see cref="List{T}"/> of communities (<see cref="List{}"/> of <see cref="AgentData"/>)</returns>
+    public static List<List<AgentData>> GetCommunities(SwarmData swarm)
     {
-        List<LogAgentData> agents = frame.getAgentData();
+        List<AgentData> agents = swarm.GetAgentsData();
 
         //Get the adjacent matrix from the agents' list
-        bool[,] adjacentMatrix = GetAdjacentMatrix(frame);
+        bool[,] adjacentMatrix = GetAdjacentMatrix(swarm);
         //Get the total number of edges from the adjacent matrix
         int m = GetNumberOfEdge(adjacentMatrix);
 
@@ -366,10 +366,10 @@ public class FrameTools
         }
 
         //Last step, convert communities of key into communities of agents
-        List<List<LogAgentData>> communities = new List<List<LogAgentData>>();
+        List<List<AgentData>> communities = new List<List<AgentData>>();
         foreach (List<int> c in keyCommunities)
         {
-            List<LogAgentData> agentCom = new List<LogAgentData>();
+            List<AgentData> agentCom = new List<AgentData>();
             foreach (int i in c)
             {
                 agentCom.Add(agents[i]);
@@ -381,20 +381,20 @@ public class FrameTools
     }
 
     /// <summary>
-    /// This method compute agents' communities from a list of agents (from a frame) based on their links with other agents and a modularity score using the Louvain algorithm.
+    /// This method compute agents' communities from a list of agents (from a swarm) based on their links with other agents and a modularity score using the Louvain algorithm.
     /// </summary>
-    /// <param name="frame"> Le current frame analysed.</param>
-    /// <returns> A <see cref="List{T}"/> of communities (<see cref="List{}"/> of <see cref="LogAgentData"/>), ordered by community size.</returns>
-    public static List<List<LogAgentData>> GetOrderedCommunities(LogClipFrame frame)
+    /// <param name="swarm"> Le current swarm analysed.</param>
+    /// <returns> A <see cref="List{T}"/> of communities (<see cref="List{}"/> of <see cref="AgentData"/>), ordered by community size.</returns>
+    public static List<List<AgentData>> GetOrderedCommunities(SwarmData swarm)
     {
-        List<List<LogAgentData>> communities = GetCommunities(frame);
+        List<List<AgentData>> communities = GetCommunities(swarm);
         for (int i = 1; i < communities.Count; i++)
         {
             for (int j = 0; j < communities.Count - i; j++)
             {
                 if (communities[j].Count > communities[j + 1].Count)
                 {
-                    List<LogAgentData> temp = communities[j];
+                    List<AgentData> temp = communities[j];
                     communities[j] = communities[j + 1];
                     communities[j + 1] = temp;
                 }
@@ -452,11 +452,11 @@ public class FrameTools
     /// Branches :  agents from branches of the graph (only one way to reach them, and the graph end at the end of the branch)
     /// Trunk : the lasting agents
     /// </summary>
-    /// <param name="frame"> The frame analysed.</param>
+    /// <param name="swarm"> The swarm analysed.</param>
     /// <returns>A <see cref="Tuple"/> containing leaves, branches and trunk agents.</returns>
-    public static Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> SeparateLeavesBranchesAndTrunk(LogClipFrame frame)
+    public static Tuple<List<AgentData>, List<AgentData>, List<AgentData>> SeparateLeavesBranchesAndTrunk(SwarmData swarm)
     {
-        return SeparateLeavesBranchesAndTrunk(frame.getAgentData(), GetAdjacentMatrix(frame));
+        return SeparateLeavesBranchesAndTrunk(swarm.GetAgentsData(), GetAdjacentMatrix(swarm));
     }
 
 
@@ -469,13 +469,13 @@ public class FrameTools
     /// <param name="agents"> The agents of the graph.</param>
     /// <param name="adjacentMatrix">The corresponding adjacent matrix of the graph.</param>
     /// <returns>A <see cref="Tuple"/> containing leaves, branches and trunk agents.</returns>
-    public static Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> SeparateLeavesBranchesAndTrunk(List<LogAgentData> agents, bool[,] adjacentMatrix)
+    public static Tuple<List<AgentData>, List<AgentData>, List<AgentData>> SeparateLeavesBranchesAndTrunk(List<AgentData> agents, bool[,] adjacentMatrix)
     {
-        List<LogAgentData> leaves = new List<LogAgentData>();
-        List<LogAgentData> branches = new List<LogAgentData>();
-        List<LogAgentData> trunk = new List<LogAgentData>(agents);
+        List<AgentData> leaves = new List<AgentData>();
+        List<AgentData> branches = new List<AgentData>();
+        List<AgentData> trunk = new List<AgentData>(agents);
 
-        Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>> res = new Tuple<List<LogAgentData>, List<LogAgentData>, List<LogAgentData>>(leaves, branches, trunk);
+        Tuple<List<AgentData>, List<AgentData>, List<AgentData>> res = new Tuple<List<AgentData>, List<AgentData>, List<AgentData>>(leaves, branches, trunk);
 
         bool finished = false;
         while (!finished)
@@ -528,17 +528,17 @@ public class FrameTools
     #region Methods - Graph matrix
 
     /// <summary>
-    /// Compute the adjacent matrix from the agents of the frame (undirected graph). 
-    /// This method uses <see cref="GetAdjacentMatrix(List{LogAgentData}, float, float)"/> method.
+    /// Compute the adjacent matrix from the agents of the swarm (undirected graph). 
+    /// This method uses <see cref="GetAdjacentMatrix(List{AgentData}, float, float)"/> method.
     /// </summary>
-    /// <param name="frame">The analysed frame.</param>
+    /// <param name="swarm">The analysed swarm.</param>
     /// <returns>The adjacent matrix as a 2D array.</returns>    
-    public static bool[,] GetAdjacentMatrix(LogClipFrame frame)
+    public static bool[,] GetAdjacentMatrix(SwarmData swarm)
     {
-        List<LogAgentData> agents = frame.getAgentData();
+        List<AgentData> agents = swarm.GetAgentsData();
 
-        float fovSize = frame.GetParameters().GetFieldOfViewSize();
-        float bsSize = frame.GetParameters().GetBlindSpotSize();
+        float fovSize = swarm.GetParameters().GetFieldOfViewSize();
+        float bsSize = swarm.GetParameters().GetBlindSpotSize();
 
         bool[,] adjacentMatrix = GetAdjacentMatrix(agents, fovSize, bsSize);
 
@@ -552,7 +552,7 @@ public class FrameTools
     /// <param name="fovSize">The field of view size in meters</param>
     /// <param name="bsSize">The blind spot size in degree</param>
     /// <returns>The adjacent matrix as a 2D array.</returns>
-    public static bool[,] GetAdjacentMatrix(List<LogAgentData> agents, float fovSize, float bsSize)
+    public static bool[,] GetAdjacentMatrix(List<AgentData> agents, float fovSize, float bsSize)
     {
         bool[,] adjacentMatrix = new bool[agents.Count, agents.Count];
 
@@ -712,5 +712,68 @@ public class FrameTools
         return newMatrix;
     }
 
+    #endregion
+
+    #region Methods - Center of mass
+    /// <summary>
+    /// Compute the center of mass of the swarm.
+    /// </summary>
+    /// <param name="swarmData"> The swarm data.</param>
+    /// <returns>The center of mass of the swarm.</returns>
+    public static Vector3 GetCenterOfMass(SwarmData swarmData)
+    {
+        List<AgentData> agents = swarmData.GetAgentsData();
+
+        return GetCenterOfMass(agents);
+    }
+
+    public static Vector3 GetCenterOfMass(List<AgentData> agents)
+    {
+        Vector3 centerOfMass = Vector3.zero;
+        foreach (AgentData a in agents)
+        {
+            centerOfMass += a.GetPosition();
+        }
+        centerOfMass /= agents.Count;
+        return centerOfMass;
+    }
+    #endregion
+
+    #region Methods - KNN
+    public static List<AgentData> KNN(AgentData agent, List<AgentData> l, int n)
+    {
+        List<AgentData> agents = new List<AgentData>(l);
+        List<AgentData> knn = new List<AgentData>();
+
+        if (agents.Count < n) n = agents.Count;
+
+        for (int i = 0; i < n; i++)
+        {
+            AgentData nearest = NearestAgent(agent, agents);
+            knn.Add(nearest);
+            agents.Remove(nearest);
+        }
+
+        return knn;
+    }
+
+    public static AgentData NearestAgent(AgentData agent, List<AgentData> l)
+    {
+        float min = float.MaxValue;
+        AgentData minAgent = null;
+        foreach (AgentData a in l)
+        {
+            if (System.Object.ReferenceEquals(a, agent)) continue;
+
+            float dist = Vector3.Distance(a.GetPosition(), agent.GetPosition());
+
+            if (dist < min)
+            {
+                min = dist;
+                minAgent = a;
+            }
+        }
+        return minAgent;
+    }
     #endregion
 }

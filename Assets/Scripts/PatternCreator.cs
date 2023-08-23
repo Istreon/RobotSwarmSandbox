@@ -10,7 +10,7 @@ public class PatternCreator : MonoBehaviour
 
     List<LineRenderer> patternRenderer;
 
-    private AgentManager agentManager;
+    private SwarmManager swarmManager;
 
     private bool isDrawing = false;
 
@@ -24,9 +24,9 @@ public class PatternCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        agentManager = FindObjectOfType<AgentManager>();
-        mapSizeX = agentManager.GetMapSizeX();
-        mapSizeZ = agentManager.GetMapSizeZ();
+        swarmManager = FindObjectOfType<SwarmManager>();
+        mapSizeX = swarmManager.GetSwarmData().GetParameters().GetMapSizeX();
+        mapSizeZ = swarmManager.GetSwarmData().GetParameters().GetMapSizeZ();
 
         mainCamera = FindObjectOfType<Camera>();
         patternRenderer = new List<LineRenderer>();
