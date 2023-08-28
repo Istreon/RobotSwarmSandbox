@@ -13,8 +13,6 @@ public class ClipPlayer : MonoBehaviour
 
     #region Private fields - clip parameters
     private SwarmClip clip;
-
-    private int fps;
     private int nbFrames;
 
     #endregion
@@ -23,8 +21,6 @@ public class ClipPlayer : MonoBehaviour
     private bool playing = false;
 
     private bool loopClip = false;
-
-    private float timer = 0.0f;
 
     private int frameNumber
     {
@@ -66,19 +62,13 @@ public class ClipPlayer : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (playing)
         {
-            if (timer >= (1.0f / this.fps))
-            {
-                UpdateCameraPositioning();
-                DisplayFrame();
-                UpdateFrameNumber();
-
-                timer = timer - (1.0f / fps);
-            }
-            timer += Time.deltaTime;
+            UpdateCameraPositioning();
+            DisplayFrame();
+            UpdateFrameNumber();
         }
     }
     #endregion
@@ -150,16 +140,12 @@ public class ClipPlayer : MonoBehaviour
 
         //Reset values for a new clip
         this.frameNumber = 0;
-
-        //Get clip informations
-        this.fps = clip.GetFps();
         this.nbFrames = clip.GetFrames().Count;
 
 
         //Udpate UI
         DisplayFrame();
 
-        //Debug.Log(clip.getClipFrames()[0].GetParameters().GetAlignmentIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetCohesionIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetSeparationIntensity() + "  " + clip.getClipFrames()[0].GetParameters().GetRandomMovementIntensity());
     }
 
     /// <summary>
@@ -247,9 +233,6 @@ public class ClipPlayer : MonoBehaviour
             mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
         }
     }
-
-
-
     #endregion
 
     #region Methods - Clip control - Frame

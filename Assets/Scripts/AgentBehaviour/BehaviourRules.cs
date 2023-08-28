@@ -10,13 +10,13 @@ public class BehaviourRules
     /// </summary>
     /// <param name="intensity"> The intensity of the resulted force.</param>
     /// <returns> A random vector, representing a random force.</returns>
-    public static Vector3 RandomMovement(float intensity)
+    public static Vector3 RandomMovement(float intensity, SerializableRandom generator)
     {
         float alea = 0.1f;
-        if (Random.value < alea)
+        if (generator.Rand(0,1) < alea)
         {
-            float x = Random.value - 0.5f;
-            float z = Random.value - 0.5f;
+            float x = (float)generator.Rand(0, 1) - 0.5f;
+            float z = (float)generator.Rand(0, 1) - 0.5f;
             Vector3 force = new Vector3(x, 0.0f, z);
             force.Normalize();
 

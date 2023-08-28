@@ -9,7 +9,7 @@ public class ClipMetrics
         int res = -1;
         int i = 0;
 
-        int validationFrames = (int)(c.GetFps() * 2.0f);
+        int validationFrames = (int)((1.0f / Time.fixedDeltaTime) * 2.0f);
         int fractureDuration = 0;
         foreach (SwarmData f in c.GetFrames())
         {

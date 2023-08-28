@@ -6,6 +6,7 @@ public class SwarmData
     #region Private fields
     private List<AgentData> agentsData;
     private SwarmParameters parameters;
+    private SerializableRandom random;
     #endregion
 
     #region Methods - Constructor
@@ -13,10 +14,16 @@ public class SwarmData
     {
         this.agentsData = agentsData;
         this.parameters = parameters;
+        this.random = new SerializableRandom();
+    }
+
+    public SwarmData(List<AgentData> agentsData, SwarmParameters parameters, SerializableRandom random)
+    {
+        this.agentsData = agentsData;
+        this.parameters = parameters;
+        this.random =  random;
     }
     #endregion
-
-
 
     #region Methods - Getter
     public List<AgentData> GetAgentsData()
@@ -29,6 +36,11 @@ public class SwarmData
         return this.parameters;
     }
 
+    public SerializableRandom GetRandomGenerator()
+    {
+        return this.random;
+    }
+
     public SwarmData Clone()
     {
         List<AgentData> agentsClone = new List<AgentData>();
@@ -36,7 +48,7 @@ public class SwarmData
         {
             agentsClone.Add(a.Clone());
         }
-        SwarmData clone = new SwarmData(agentsClone, parameters.Clone());
+        SwarmData clone = new SwarmData(agentsClone, parameters.Clone(),random.Clone());
 
         return clone;
     }

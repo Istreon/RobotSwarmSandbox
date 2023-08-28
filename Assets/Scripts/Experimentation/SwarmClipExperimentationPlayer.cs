@@ -83,7 +83,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
 
 
-
         //Shuffle list
         var rnd = new System.Random();
         List<string> l = filePaths.ToList();

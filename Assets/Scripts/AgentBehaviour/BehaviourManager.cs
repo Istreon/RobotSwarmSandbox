@@ -54,7 +54,7 @@ public class BehaviourManager
             neighboursSpeeds.Add(a.GetSpeed());
         }
 
-        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity()));
+        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity(), swarm.GetRandomGenerator()));
         forces.Add(BehaviourRules.MoveForward(parameters.GetMoveForwardIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.Friction(parameters.GetFrictionIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.AvoidCollisionWithNeighbours(parameters.GetAvoidCollisionWithNeighboursIntensity(), agent.GetPosition(), neighboursPositions, parameters.GetMaxSpeed(), 0.09f));
@@ -125,7 +125,7 @@ public class BehaviourManager
             separationPositions.Add(a.GetPosition());
         }
 
-        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity()));
+        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity(), swarm.GetRandomGenerator()));
         forces.Add(BehaviourRules.MoveForward(parameters.GetMoveForwardIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.Friction(parameters.GetFrictionIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.AvoidCollisionWithNeighbours(parameters.GetAvoidCollisionWithNeighboursIntensity(), agent.GetPosition(), neighboursPositions, parameters.GetMaxSpeed(), 0.09f));
@@ -155,7 +155,7 @@ public class BehaviourManager
             neighboursSpeeds.Add(a.GetSpeed());
         }
 
-        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity()));
+        forces.Add(BehaviourRules.RandomMovement(parameters.GetRandomMovementIntensity(), swarm.GetRandomGenerator()));
         forces.Add(BehaviourRules.MoveForward(parameters.GetMoveForwardIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.Friction(parameters.GetFrictionIntensity(), agent.GetSpeed()));
         forces.Add(BehaviourRules.AvoidCollisionWithNeighbours(parameters.GetAvoidCollisionWithNeighboursIntensity(), agent.GetPosition(), neighboursPositions, parameters.GetMaxSpeed(), 0.09f));

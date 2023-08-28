@@ -14,8 +14,6 @@ public class ExportClipFeatures : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-
         filePath = Application.dataPath + filePath;
         Debug.Log(filePath);
 
@@ -30,7 +28,6 @@ public class ExportClipFeatures : MonoBehaviour
 
         //Prepare csv result file
         string line = "Filename;" +
-            "FPS;" +
             "NbFrames;" +
             "FractureFrame;" +
             "FractureScore;" +
@@ -102,7 +99,6 @@ public class ExportClipFeatures : MonoBehaviour
                 pos = s.IndexOf("/");
             } 
             line =  s + ";" 
-                + c.GetFps() + ";" 
                 + c.GetFrames().Count + ";" 
                 + fractureFrame + ";" 
                 + score + ";"  
@@ -235,7 +231,7 @@ public class ExportClipFeatures : MonoBehaviour
 
         float change = distAtFrac - pastDist;
 
-        float res = (change / (float)n) * (float)c.GetFps(); //To get a value per second
+        float res = (change / (float)n) * (1.0f / Time.fixedDeltaTime); //To get a value per second
 
         return res;
 
@@ -297,7 +293,7 @@ public class ExportClipFeatures : MonoBehaviour
 
             float pastDist = DistanceClusterCMFromRemainingSwarmCM(pastCluster, pastAgents);
 
-            float sepSpeed = ((currentDist - pastDist) / k ) * c.GetFps();
+            float sepSpeed = ((currentDist - pastDist) / k ) * (1.0f / Time.fixedDeltaTime);
 
             if(sepSpeed > maxSepSpeed)
             {
@@ -356,7 +352,7 @@ public class ExportClipFeatures : MonoBehaviour
 
             float pastDist = DistanceClusterCMFromRemainingSwarmCM(pastCluster, pastAgents);
 
-            float sepSpeed = ((currentDist - pastDist) / k) * c.GetFps();
+            float sepSpeed = ((currentDist - pastDist) / k) * (1.0f/Time.fixedDeltaTime);
 
             if (sepSpeed > maxSepSpeed)
             {
@@ -366,7 +362,7 @@ public class ExportClipFeatures : MonoBehaviour
             }
         }
 
-        float densityChangeSpeed = DensityChangeSpeed(bestCluster, bestPastCluster, k, c.GetFps());
+        float densityChangeSpeed = DensityChangeSpeed(bestCluster, bestPastCluster, k);
 
         maxSepSpeed += densityChangeSpeed * 2; //fois 2 car on prend en compte le changement de densité du reste de l'essaim de façon simplifié (essaim homogène)
 
@@ -375,12 +371,12 @@ public class ExportClipFeatures : MonoBehaviour
 
     }
 
-    private float DensityChangeSpeed(List<AgentData> cluster,  List<AgentData> pastCluster, int k, int fps)
+    private float DensityChangeSpeed(List<AgentData> cluster,  List<AgentData> pastCluster, int k)
     {
         float currentDist = MeanDistFromCM(cluster);
         float pastDist = MeanDistFromCM(pastCluster);
 
-        float densityChangeSpeed = ((pastDist - currentDist) /(float) k) * (float)fps;
+        float densityChangeSpeed = ((pastDist - currentDist) /(float) k) * (1.0f / Time.fixedDeltaTime);
 
         return densityChangeSpeed;
     }

@@ -24,8 +24,6 @@ public class SwarmManager : MonoBehaviour
 
     private Displayer[] existingDisplayers;
 
-    
-
     // Start is called before the first frame update
     void Start()
     {
@@ -53,26 +51,24 @@ public class SwarmManager : MonoBehaviour
         {
             SwarmParameters parameters = parametersInterface.GetParameters();
 
+            SerializableRandom random = new SerializableRandom();
+
             List<AgentData> agents = new List<AgentData>();
             for (int i = 0; i < numberOfAgents; i++)
             {
 
-                Vector3 position = new Vector3(UnityEngine.Random.Range(0.0f, parameters.GetMapSizeX()), 0.0f, UnityEngine.Random.Range(0.0f, parameters.GetMapSizeZ()));
-                Vector3 direction = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), 0.0f, UnityEngine.Random.Range(-1.0f, 1.0f));
+                Vector3 position = new Vector3((float)random.Rand(0, (double)parameters.GetMapSizeX()), 0.0f, (float)random.Rand(0, (double)parameters.GetMapSizeZ()));
+                Vector3 direction = new Vector3((float)random.Rand(-1, 1), 0.0f, (float)random.Rand(-1, 1));
 
                 AgentData agent = new AgentData(position, direction.normalized);
                 agents.Add(agent);
             }
-            swarm = new SwarmData(agents, parameters);
-        }
-
-            
-
-        
+            swarm = new SwarmData(agents, parameters, random);
+        } 
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Update swarm parameters
         SwarmParameters parameters = parametersInterface.GetParameters();
