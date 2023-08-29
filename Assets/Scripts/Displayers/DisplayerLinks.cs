@@ -6,6 +6,8 @@ public class DisplayerLinks : Displayer
 {
     #region Serialized fields
     [SerializeField]
+    private bool visu3D = false;
+    [SerializeField]
     private float minWidth = 0.002f;
     [SerializeField]
     private float maxWidth = 0.03f;
@@ -58,26 +60,53 @@ public class DisplayerLinks : Displayer
 
         foreach (Tuple<AgentData,AgentData> l in links)
         {
-            //Calculate the rapport between the current link size and the field of view size
-            float distOnMaxDistance = Vector3.Distance(l.Item1.GetPosition(), l.Item2.GetPosition()) / fovSize;
-
-            //Calculate the width of the displayed link based on the rapport between the link size and fov
-            float width = maxWidth - (maxWidth-minWidth) * distOnMaxDistance;
-
-            //Get the vertices of the line
-            List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width);
-            //Get the triangles from the vertices of the line
-            List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
-
-            //Update triangles indexes before adding them to the triangles list
-            for (int k = 0; k < t.Count; k++)
+            if (!visu3D)
             {
-                t[k] += vertices.Count;
-            }
+                //Calculate the rapport between the current link size and the field of view size
+                float distOnMaxDistance = Vector3.Distance(l.Item1.GetPosition(), l.Item2.GetPosition()) / fovSize;
 
-            //Updathe vertices and triangles list with the new line
-            vertices.AddRange(v);
-            triangles.AddRange(t);
+                //Calculate the width of the displayed link based on the rapport between the link size and fov
+                float width = maxWidth - (maxWidth - minWidth) * distOnMaxDistance;
+
+                //Get the vertices of the line
+                List<Vector3> v = MeshTools.TranformLineToRectanglePoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width);
+                //Get the triangles from the vertices of the line
+                List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
+
+                //Update triangles indexes before adding them to the triangles list
+                for (int k = 0; k < t.Count; k++)
+                {
+                    t[k] += vertices.Count;
+                }
+
+                //Updathe vertices and triangles list with the new line
+                vertices.AddRange(v);
+                triangles.AddRange(t);
+            }
+            else 
+            {
+                //Calculate the rapport between the current link size and the field of view size
+                float distOnMaxDistance = Vector3.Distance(l.Item1.GetPosition(), l.Item2.GetPosition()) / fovSize;
+
+                //Calculate the width of the displayed link based on the rapport between the link size and fov
+                float width = maxWidth - (maxWidth - minWidth) * distOnMaxDistance;
+
+                //Get the vertices of the line
+                Tuple<List<Vector3>,List<int>> m = MeshTools.TranformLineToPolygonUpPoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width);
+                List<Vector3> v = m.Item1;
+                List<int> t = m.Item2;
+
+                //Update triangles indexes before adding them to the triangles list
+                for (int k = 0; k < t.Count; k++)
+                {
+                    t[k] += vertices.Count;
+                }
+
+                //Updathe vertices and triangles list with the new line
+                vertices.AddRange(v);
+                triangles.AddRange(t);
+            }
+            
         }
 
         Vector2[] uv = new Vector2[vertices.Count];

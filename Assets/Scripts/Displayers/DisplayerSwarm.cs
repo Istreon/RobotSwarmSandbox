@@ -250,7 +250,7 @@ public class DisplayerSwarm : Displayer
 
     private void UpdateActorPosition(int actorId, Vector3 position)
     {
-        actors[actorId].transform.position = position + spatialOrigin;
+        actors[actorId].transform.localPosition = position + spatialOrigin;
     }
 
     private void UpdateActorPositionAndDirection(int actorId, Vector3 position, Vector3 direction)

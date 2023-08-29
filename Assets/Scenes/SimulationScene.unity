@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90a4b90b3b11e3a43a92bc838d8af4b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visu3D: 1
   minWidth: 0.005
   maxWidth: 0.05
   material: {fileID: 2100000, guid: 290d1b3d09fdad749898033c8428372b, type: 2}
@@ -163,7 +164,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 113061057}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -289,6 +290,7 @@ MonoBehaviour:
   parametersInterface: {fileID: 0}
   displayers:
   - {fileID: 1750464333}
+  - {fileID: 113061058}
 --- !u!4 &173933244
 Transform:
   m_ObjectHideFlags: 0
@@ -318,8 +320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agentBehaviour: 1
   agentMovement: 0
-  mapSizeX: 5
-  mapSizeZ: 5
+  mapSizeX: 7
+  mapSizeZ: 7
   fieldOfViewSize: 1
   blindSpotSize: 30
   maxSpeed: 0.1
@@ -1305,7 +1307,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 2.5, y: 5, z: 2.5}
+  m_LocalPosition: {x: 3.5, y: 7, z: 3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1639,7 +1641,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1750464331}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.015, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1658,7 +1660,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1274b4103092de24abe5fe18bb1ee1a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayType: 0
+  displayType: 1
   actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
 --- !u!1 &1752624802
 GameObject:
@@ -1974,7 +1976,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 799f5f4b0a93ed946b7621fe08d901b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fps: 60
 --- !u!1 &1807048403
 GameObject:
   m_ObjectHideFlags: 0
