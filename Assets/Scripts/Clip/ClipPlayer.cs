@@ -7,8 +7,12 @@ public class ClipPlayer : MonoBehaviour
     #region Serialized fields
     [SerializeField]
     private bool automaticCameraPositioning = false;
+
     [SerializeField]
-    private List<Displayer> displayers;
+    private Transform displayers;
+
+    [SerializeField]
+    private List<Displayer> usedDisplayers;
     #endregion
 
     #region Private fields - clip parameters
@@ -38,6 +42,8 @@ public class ClipPlayer : MonoBehaviour
 
     #region Private fields - others
     private Camera mainCamera;
+
+    Displayer[] existingDisplayers;
     #endregion
 
     #region Event - Frame number changed
@@ -59,6 +65,8 @@ public class ClipPlayer : MonoBehaviour
         {
             Debug.Log("Missing main camera in the scene.");
         }
+
+        existingDisplayers = displayers.GetComponentsInChildren<Displayer>();
     }
 
     // Update is called once per frame
@@ -110,17 +118,17 @@ public class ClipPlayer : MonoBehaviour
         SwarmData frame = clip.GetFrames()[frameNumber];
 
 
-        Displayer[] existingDisplayers = FindObjectsOfType<Displayer>();
+
 
         //--Clear display for unused displayer--//
         foreach (Displayer d in existingDisplayers)
         {
-            if (!displayers.Contains(d))
+            if (!usedDisplayers.Contains(d))
                 d.ClearVisual();
         }
 
         //--Refresh the display--//
-        foreach (Displayer d in displayers)
+        foreach (Displayer d in usedDisplayers)
         {
             d.DisplayVisual(frame);
         }

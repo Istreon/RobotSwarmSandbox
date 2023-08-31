@@ -15,7 +15,11 @@ public class SwarmManager : MonoBehaviour
     EditorParametersInterface parametersInterface;
 
     [SerializeField]
-    private List<Displayer> displayers;
+    [Tooltip("The transform containing all the \"Displayer\" components.")]
+    private Transform displayers;
+
+    [SerializeField]
+    private List<Displayer> usedDisplayers;
     #endregion
 
     private SwarmData swarm;
@@ -31,7 +35,7 @@ public class SwarmManager : MonoBehaviour
         map = Instantiate(mapPrefab);
         map.transform.parent = null;
 
-        existingDisplayers = FindObjectsOfType<Displayer>();
+        existingDisplayers = displayers.GetComponentsInChildren<Displayer>();
 
         parametersInterface = FindObjectOfType<EditorParametersInterface>();
         if (parametersInterface == null) {
@@ -119,13 +123,13 @@ public class SwarmManager : MonoBehaviour
         //--Affichage--//
         foreach (Displayer d in existingDisplayers)
         {
-            if(!displayers.Contains(d))
+            if(!usedDisplayers.Contains(d))
                 d.ClearVisual();
         }
 
-        foreach (Displayer d in displayers)
+        foreach (Displayer d in usedDisplayers)
         {
-            d.DisplayVisual(swarm);
+            if(d!=null) d.DisplayVisual(swarm);
         }
 
         UpdateMap();

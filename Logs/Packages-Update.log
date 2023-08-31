@@ -134,3 +134,16 @@ Update Mode: updateDependencies
 The following packages were updated:
   com.unity.ide.rider from version 3.0.21 to 3.0.24
   com.unity.inputsystem from version 1.5.1 to 1.6.1
+
+=== Wed Aug 30 15:42:13 2023
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were added:
+  com.unity.ai.navigation@1.1.4
+The following packages were updated:
+  com.unity.inputsystem from version 1.6.1 to 1.6.3
+  com.unity.timeline from version 1.6.5 to 1.7.5
+  com.unity.visualscripting from version 1.8.0 to 1.9.0
+  com.unity.xr.oculus from version 3.3.0 to 4.0.0
