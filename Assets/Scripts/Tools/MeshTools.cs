@@ -22,20 +22,20 @@ public class MeshTools
         return points;
     }
 
-    public static System.Tuple<List<Vector3>, List<int>> TranformLineToPolygonUpPoints(Vector3 startPoint, Vector3 endPoint, float width)
+    public static System.Tuple<List<Vector3>, List<int>> TranformLineToPolygonUpPoints(Vector3 startPoint, Vector3 endPoint, float width, float height)
     {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
         //--Face 1--//
-        List<Vector3> v = TranformLineToHorizontalFacePoints(startPoint, endPoint, width, false);
+        List<Vector3> v = TranformLineToHorizontalFacePoints(startPoint, endPoint, width, height, false);
         List<int> t = MeshTools.DrawFilledTriangles(v.ToArray());
 
         vertices.AddRange(v);
         triangles.AddRange(t);
 
         //--Face 2--//
-        v = TranformLineToHorizontalFacePoints(startPoint, endPoint, width, true);
+        v = TranformLineToHorizontalFacePoints(startPoint, endPoint, width, height, true);
         t = MeshTools.DrawFilledTriangles(v.ToArray());
 
         //Update triangles indexes before adding them to the triangles list
@@ -48,7 +48,7 @@ public class MeshTools
         triangles.AddRange(t);
 
         //--Face 3--//
-        v = TranformLineToVerticalFacePoints(startPoint, endPoint, width, false);
+        v = TranformLineToVerticalFacePoints(startPoint, endPoint, width, height, false);
         t = MeshTools.DrawFilledTriangles(v.ToArray());
 
         //Update triangles indexes before adding them to the triangles list
@@ -61,7 +61,7 @@ public class MeshTools
         triangles.AddRange(t);
 
         //--Face 4--//
-        v = TranformLineToVerticalFacePoints(startPoint, endPoint, width, true);
+        v = TranformLineToVerticalFacePoints(startPoint, endPoint, width, height, true);
         t = MeshTools.DrawFilledTriangles(v.ToArray());
 
         //Update triangles indexes before adding them to the triangles list
@@ -78,7 +78,7 @@ public class MeshTools
 
 
 
-    private static List<Vector3> TranformLineToHorizontalFacePoints(Vector3 startPoint, Vector3 endPoint, float width, bool side)
+    private static List<Vector3> TranformLineToHorizontalFacePoints(Vector3 startPoint, Vector3 endPoint, float width, float heigth,  bool side)
     {
         float sideValue = 1;
 
@@ -93,7 +93,7 @@ public class MeshTools
         Vector3 perp = new Vector3(-line.z * sideValue, 0.0f, line.x * sideValue);
         perp = perp.normalized;
 
-        Vector3 offset = new Vector3(0.0f, (width / 2) * sideValue, 0.0f);
+        Vector3 offset = new Vector3(0.0f, (heigth / 2) * sideValue, 0.0f);
 
         List<Vector3> points = new List<Vector3>();
         points.Add(startPoint - (perp * (width / 2)) + offset);
@@ -104,7 +104,7 @@ public class MeshTools
         return points;
     }
 
-    private static List<Vector3> TranformLineToVerticalFacePoints(Vector3 startPoint, Vector3 endPoint, float width, bool side)
+    private static List<Vector3> TranformLineToVerticalFacePoints(Vector3 startPoint, Vector3 endPoint, float width, float height,  bool side)
     {
         float sideValue = 1;
 
@@ -122,10 +122,10 @@ public class MeshTools
         Vector3 offset = new Vector3(0.0f, 0.0f, -(width / 2)* sideValue);
 
         List<Vector3> points = new List<Vector3>();
-        points.Add(startPoint - (perp * (width / 2)) + offset);
-        points.Add(endPoint - (perp * (width / 2)) + offset);
-        points.Add(endPoint + (perp * (width / 2)) + offset);
-        points.Add(startPoint + (perp * (width / 2)) + offset);
+        points.Add(startPoint - (perp * (height / 2)) + offset);
+        points.Add(endPoint - (perp * (height / 2)) + offset);
+        points.Add(endPoint + (perp * (height / 2)) + offset);
+        points.Add(startPoint + (perp * (height / 2)) + offset);
 
         return points;
     }

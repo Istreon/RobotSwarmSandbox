@@ -18,7 +18,6 @@ public class DisplayerSwarm : Displayer
     private DisplayType displayType = DisplayType.Simple;
     [SerializeField]
     private GameObject actorPrefab;
-
     #endregion
 
     #region Private fields
@@ -44,6 +43,8 @@ public class DisplayerSwarm : Displayer
         clusterPalette = ColorTools.GetShuffledColorPalette(nbColorClusters);
         communitiesPalette = ColorTools.GetColorPalette(nbColorCommunities);
         lbtPalette = ColorTools.GetColorPalette(3);
+        if(actorPrefab.GetComponent<Renderer>() == null)
+            Debug.LogWarning("The \"ActorPrefab\" as no component \"Renderer\", no color will be displayed.", this);
     }
     #endregion
 
@@ -100,7 +101,9 @@ public class DisplayerSwarm : Displayer
             UpdateActorPositionAndDirection(i, a.GetPosition(), a.GetDirection());
 
             //Update actor color
-            actors[i].GetComponent<Renderer>().material.color = Color.black;
+            Renderer actorRenderer = actors[i].GetComponent<Renderer>();
+            if(actorRenderer != null)
+                actorRenderer.material.color = Color.black;
         }
     }
 
@@ -126,15 +129,19 @@ public class DisplayerSwarm : Displayer
                 //Update actor position and direction
                 UpdateActorPositionAndDirection(i, a.GetPosition(), a.GetDirection());
 
-
-                if (clusters.Count > nbColorClusters)
+                //Update actor color
+                Renderer actorRenderer = actors[i].GetComponent<Renderer>();
+                if (actorRenderer != null)
                 {
-                    actors[i].GetComponent<Renderer>().material.color = Color.black;
-                }
-                else
-                {
-                    actors[i].GetComponent<Renderer>().material.color = clusterPalette[c];
-                }
+                    if (clusters.Count > nbColorClusters)
+                    {
+                        actorRenderer.material.color = Color.black;
+                    }
+                    else
+                    {
+                        actorRenderer.material.color = clusterPalette[c];
+                    }
+                } 
                 i++;
             }
             c++;
@@ -158,7 +165,9 @@ public class DisplayerSwarm : Displayer
                 //Update actor position and direction
                 UpdateActorPositionAndDirection(i, a.GetPosition(), a.GetDirection());
 
-                actors[i].GetComponent<Renderer>().material.color = communitiesPalette[c % nbColorCommunities];
+                Renderer actorRenderer = actors[i].GetComponent<Renderer>();
+                if (actorRenderer != null)
+                    actorRenderer.material.color = communitiesPalette[c % nbColorCommunities];
 
                 i++;
             }
@@ -186,7 +195,9 @@ public class DisplayerSwarm : Displayer
                 //Update actor position and direction
                 UpdateActorPositionAndDirection(i, a.GetPosition(), a.GetDirection());
 
-                actors[i].GetComponent<Renderer>().material.color = lbtPalette[c];
+                Renderer actorRenderer = actors[i].GetComponent<Renderer>();
+                if (actorRenderer != null)
+                    actorRenderer.material.color = lbtPalette[c];
                 i++;
             }
             c++;
@@ -211,7 +222,7 @@ public class DisplayerSwarm : Displayer
             for (int i = 0; i < (numberOfAgents - numberOfActors); i++)
             {
                 GameObject newAgent = GameObject.Instantiate(actorPrefab);
-                newAgent.transform.position = new Vector3(0.0f, 0.001f, 0.0f);
+                newAgent.transform.position = Vector3.zero;
                 newAgent.transform.rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 359.0f), 0.0f);
                 newAgent.transform.parent = this.transform;
                 actors.Add(newAgent);
