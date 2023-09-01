@@ -7,10 +7,12 @@ using UnityEngine;
 
 public class FlockingBehaviour : MonoBehaviour
 {
+    #region Serialized fields
+    [SerializeField]
+    private FlockingManager manager;
+    #endregion
 
     #region Private fields
-    private FlockingManager manager;
-
     public Material[] materials;
 
 
@@ -30,8 +32,7 @@ public class FlockingBehaviour : MonoBehaviour
     {
         if (manager == null)
         {
-            manager = FindObjectOfType<FlockingManager>();
-            if (manager == null) Debug.LogError("Missing Flocking Manager in the scene", this);
+            if (manager == null) Debug.LogError("Missing Flocking Manager.", this);
         }
 
         flockmates = new List<GameObject>();

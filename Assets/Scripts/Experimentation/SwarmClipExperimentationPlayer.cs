@@ -14,6 +14,9 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 {
     #region Serialize fields
     [SerializeField]
+    private ClipPlayer clipPlayer;
+
+    [SerializeField]
     private GameObject nextClipMenu;
 
     [SerializeField]
@@ -34,8 +37,6 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
     private List<SwarmClip> clips = new List<SwarmClip>();
 
     private int currentClip = 0;
-
-    private ClipPlayer clipPlayer;
 
     private ExperimentationResult experimentationResult = new ExperimentationResult();
 
@@ -79,9 +80,10 @@ public class SwarmClipExperimentationPlayer : MonoBehaviour
 
         slider.gameObject.SetActive(false);
 
-        clipPlayer = FindObjectOfType<ClipPlayer>();
-
-
+        if (clipPlayer == null)
+        {
+            Debug.LogError("There is no ClipPlayer in the scene.", this);
+        }
 
         //Shuffle list
         var rnd = new System.Random();

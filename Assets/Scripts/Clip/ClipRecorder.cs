@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class ClipRecorder : MonoBehaviour
 {
-    #region Private fields
+    #region Serialized fields
+    [SerializeField]
     private SwarmManager swarmManager;
+    #endregion
 
+    #region Private fields
     private bool recording = false;
 
     private List<SwarmData> frames;
@@ -15,8 +18,7 @@ public class ClipRecorder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        swarmManager = FindObjectOfType<SwarmManager>();
-        if (swarmManager == null) Debug.LogError("AgentManager is missing in the scene", this);
+        if (swarmManager == null) Debug.LogError("AgentManager is missing.", this);
 
         frames = new List<SwarmData>();
     }

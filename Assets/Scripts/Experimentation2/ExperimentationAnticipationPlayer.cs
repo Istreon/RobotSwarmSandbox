@@ -15,6 +15,9 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 {
     #region Serialize fields
     [SerializeField]
+    private ClipPlayer clipPlayer;
+
+    [SerializeField]
     private GameObject answerMenu;
 
     [SerializeField]
@@ -34,8 +37,6 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     //--Clip player--//
 
     private int currentClip = 0;
-
-    private ClipPlayer clipPlayer;
 
     //--Results--//
     private Exp2AnticipationResult experimentationResult = new Exp2AnticipationResult();
@@ -85,8 +86,10 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         string line = "Filename,Result\r";
         sb.Append(line);
 
-        //Find the clip player in the scene
-        clipPlayer = FindObjectOfType<ClipPlayer>();
+        if (clipPlayer == null)
+        {
+            Debug.LogError("There is no ClipPlayer in the scene.", this);
+        }
 
         //Shuffle the list of clip files
         var rnd = new System.Random();

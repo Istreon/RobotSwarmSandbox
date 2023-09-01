@@ -67,9 +67,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -1119,7 +1116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayType: 1
-  actorPrefab: {fileID: 8283449362047514218, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
+  actorPrefab: {fileID: 5421626327684766240, guid: 04076efbd31e5ae4ab180d68495f5a09, type: 3}
 --- !u!4 &845184233
 Transform:
   m_ObjectHideFlags: 0
@@ -1323,6 +1320,8 @@ MonoBehaviour:
   visu3D: 0
   minWidth: 0.002
   maxWidth: 0.03
+  minHeight: 0.001
+  maxHeight: 0.025
   material: {fileID: 2100000, guid: 290d1b3d09fdad749898033c8428372b, type: 2}
 --- !u!1 &1023882142
 GameObject:
@@ -2188,6 +2187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19a924e450c56024795139acdbf54ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clipPlayer: {fileID: 1557432351}
   buttonsIfClipLoaded: {fileID: 1861730347}
   saveButton: {fileID: 2049981063}
   slider: {fileID: 200058103}
@@ -2205,8 +2205,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   automaticCameraPositioning: 1
-  displayers: {fileID: 0}
-  usedDisplayers: []
+  displayers: {fileID: 865413436}
+  usedDisplayers:
+  - {fileID: 845184232}
+  - {fileID: 952639067}
 --- !u!1 &1579176413
 GameObject:
   m_ObjectHideFlags: 0

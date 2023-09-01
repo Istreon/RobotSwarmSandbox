@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 public class ClipEditor : MonoBehaviour
 {
     #region Serialized fields
+    [SerializeField]
+    private ClipPlayer clipPlayer;
 
     [SerializeField]
     private GameObject buttonsIfClipLoaded;
@@ -33,8 +35,6 @@ public class ClipEditor : MonoBehaviour
     #endregion
 
     #region Private fields - clip editor parameters
-    private ClipPlayer clipPlayer;
-
     private bool loaded = false;
     private bool sliderValueChanged = false;
     private bool modifiedClip = false;
@@ -45,7 +45,6 @@ public class ClipEditor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        clipPlayer = FindObjectOfType<ClipPlayer>();
         if(clipPlayer == null)
         {
             Debug.LogError("There is no ClipPlayer in the scene.", this);

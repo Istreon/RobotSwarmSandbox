@@ -37,13 +37,12 @@ public class SwarmManager : MonoBehaviour
 
         existingDisplayers = displayers.GetComponentsInChildren<Displayer>();
 
-        parametersInterface = FindObjectOfType<EditorParametersInterface>();
         if (parametersInterface == null) {
             Debug.LogError("ParameterManager is missing in the scene", this);
         }
 
 
-        FrameTransmitter frameTransmitter = FindObjectOfType<FrameTransmitter>();
+        FrameTransmitter frameTransmitter = FindAnyObjectByType<FrameTransmitter>();
 
         if (frameTransmitter != null)
         {

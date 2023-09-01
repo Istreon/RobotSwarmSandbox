@@ -10,6 +10,7 @@ public class PatternCreator : MonoBehaviour
 
     List<LineRenderer> patternRenderer;
 
+    [SerializeField]
     private SwarmManager swarmManager;
 
     private bool isDrawing = false;
@@ -24,11 +25,10 @@ public class PatternCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        swarmManager = FindObjectOfType<SwarmManager>();
         mapSizeX = swarmManager.GetSwarmData().GetParameters().GetMapSizeX();
         mapSizeZ = swarmManager.GetSwarmData().GetParameters().GetMapSizeZ();
 
-        mainCamera = FindObjectOfType<Camera>();
+        mainCamera = Camera.main;
         patternRenderer = new List<LineRenderer>();
 
         vectorFieldState = new bool[cutNumber,cutNumber];

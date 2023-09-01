@@ -60,7 +60,7 @@ public class ClipPlayer : MonoBehaviour
     #region Methods - MonoBehaviour callbacks
     private void Start()
     {
-        mainCamera = FindObjectOfType<Camera>();
+        mainCamera = Camera.main;
         if(mainCamera == null)
         {
             Debug.Log("Missing main camera in the scene.");
