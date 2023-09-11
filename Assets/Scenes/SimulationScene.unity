@@ -207,6 +207,7 @@ MonoBehaviour:
   usedDisplayers:
   - {fileID: 1750464333}
   - {fileID: 113061058}
+  - {fileID: 2075938384}
 --- !u!4 &173933244
 Transform:
   m_ObjectHideFlags: 0
@@ -769,6 +770,7 @@ Transform:
   - {fileID: 1694269164}
   - {fileID: 1142591577}
   - {fileID: 656601045}
+  - {fileID: 2075938383}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &843391744
@@ -1683,6 +1685,54 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!1 &2075938382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2075938383}
+  - component: {fileID: 2075938384}
+  m_Layer: 0
+  m_Name: Displayer_DominantForce
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2075938383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075938382}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 840431973}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2075938384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075938382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d19f1154b3484e42a647abe5699ad05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pictoAttraction: {fileID: 3670647569092956346, guid: 741a983f6aa6a6447b6c9f519c590603, type: 3}
+  pictoRepulsion: {fileID: 3670647569092956346, guid: 5e5ee2e9cad55a44f8ef2606070a9245, type: 3}
+  toleranceThreshold: 0
+  pictoHeight: 0.1
 --- !u!1 &2085056683
 GameObject:
   m_ObjectHideFlags: 0

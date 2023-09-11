@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,18 @@ public class BehaviourManager
         Reynolds,
         Couzin,
         PreservationConnectivity
+    }
+
+    public enum ForceType
+    {
+        Other,
+        Attraction,
+        Repulsion,
+        Alignment,
+        Friction,
+        Random,
+        Forward,
+        Potential
     }
 
     public static List<Vector3> ApplySocialBehaviour(AgentBehaviour agentBehaviour, AgentData agent, SwarmData swarm)
@@ -165,5 +178,41 @@ public class BehaviourManager
         forces.Add(BehaviourRules.AlignmentUsingDifference(parameters.GetAlignmentIntensity(), agent.GetSpeed(), neighboursSpeeds));
 
         return forces;
+    }
+
+    public static List<Tuple<ForceType,Vector3>> GetForces(AgentData agent, AgentBehaviour agentBehaviour)
+    {
+        List<Vector3> forces = agent.GetForces();
+        List<Tuple<ForceType, Vector3>> detailedForces = new List<Tuple<ForceType, Vector3>>();
+
+        detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Random, forces[0]));
+        detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Forward, forces[1]));
+        detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Friction, forces[2]));
+        detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Repulsion, forces[3]));
+        detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Repulsion, forces[4]));
+
+        switch (agentBehaviour)
+        {
+            case AgentBehaviour.Reynolds:
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Attraction, forces[5]));
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Repulsion, forces[6]));
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Alignment, forces[7]));
+
+                break;
+            case AgentBehaviour.Couzin:
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Attraction, forces[5]));
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Repulsion, forces[6]));
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Alignment, forces[7]));
+                break;
+            case AgentBehaviour.PreservationConnectivity:
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Potential, forces[5]));
+                detailedForces.Add(new Tuple<ForceType, Vector3>(ForceType.Alignment, forces[6]));
+                break;
+            default:
+                detailedForces = new List<Tuple<ForceType, Vector3>>();
+                break;
+        }
+
+        return detailedForces;
     }
 }
