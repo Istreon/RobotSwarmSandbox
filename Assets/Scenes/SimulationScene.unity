@@ -205,7 +205,7 @@ MonoBehaviour:
   parametersInterface: {fileID: 173933245}
   displayers: {fileID: 840431973}
   usedDisplayers:
-  - {fileID: 1750464333}
+  - {fileID: 843391746}
   - {fileID: 113061058}
   - {fileID: 2075938384}
 --- !u!4 &173933244
@@ -1729,9 +1729,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d19f1154b3484e42a647abe5699ad05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pictoAttraction: {fileID: 3670647569092956346, guid: 741a983f6aa6a6447b6c9f519c590603, type: 3}
-  pictoRepulsion: {fileID: 3670647569092956346, guid: 5e5ee2e9cad55a44f8ef2606070a9245, type: 3}
-  toleranceThreshold: 0
+  pictoAttraction: {fileID: 7232597059624878161, guid: 5b3274a3913895041ac61b0324478ed2, type: 3}
+  pictoRepulsion: {fileID: 7729646329941515905, guid: 2415262dac2ccef4d9660904a8acb303, type: 3}
+  toleranceThreshold: 0.05
   pictoHeight: 0.1
 --- !u!1 &2085056683
 GameObject:

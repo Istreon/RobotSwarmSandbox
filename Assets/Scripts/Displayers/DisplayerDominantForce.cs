@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +12,7 @@ public class DisplayerDominantForce : Displayer
     private GameObject pictoRepulsion;
 
     [SerializeField]
+    [Range(0.0f,0.5f)]
     private float toleranceThreshold = 0.0f;    
     
     [SerializeField]
@@ -70,6 +70,7 @@ public class DisplayerDominantForce : Displayer
             float attIntensity = 0.0f;
             Vector3 att = Vector3.zero;
 
+            
             foreach (Vector3 v in repulsion)
             {
                 if(v.magnitude > repIntensity)
@@ -89,6 +90,11 @@ public class DisplayerDominantForce : Displayer
             }
 
 
+            if (repIntensity == 0.0f && attIntensity == 0.0f) continue;
+
+            float ratio = repIntensity / attIntensity;
+
+            if (ratio < 1.0f + toleranceThreshold && ratio > 1.0f - toleranceThreshold) continue;
 
             GameObject g;
             
@@ -104,7 +110,10 @@ public class DisplayerDominantForce : Displayer
             g.transform.parent = this.transform;
 
             g.transform.localPosition = a.GetPosition() + new Vector3(0.0f, pictoHeight, 0.0f);
-            g.transform.localRotation = Quaternion.Euler(a.GetDirection());
+
+            float agentDirection_YAxis = 180 - (Mathf.Acos(a.GetDirection().normalized.x) * 180.0f / Mathf.PI);
+            if (a.GetDirection().z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+            g.transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
 
             pictos.Add(g);
         }
