@@ -97,13 +97,16 @@ public class DisplayerDominantForce : Displayer
             if (ratio < 1.0f + toleranceThreshold && ratio > 1.0f - toleranceThreshold) continue;
 
             GameObject g;
-            
+
+            Vector3 dir;
             if(repIntensity<attIntensity)
             {
                 g = Instantiate(pictoAttraction);
+                dir = att;
             } else
             {
                 g = Instantiate(pictoRepulsion);
+                dir = rep;
             }
             
 
@@ -111,8 +114,8 @@ public class DisplayerDominantForce : Displayer
 
             g.transform.localPosition = a.GetPosition() + new Vector3(0.0f, pictoHeight, 0.0f);
 
-            float agentDirection_YAxis = 180 - (Mathf.Acos(a.GetDirection().normalized.x) * 180.0f / Mathf.PI);
-            if (a.GetDirection().z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+            float agentDirection_YAxis = 180 - (Mathf.Acos(dir.normalized.x) * 180.0f / Mathf.PI);
+            if (dir.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
             g.transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
 
             pictos.Add(g);

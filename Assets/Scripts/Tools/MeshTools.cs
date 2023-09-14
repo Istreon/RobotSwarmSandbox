@@ -130,6 +130,191 @@ public class MeshTools
         return points;
     }
 
+    #region Methods - Cuboid mesh
+    public static System.Tuple<List<Vector3>, List<int>> CuboidPoints(float width, float length)
+    {
+        List<Vector3> points = new List<Vector3>();
+
+        points.Add(new Vector3(-width / 2, 0.0f, -width/2));
+        points.Add(new Vector3(-width / 2, length, -width/2));
+        points.Add(new Vector3(-width / 2, length, width / 2));
+        points.Add(new Vector3(-width / 2, 0.0f, width/2));
+        points.Add(new Vector3(width / 2, 0.0f, width/2));
+        points.Add(new Vector3(width / 2, length, width/2));
+        points.Add(new Vector3(width / 2, length, -width / 2));
+        points.Add(new Vector3(width / 2, 0.0f, -width/2));
+
+
+        List<int> triangles = new List<int>();
+
+        triangles.Add(0);
+        triangles.Add(2);
+        triangles.Add(1);
+                
+        triangles.Add(2);
+        triangles.Add(0);
+        triangles.Add(3);        
+        
+        triangles.Add(3);
+        triangles.Add(5);
+        triangles.Add(2);        
+        
+        triangles.Add(3);
+        triangles.Add(4);
+        triangles.Add(5);
+
+        triangles.Add(4);
+        triangles.Add(6);
+        triangles.Add(5);        
+        
+        triangles.Add(4);
+        triangles.Add(7);
+        triangles.Add(6);        
+        
+        triangles.Add(7);
+        triangles.Add(1);
+        triangles.Add(6);
+
+        triangles.Add(7);
+        triangles.Add(0);
+        triangles.Add(1);
+
+        triangles.Add(5);
+        triangles.Add(6);
+        triangles.Add(1);
+
+        triangles.Add(5);
+        triangles.Add(1);
+        triangles.Add(2);
+
+        triangles.Add(4);
+        triangles.Add(0);
+        triangles.Add(7);
+
+        triangles.Add(4);
+        triangles.Add(3);
+        triangles.Add(0);
+
+        return new System.Tuple<List<Vector3>,List<int>>(points,triangles);
+    }
+
+    public static System.Tuple<List<Vector3>, List<int>> TranformLineToCuboidPoints(Vector3 startPoint, Vector3 endPoint, float width)
+    {   
+        Vector3 newDirection = endPoint - startPoint;
+
+        List<Vector3> vertices;
+        List<int> triangles;
+
+        float length = newDirection.magnitude;
+
+        System.Tuple<List<Vector3>, List<int>> m= CuboidPoints(width, length);
+
+        vertices=m.Item1;
+        triangles= m.Item2;
+
+
+        Vector3 cuboidNormal = Vector3.up;
+
+        newDirection.Normalize();
+
+        Quaternion rotation = Quaternion.FromToRotation(cuboidNormal, newDirection);
+
+        for(int i=0; i<vertices.Count; i++)
+        {
+            vertices[i] += startPoint;
+        }
+
+        List<Vector3> temp = new List<Vector3>();
+        foreach (Vector3 p in vertices)
+        {
+            temp.Add(RotatePointAroundPivot(p, startPoint, rotation));
+        }
+
+        vertices = temp;
+
+
+        return new System.Tuple<List<Vector3>, List<int>>(vertices, triangles);
+    }
+
+    #endregion
+
+    #region Methods - Spring mesh
+    public static System.Tuple<List<Vector3>, List<int>> GetSpringMesh(Vector3 position1, Vector3 position2, int nbLoops, int nbVerticesPerLoops, float length, float width, float wireWidth)
+    {
+        Vector3 circleNormal = Vector3.up;
+
+        Vector3 springNormal = position2 - position1;
+        springNormal.Normalize();
+
+        Quaternion rotation = Quaternion.FromToRotation(circleNormal, springNormal);
+
+        float angle = 2 * Mathf.PI / (float)nbVerticesPerLoops;
+
+        float heightStep = length / (nbVerticesPerLoops * nbLoops);
+
+        List<Vector3> circlePoints = new List<Vector3>();
+
+        for (int i = 0; i < nbVerticesPerLoops; i++)
+        {
+            Vector3 vertex = new Vector3(Mathf.Cos(angle * i) * width/2, 0.0f, Mathf.Sin(angle * i) * width/2);
+            circlePoints.Add(vertex);
+        }
+
+        List<Vector3> points = new List<Vector3>();
+
+        for (int i = 0; i < nbLoops * nbVerticesPerLoops; i++)
+        {
+            points.Add(circlePoints[i % nbVerticesPerLoops] + new Vector3(0.0f, heightStep * i, 0.0f) + position1); ;
+        }
+
+        List<Vector3> temp = new List<Vector3>();
+        foreach (Vector3 p in points)
+        {
+            temp.Add(RotatePointAroundPivot(p, position1, rotation));
+        }
+
+        points = temp;
+
+        //Initialise lists of vertices and triangles for the mesh
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            //Get the vertices of the line
+            System.Tuple<List<Vector3>, List<int>> m = MeshTools.TranformLineToCuboidPoints(points[i], points[(i + 1)], wireWidth);
+            List<Vector3> v = m.Item1;
+            List<int> t = m.Item2;
+
+            //Update triangles indexes before adding them to the triangles list
+            for (int k = 0; k < t.Count; k++)
+            {
+                t[k] += vertices.Count;
+            }
+
+            //Updathe vertices and triangles list with the new line
+            vertices.AddRange(v);
+            triangles.AddRange(t);
+        }
+
+        return new System.Tuple<List<Vector3>, List<int>>(vertices, triangles);
+    }
+    #endregion
+
+
+    //https://discussions.unity.com/t/rotate-a-vector-around-a-certain-point/81225/2
+    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+    {
+        return Quaternion.Euler(angles) * (point - pivot) + pivot;
+    }
+
+    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation)
+    {
+        return rotation * (point - pivot) + pivot;
+    }
+
+
+
     /// <summary>
     /// From a list of vertices, prepare the triangles array that will be use in a mesh. 
     /// .......

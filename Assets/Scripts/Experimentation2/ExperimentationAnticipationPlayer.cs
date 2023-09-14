@@ -22,6 +22,9 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     [SerializeField]
     private GameObject startingMenu;
+
+    [SerializeField]
+    private GameObject finishMenu;
     #endregion
 
     #region Private fields
@@ -125,14 +128,16 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     {
         if (clipPlayer.IsClipFinished() && currentClip !=-1) //If the current clip ended
         {
-            //Display answering menu
-            answerMenu.SetActive(true);
-
             //Check if the experimentation is ended to save the results
             if (currentClip >= clips.Count - 1 && !resultSaved)
             {
-                answerMenu.GetComponentInChildren<TMP_Text>().text = "Finish";
+                //Display finish menu
+                finishMenu.SetActive(true);
                 SaveResult();
+            } else
+            {
+                //Display answering menu
+                answerMenu.SetActive(true);
             }
         }
         else
