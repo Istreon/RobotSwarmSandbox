@@ -32,7 +32,8 @@ public class ClipFeaturesExtractor : MonoBehaviour
             "MeanTowardsCenterOfMass;" +
             "MeanEffectiveGroupMotion;" +
             "MeanOrder;" +
-            "StandardDeviationOfKnnDirection\r";
+            "StandardDeviationOfKnnDirection;"+
+            "FinalExpansionDistance\r";
         sb.Append(line);
 
         //Load all clip
@@ -73,15 +74,20 @@ public class ClipFeaturesExtractor : MonoBehaviour
                 + ClipMetrics.MeanTowardsCenterOfMass(c) + ";" 
                 + ClipMetrics.MeanEffectiveGroupMotion(c) + ";"
                 + ClipMetrics.MeanOrder(c) + ";" 
-                + ClipMetrics.MeanStandardDeviationOfKnnDirection(c) + "\r";
+                + ClipMetrics.MeanStandardDeviationOfKnnDirection(c) + ";"
+                + SwarmMetrics.TotalDistance(c.GetFrames()[c.GetFrames().Count - 1]) + "\r";
             sb.Append(line);
          
             currentClip++;
             
         }
 
+        string res = sb.ToString();
+        res= res.Replace(",", ".");
+        res = res.Replace(";", ",");
+
         //Save result
-        File.AppendAllText(resultFilePathCSV, sb.ToString());
+        File.AppendAllText(resultFilePathCSV, res);
         sb.Clear();
 
         Debug.Log("Results saved.");

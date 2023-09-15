@@ -207,7 +207,6 @@ MonoBehaviour:
   usedDisplayers:
   - {fileID: 843391746}
   - {fileID: 113061058}
-  - {fileID: 2075938384}
 --- !u!4 &173933244
 Transform:
   m_ObjectHideFlags: 0
