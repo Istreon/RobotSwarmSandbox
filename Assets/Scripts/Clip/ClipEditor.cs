@@ -24,6 +24,12 @@ public class ClipEditor : MonoBehaviour
     [SerializeField]
     private Button playButton;
 
+    [SerializeField]
+    private TMP_Text clipDurationText;    
+    
+    [SerializeField]
+    private TMP_Text timestampText;
+
     #endregion
 
     #region Private fields - clip parameters
@@ -66,6 +72,11 @@ public class ClipEditor : MonoBehaviour
         //Update button name based on his behavior if pressed
         playButton.GetComponentInChildren<TMP_Text>().text = clipPlayer.IsPlaying() ? "Pause" : "Play";
         //Debug.Log(clipPlayer.GetFrameNumber());
+        if(loaded)
+        {
+            clipDurationText.text = (clip.GetFrames().Count * Time.fixedDeltaTime).ToString() + " s";
+            timestampText.text = (clipPlayer.GetFrameNumber() * Time.fixedDeltaTime).ToString();
+        }
     }
     #endregion
 
