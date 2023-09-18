@@ -436,6 +436,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: mona
       objectReference: {fileID: 0}
+    - target: {fileID: 4867038351718743243, guid: 0c17267be0714bd4f9b114e599847770, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

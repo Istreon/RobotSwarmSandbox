@@ -6,10 +6,23 @@ public class DisplayerDominantForce : Displayer
 {
     #region Serialized fields
     [SerializeField]
+    private bool lowNeighboursOnly = true;
+
+    [SerializeField]
+    [Range(1,5)]
+    private int neighboursCount = 2;
+
+    [SerializeField]
     private GameObject pictoAttraction;
 
     [SerializeField]
-    private GameObject pictoRepulsion;
+    private GameObject pictoRepulsion;    
+    
+    [SerializeField]
+    private GameObject pictoAlignment;
+
+    [SerializeField]
+    private GameObject pictoIsolated;
 
     [SerializeField]
     [Range(0.0f,0.5f)]
@@ -47,10 +60,19 @@ public class DisplayerDominantForce : Displayer
         BehaviourManager.AgentBehaviour agentBehaviour = swarmData.GetParameters().GetAgentBehaviour();
         foreach(AgentData a in agents)
         {
+            
+            if(lowNeighboursOnly)
+            {
+                int count = SwarmTools.GetNeighbours(a, swarmData.GetAgentsData(), swarmData.GetParameters().GetFieldOfViewSize(), swarmData.GetParameters().GetBlindSpotSize()).Count;
+                if (count > neighboursCount) continue;
+            }
+
+
             List<Tuple<BehaviourManager.ForceType, Vector3>> forces =  BehaviourManager.GetForces(a, agentBehaviour);
 
             List<Vector3> repulsion = new List<Vector3>();
             List<Vector3> attraction = new List<Vector3>();
+            List<Vector3> alignment = new List<Vector3>();
 
             foreach(Tuple<BehaviourManager.ForceType, Vector3> t in forces)
             {
@@ -61,6 +83,9 @@ public class DisplayerDominantForce : Displayer
                         break;
                     case BehaviourManager.ForceType.Repulsion:
                         repulsion.Add(t.Item2);
+                        break;                    
+                    case BehaviourManager.ForceType.Alignment:
+                        alignment.Add(t.Item2);
                         break;
                 }
             }
@@ -68,7 +93,9 @@ public class DisplayerDominantForce : Displayer
             float repIntensity = 0.0f;
             Vector3 rep = Vector3.zero;
             float attIntensity = 0.0f;
-            Vector3 att = Vector3.zero;
+            Vector3 att = Vector3.zero;            
+            float aliIntensity = 0.0f;
+            Vector3 ali = Vector3.zero;
 
             
             foreach (Vector3 v in repulsion)
@@ -87,28 +114,66 @@ public class DisplayerDominantForce : Displayer
                     attIntensity = v.magnitude;
                     att = v;
                 }
-            }
-
-
-            if (repIntensity == 0.0f && attIntensity == 0.0f) continue;
-
-            float ratio = repIntensity / attIntensity;
-
-            if (ratio < 1.0f + toleranceThreshold && ratio > 1.0f - toleranceThreshold) continue;
-
-            GameObject g;
-
-            Vector3 dir;
-            if(repIntensity<attIntensity)
-            {
-                g = Instantiate(pictoAttraction);
-                dir = att;
-            } else
-            {
-                g = Instantiate(pictoRepulsion);
-                dir = rep;
-            }
+            }            
             
+            foreach (Vector3 v in alignment)
+            {
+                if(v.magnitude > aliIntensity)
+                {
+                    aliIntensity = v.magnitude;
+                    ali = v;
+                }
+            }
+            GameObject g;
+            Vector3 dir;
+
+            if (repIntensity == 0.0f && attIntensity == 0.0f && aliIntensity == 0.0f)
+            {
+                g = Instantiate(pictoIsolated);
+                dir = a.GetSpeed();
+            }
+            else
+            {
+
+
+
+                float ratio = 1.0f;
+                List<float> temp = new List<float>();
+                temp.Add(repIntensity);
+                temp.Add(attIntensity);
+                temp.Add(aliIntensity);
+
+                temp.Sort(new ListTools.GFG());
+
+                ratio = temp[0] / temp[1];
+
+
+                if (ratio < 1.0f + toleranceThreshold && ratio > 1.0f - toleranceThreshold) continue;
+
+
+
+                
+                //if (aliIntensity > repIntensity && aliIntensity > attIntensity)
+
+                if (aliIntensity > repIntensity && aliIntensity > attIntensity)
+                {
+                    g = Instantiate(pictoAlignment);
+                    dir = ali;
+                }
+                else
+                {
+                    if (repIntensity > attIntensity)
+                    {
+                        g = Instantiate(pictoRepulsion);
+                        dir = rep;
+                    }
+                    else
+                    {
+                        g = Instantiate(pictoAttraction);
+                        dir = att;
+                    }
+                }
+            }
 
             g.transform.parent = this.transform;
 

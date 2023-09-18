@@ -206,7 +206,7 @@ MonoBehaviour:
   displayers: {fileID: 840431973}
   usedDisplayers:
   - {fileID: 843391746}
-  - {fileID: 113061058}
+  - {fileID: 2075938384}
 --- !u!4 &173933244
 Transform:
   m_ObjectHideFlags: 0
@@ -1778,8 +1778,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d19f1154b3484e42a647abe5699ad05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lowNeighboursOnly: 1
+  neighboursCount: 2
   pictoAttraction: {fileID: 7232597059624878161, guid: 5b3274a3913895041ac61b0324478ed2, type: 3}
   pictoRepulsion: {fileID: 7729646329941515905, guid: 2415262dac2ccef4d9660904a8acb303, type: 3}
+  pictoAlignment: {fileID: 250751499053091157, guid: e3de2f5b3243cad48b81971b6c09c471, type: 3}
+  pictoIsolated: {fileID: 6717148404158158828, guid: f8db824965f507c4c9314dbd7591113e, type: 3}
   toleranceThreshold: 0.05
   pictoHeight: 0.1
 --- !u!1 &2085056683

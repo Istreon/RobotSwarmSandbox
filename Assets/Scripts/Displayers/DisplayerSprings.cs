@@ -61,10 +61,8 @@ public class DisplayerSprings : Displayer
 
         foreach (Tuple<AgentData, AgentData> l in links)
         {
-            
             //Get the vertices of the line
             Tuple<List<Vector3>, List<int>> m = MeshTools.GetSpringMesh(l.Item1.GetPosition(), l.Item2.GetPosition(), nbBoucles, nbVertices, (l.Item1.GetPosition() - l.Item2.GetPosition()).magnitude, width, wireWidth);
-
 
             List<Vector3> v = m.Item1;
             List<int> t = m.Item2;
@@ -78,8 +76,6 @@ public class DisplayerSprings : Displayer
             //Updathe vertices and triangles list with the new line
             vertices.AddRange(v);
             triangles.AddRange(t);
-            
-
         }
 
         Vector2[] uv = new Vector2[vertices.Count];
