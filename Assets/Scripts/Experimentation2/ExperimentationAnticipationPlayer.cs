@@ -25,6 +25,12 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     [SerializeField]
     private GameObject finishMenu;
+
+    [SerializeField]
+    private Displayer defaultVisualisation;
+
+    [SerializeField]
+    private List<Displayer> testedVisualisation;
     #endregion
 
     #region Private fields

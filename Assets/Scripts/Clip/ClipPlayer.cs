@@ -324,4 +324,12 @@ public class ClipPlayer : MonoBehaviour
     }
 
     #endregion
+
+    #region Methods - Setter
+    public void SetUsedDisplayers(List<Displayer> displayers)
+    {
+        usedDisplayers = displayers;
+    }
+
+    #endregion
 }
