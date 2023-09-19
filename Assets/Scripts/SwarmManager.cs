@@ -6,6 +6,8 @@ public class SwarmManager : MonoBehaviour
 {
     #region Serialized fields
     [SerializeField]
+    private bool generateMap = true;
+    [SerializeField]
     private GameObject mapPrefab;
 
     [SerializeField]
@@ -31,9 +33,13 @@ public class SwarmManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Instantiation of the map
-        map = Instantiate(mapPrefab);
-        map.transform.parent = null;
+        if(generateMap)
+        {
+            //Instantiation of the map
+            map = Instantiate(mapPrefab);
+            map.transform.parent = null;
+        }
+
 
         existingDisplayers = displayers.GetComponentsInChildren<Displayer>();
 
@@ -131,7 +137,7 @@ public class SwarmManager : MonoBehaviour
             if(d!=null) d.DisplayVisual(swarm);
         }
 
-        UpdateMap();
+        if(map!=null) UpdateMap();
     }
 
     #region Methods - Map

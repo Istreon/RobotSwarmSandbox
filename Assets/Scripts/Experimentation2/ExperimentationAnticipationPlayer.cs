@@ -100,6 +100,12 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
             Debug.LogError("There is no ClipPlayer in the scene.", this);
         }
 
+        //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
+
+        //Multiplier par 4 et associer l'id des visus
+
+        //Suffle
+
         //Shuffle the list of clip files
         var rnd = new System.Random();
         List<string> l = filePaths.ToList();
