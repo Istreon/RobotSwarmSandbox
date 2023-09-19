@@ -39,13 +39,18 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     string[] filePaths;
 
-    private List<SwarmClip> clips = new List<SwarmClip>();
-
     Thread backgroundThread;
+
+    List<Tuple<int, int>> experimentalConditions; //Tuple<idClip, idVisu> = an experimental condition, with a clip and the associated visualisation
+
+    List<int> loadOrder;
+
+    private SwarmClip[] clips;
+
 
     //--Clip player--//
 
-    private int currentClip = 0;
+    private int currentCondition = 0;
 
     //--Results--//
     private Exp2AnticipationResult experimentationResult = new Exp2AnticipationResult();
@@ -60,6 +65,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     StringBuilder sb = new StringBuilder();
     #endregion
 
+
+    int totalCount = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -77,6 +84,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         //Get the files path from the clip folder
         filePaths = Directory.GetFiles(filePath, "*.dat",
                                          SearchOption.TopDirectoryOnly);
+
 
         //Prepare the name of the result files
         string date = System.DateTime.Now.ToString("yyyyMMddHHmmss"); 
@@ -101,20 +109,39 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
+        
+        experimentalConditions = new List<Tuple<int, int>>();
+        for(int v =0; v < testedVisualisation.Count +1; v++)
+        {
+            for (int c = 0; c < filePaths.Length; c++)
+            {
+                experimentalConditions.Add(new Tuple<int, int>(c, v));
+            }
+        }
 
-        //Multiplier par 4 et associer l'id des visus
-
-        //Suffle
 
         //Shuffle the list of clip files
         var rnd = new System.Random();
-        List<string> l = filePaths.ToList();
-        l = l.OrderBy(item => rnd.Next()).ToList<string>();
-        filePaths = l.ToArray();
+        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int,int>>();
+
+
+        //Obtenir l'ordre de chargement des clips
+        this.loadOrder = new List<int>();
+        foreach (Tuple<int,int> cond in experimentalConditions)
+        {
+            int clipId = cond.Item1;
+            if(!loadOrder.Contains(clipId))
+            {
+                loadOrder.Add(clipId);
+            }
+        }
+
+
+        clips = new SwarmClip[filePaths.Length];
 
 
         //Load the first clip before continue
-        LoadFirstClips();
+        bool succes = LoadFirstClips();
         
         //Prepare the thread that will load the other clips
         backgroundThread = new Thread(new ThreadStart(LoadOtherClips));
@@ -123,9 +150,9 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         backgroundThread.Start();
 
  
-        if (clips.Count > 0)
+        if (succes)
         {
-            currentClip = -1;
+            currentCondition = -1;
         }
     }
 
@@ -138,14 +165,15 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (clipPlayer.IsClipFinished() && currentClip !=-1) //If the current clip ended
+        if (clipPlayer.IsClipFinished() && currentCondition != -1) //If the current clip ended
         {
             //Check if the experimentation is ended to save the results
-            if (currentClip >= clips.Count - 1 && !resultSaved)
+            if (currentCondition >= experimentalConditions.Count - 1 && !resultSaved)
             {
                 //Display finish menu
                 finishMenu.SetActive(true);
                 SaveResult();
+                Debug.Log("Total count = " + totalCount);
             } else
             {
                 //Display answering menu
@@ -160,7 +188,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     public void StartExperimentation()
     {
-        if (currentClip == -1) //If no clip was display
+        if (currentCondition == -1) //If no clip was display
         {
             //Disable starting menu
             startingMenu.SetActive(false);
@@ -176,17 +204,26 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     private void NextClip()
     {
 
-            if (currentClip >= clips.Count - 1)
+            if (currentCondition >= experimentalConditions.Count - 1)
             {
                 Debug.Log("Experimentation finished");
             }
             else
             {
-                currentClip++;
-                clipPlayer.SetClip(clips[currentClip]);
-                Debug.Log("Next clip " + (currentClip + 1));
+                currentCondition++;
+                clipPlayer.SetClip(clips[experimentalConditions[currentCondition].Item1]);
+                Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
+
+                List<Displayer> newDisplay = new List<Displayer>();
+                newDisplay.Add(defaultVisualisation);
+                if(experimentalConditions[currentCondition].Item2!=0)
+                {
+                newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2-1]);
+                }
+                clipPlayer.SetUsedDisplayers(newDisplay);
                 clipPlayer.Play();
                 answered = false;
+                totalCount++;
             }
         
     }
@@ -198,7 +235,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         if (!answered && clipPlayer.IsClipFinished())
         {
             //Get file name from file path
-            string s = filePaths[currentClip];
+            string s = filePaths[experimentalConditions[currentCondition].Item1];
             int pos = s.IndexOf("/");
             while (pos != -1)
             {
@@ -241,21 +278,26 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     #region Methods - Load clips
 
-    public void LoadFirstClips()
+    public bool LoadFirstClips()
     {
 
-        string s = filePaths[0];
+        string s = filePaths[loadOrder[0]];
 
         //Loading clip from full file path
         SwarmClip clip = ClipTools.LoadClip(s);
 
         if (clip != null)
         {
-            clips.Add(clip); //Add the loaded clip to the list
+            clips[loadOrder[0]]= clip; //Add the loaded clip to the list
             Debug.Log("Clip " + s + " Loaded.");
+            return true;
         }
         else
+        {
             Debug.LogError("Clip can't be load from " + s, this);
+            return false;
+        }
+
 
     }
 
@@ -265,14 +307,14 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         for (int i = 1; i < filePaths.Length; i++)
         {
             //Concatenation of file path and file name
-            string s = this.filePaths[i];
+            string s = this.filePaths[loadOrder[i]];
 
             //Loading clip from full file path
             SwarmClip clip = ClipTools.LoadClip(s);
 
             if (clip != null)
             {
-                clips.Add(clip); //Add the loaded clip to the list
+                clips[loadOrder[i]] = clip; //Add the loaded clip to the list
                 Debug.Log("Clip " + s + " Loaded.");
             }
             else
