@@ -18,6 +18,9 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     private ClipPlayer clipPlayer;
 
     [SerializeField]
+    private Slider progressionSlider;
+
+    [SerializeField]
     private GameObject answerMenu;
 
     [SerializeField]
@@ -64,9 +67,6 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     StringBuilder sb = new StringBuilder();
     #endregion
-
-
-    int totalCount = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -122,7 +122,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
         //Shuffle the list of clip files
         var rnd = new System.Random();
-        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int,int>>();
+        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
+        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
 
 
         //Obtenir l'ordre de chargement des clips
@@ -173,11 +174,12 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
                 //Display finish menu
                 finishMenu.SetActive(true);
                 SaveResult();
-                Debug.Log("Total count = " + totalCount);
             } else
             {
                 //Display answering menu
+                progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
                 answerMenu.SetActive(true);
+                clipPlayer.AllowDisplay(false);
             }
         }
         else
@@ -211,19 +213,24 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
             else
             {
                 currentCondition++;
+
+                clipPlayer.AllowDisplay(true);
+                //Changing display
+                List<Displayer> newDisplay = new List<Displayer>();
+                newDisplay.Add(defaultVisualisation);
+                if (experimentalConditions[currentCondition].Item2 != 0)
+                {
+                    newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
+                }
+                clipPlayer.SetUsedDisplayers(newDisplay);
+                
+                //Changing clip
                 clipPlayer.SetClip(clips[experimentalConditions[currentCondition].Item1]);
                 Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
 
-                List<Displayer> newDisplay = new List<Displayer>();
-                newDisplay.Add(defaultVisualisation);
-                if(experimentalConditions[currentCondition].Item2!=0)
-                {
-                newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2-1]);
-                }
-                clipPlayer.SetUsedDisplayers(newDisplay);
-                clipPlayer.Play();
+
+                clipPlayer.Invoke("Play",1.0f);
                 answered = false;
-                totalCount++;
             }
         
     }

@@ -59,10 +59,11 @@ public class DisplayerSprings : Displayer
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
+
         foreach (Tuple<AgentData, AgentData> l in links)
         {
             //Get the vertices of the line
-            Tuple<List<Vector3>, List<int>> m = MeshTools.GetSpringMesh(l.Item1.GetPosition(), l.Item2.GetPosition(), nbBoucles, nbVertices, (l.Item1.GetPosition() - l.Item2.GetPosition()).magnitude, width, wireWidth);
+            Tuple<List<Vector3>, List<int>> m = MeshTools.GetSpringMesh(l.Item1.GetPosition(), l.Item2.GetPosition(), nbBoucles, nbVertices, width, wireWidth);
 
             List<Vector3> v = m.Item1;
             List<int> t = m.Item2;

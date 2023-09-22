@@ -101,7 +101,7 @@ public class DisplayerLinks : Displayer
 
 
                 //Get the vertices of the line
-                Tuple<List<Vector3>,List<int>> m = MeshTools.TranformLineToPolygonUpPoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width, height);
+                Tuple<List<Vector3>,List<int>> m = MeshTools.TranformLineToCuboidPoints(l.Item1.GetPosition(), l.Item2.GetPosition(), width,height);
                 List<Vector3> v = m.Item1;
                 List<int> t = m.Item2;
 

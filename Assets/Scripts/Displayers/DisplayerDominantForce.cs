@@ -26,21 +26,25 @@ public class DisplayerDominantForce : Displayer
 
     [SerializeField]
     [Range(0.0f,0.5f)]
-    private float toleranceThreshold = 0.0f;    
-    
+    private float toleranceThreshold = 0.0f;
+
+    [SerializeField]
+    [Range(0,180)]
+    private int angleThreshold = 0;
+
     [SerializeField]
     private float pictoHeight = 0.1f;
     #endregion
 
     #region Private fields
-    private List<GameObject> pictos;
+    private List<GameObject> pictos = new List<GameObject>();
     #endregion
 
     #region Methods - Monobehaviour callbacks
     // Start is called before the first frame update
     void Start()
     {
-        pictos = new List<GameObject>();
+
     }
 
     // Update is called once per frame
@@ -97,7 +101,7 @@ public class DisplayerDominantForce : Displayer
             float aliIntensity = 0.0f;
             Vector3 ali = Vector3.zero;
 
-            
+            Vector3 totalForce = Vector3.zero;
             foreach (Vector3 v in repulsion)
             {
                 if(v.magnitude > repIntensity)
@@ -105,6 +109,7 @@ public class DisplayerDominantForce : Displayer
                     repIntensity = v.magnitude;
                     rep = v;
                 }
+                totalForce += v;
             }            
             
             foreach (Vector3 v in attraction)
@@ -114,6 +119,7 @@ public class DisplayerDominantForce : Displayer
                     attIntensity = v.magnitude;
                     att = v;
                 }
+                totalForce += v;
             }            
             
             foreach (Vector3 v in alignment)
@@ -123,6 +129,7 @@ public class DisplayerDominantForce : Displayer
                     aliIntensity = v.magnitude;
                     ali = v;
                 }
+                totalForce += v;
             }
             GameObject g;
             Vector3 dir;
@@ -174,16 +181,27 @@ public class DisplayerDominantForce : Displayer
                     }
                 }
             }
+            //dir = a.GetAcceleration();
 
-            g.transform.parent = this.transform;
 
-            g.transform.localPosition = a.GetPosition() + new Vector3(0.0f, pictoHeight, 0.0f);
 
-            float agentDirection_YAxis = 180 - (Mathf.Acos(dir.normalized.x) * 180.0f / Mathf.PI);
-            if (dir.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
-            g.transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+            Vector3 potentialSpeed = a.GetSpeed() + totalForce * Time.fixedDeltaTime;
 
-            pictos.Add(g);
+            float angle = Vector3.Angle(potentialSpeed, a.GetSpeed()) * 180.0f / Mathf.PI;
+
+
+            if(angle>angleThreshold)
+            {
+                g.transform.parent = this.transform;
+
+                g.transform.localPosition = a.GetPosition() + new Vector3(0.0f, pictoHeight, 0.0f);
+
+                float agentDirection_YAxis = 180 - (Mathf.Acos(dir.normalized.x) * 180.0f / Mathf.PI);
+                if (dir.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
+                g.transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+
+                pictos.Add(g);
+            } 
         }
 
 

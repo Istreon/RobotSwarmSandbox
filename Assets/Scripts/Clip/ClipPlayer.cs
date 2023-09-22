@@ -24,6 +24,8 @@ public class ClipPlayer : MonoBehaviour
     #region Private fields - player parameters
     private bool playing = false;
 
+    private bool displaying = true;
+
     private bool loopClip = false;
 
     private int frameNumber
@@ -77,6 +79,16 @@ public class ClipPlayer : MonoBehaviour
             UpdateCameraPositioning();
             DisplayFrame();
             UpdateFrameNumber();
+        } else
+        {
+            if(!displaying)
+            {
+                //--Clear display for unused displayer--//
+                foreach (Displayer d in existingDisplayers)
+                {
+                        d.ClearVisual();
+                }
+            }
         }
     }
     #endregion
@@ -116,9 +128,6 @@ public class ClipPlayer : MonoBehaviour
     {
 
         SwarmData frame = clip.GetFrames()[frameNumber];
-
-
-
 
         //--Clear display for unused displayer--//
         foreach (Displayer d in existingDisplayers)
@@ -240,6 +249,12 @@ public class ClipPlayer : MonoBehaviour
             mainCamera.transform.position = new Vector3(parameters.GetMapSizeX() / 2.0f, Mathf.Max(parameters.GetMapSizeZ(), parameters.GetMapSizeX()), parameters.GetMapSizeZ() / 2.0f);
             mainCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
         }
+    }
+
+    public void AllowDisplay(bool display)
+    {
+        displaying = display;
+        if (!displaying) playing = false;
     }
     #endregion
 
