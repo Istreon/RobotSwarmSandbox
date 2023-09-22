@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SwarmManager : MonoBehaviour
 {
@@ -138,6 +139,11 @@ public class SwarmManager : MonoBehaviour
         }
 
         if(map!=null) UpdateMap();
+    }
+
+    public void LoadClipPlayer()
+    {
+        SceneManager.LoadScene("ClipEditorScene");
     }
 
     #region Methods - Map
