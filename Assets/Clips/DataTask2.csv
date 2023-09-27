@@ -1,0 +1,12 @@
+FF1.dat,supprimer alignement,maximiser alignement
+FF2.dat,supprimer alignement,réduire cohésion
+FF3.dat,maximiser alignement,supprimer alignement
+DF1.dat,réduire cohésion,augmenter cohésion
+DF2.dat,maximiser alignement ,supprimer alignement
+DF3.dat,réduire cohésion,maximiser alignement
+EF1.dat,augmenter cohésion,réduire cohésion
+EF2.dat,maximiser alignement,supprimer alignement
+EF3.dat,augmenter cohésion,maximiser alignement
+SF1.dat,augmenter cohésion + alignement,résuire cohésion + augmenter alignement
+SF2.dat,maximiser alignement,augmenter cohésion
+SF3.dat,augmenter cohésion,maximiser alignement
