@@ -11,7 +11,7 @@ using System.Text;
 
 [RequireComponent(typeof(ClipPlayer))]
 
-public class ExperimentationAnticipationPlayer : MonoBehaviour
+public class ExperimentationRightInteractionPlayer : MonoBehaviour
 {
     #region Serialize fields
     [SerializeField]
@@ -22,6 +22,12 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     [SerializeField]
     private GameObject answerMenu;
+
+    [SerializeField]
+    private Button button1;    
+    
+    [SerializeField]
+    private Button button2;
 
     [SerializeField]
     private GameObject startingMenu;
@@ -41,6 +47,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     string filePath = "/Clips/"; //The folder containing clip files
 
     string[] filePaths;
+
+    List<Tuple<string, string, string>> dataTask2;
 
     Thread backgroundThread;
 
@@ -68,6 +76,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     float participantHeight = 0.0f;
 
     StringBuilder sb = new StringBuilder();
+
+    private bool reverseAnswer = false;
     #endregion
 
     // Start is called before the first frame update
@@ -75,6 +85,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     {
         //Disable gameObject
         answerMenu.SetActive(false); //Answering menu
+        finishMenu.SetActive(false); //Answering menu
 
         //Enable gameObject
         startingMenu.SetActive(true);
@@ -87,10 +98,31 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         filePaths = Directory.GetFiles(filePath, "*.dat",
                                          SearchOption.TopDirectoryOnly);
 
+        ReadCSVFile();
+
+        List<string> fileToKeep = new List<string>();
+        foreach(string f in filePaths)
+        {
+            String s = GetFileName(f);
+
+            bool usedFile = false;
+            foreach(Tuple<string,string, string> data in dataTask2)
+            {
+                if(String.Equals(data.Item1,s))
+                {
+                    usedFile = true;
+                }
+            }
+
+            if (usedFile)fileToKeep.Add(f);
+        }
+
+        filePaths = fileToKeep.ToArray();
+
 
         //Prepare the name of the result files
         string date = System.DateTime.Now.ToString("yyyyMMddHHmmss"); 
-        string resultFilename = "/" + "resultT1_" + date; //it uses the date to obtain a unique name
+        string resultFilename = "/" + "resultT2_" + date; //it uses the date to obtain a unique name
         string resultFolderPath = Application.dataPath + "/Results";
         resultFilePathDat = resultFolderPath + resultFilename + ".dat";
         resultFilePathCSV = resultFolderPath + resultFilename + ".csv";
@@ -170,7 +202,6 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     {
         if (clipPlayer.IsClipFinished() && currentCondition != -1 && !resultSaved) //If the current clip ended
         {
-
                 //Display answering menu
                 progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
                 answerMenu.SetActive(true);
@@ -208,6 +239,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
                 //Display finish menu
                 finishMenu.SetActive(true);
                 SaveResult();
+    
                 Debug.Log("Experimentation finished");
             }
             else
@@ -223,7 +255,36 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
                     newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
                 }
                 clipPlayer.SetUsedDisplayers(newDisplay);
+
+                string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+                Tuple<string, string, string> dataAnswer = new Tuple<string, string, string>("","","");
+                foreach (Tuple<string,string,string> data in dataTask2)
+                {
+                    if (String.Equals(data.Item1, s))
+                    {
+                        dataAnswer = data;
+                        break;
+                    }
+                }
+            Debug.Log(dataAnswer.Item1 + dataAnswer.Item2 + dataAnswer.Item3);
+                int val = (int)UnityEngine.Random.Range(1, 100);
+                if (val % 2 == 0)
+                    reverseAnswer = false;
+                else
+                    reverseAnswer = true;
                 
+                if(reverseAnswer)
+                {
+                    button1.GetComponentInChildren<TMP_Text>().text = dataAnswer.Item3.ToString();
+                    button2.GetComponentInChildren<TMP_Text>().text = dataAnswer.Item2.ToString();
+                }
+                else
+                {
+                    button1.GetComponentInChildren<TMP_Text>().text = dataAnswer.Item2.ToString();
+                    button2.GetComponentInChildren<TMP_Text>().text = dataAnswer.Item3.ToString();
+                }
+
+
                 //Changing clip
                 clipPlayer.SetClip(clips[experimentalConditions[currentCondition].Item1]);
                 Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
@@ -242,14 +303,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         if (!answered && clipPlayer.IsClipFinished())
         {
             //Get file name from file path
-            string s = filePaths[experimentalConditions[currentCondition].Item1];
-            int pos = s.IndexOf("/");
-            while (pos != -1)
-            {
-                s = s.Substring(pos + 1);
-                pos = s.IndexOf("/");
-            }
-
+            string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+            if (reverseAnswer) choice = !choice;
             Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, choice,participantHeight);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
@@ -272,7 +327,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename +  "," + cr.fracture + "," + cr.height + "\r";
+            line = cr.filename + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
             sb.Append(line);
         }
 
@@ -330,4 +385,42 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     }
 
     #endregion
+
+    private void ReadCSVFile()
+    {
+        dataTask2 = new List<Tuple<string, string, string>>();
+        StreamReader strReader = new StreamReader(Application.dataPath + "/Clips/DataTask2.csv");
+        bool endOfFile = false;
+        while(!endOfFile)
+        {
+            string data_string = strReader.ReadLine();
+            if(data_string == null)
+            {
+                endOfFile = true;
+                break;
+            }
+
+            
+            var data_values = data_string.Split(',');
+            Tuple<String, String, String> data = new Tuple<string, string, string>(data_values[0], data_values[1], data_values[2]);
+            dataTask2.Add(data);
+            /*for (int i=0; i< data_values.Length; i++)
+            {
+                Debug.Log("Value : " + i.ToString() + " " + data_values[i].ToString());
+            }*/
+        }
+    }
+
+    private string GetFileName(string filePath)
+    {
+        //Get file name from file path
+        string s = filePath;
+        int pos = s.IndexOf("/");
+        while (pos != -1)
+        {
+            s = s.Substring(pos + 1);
+            pos = s.IndexOf("/");
+        }
+        return s;
+    }
 }
