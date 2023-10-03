@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Experimentation2/XREvaluationAnticipation.unity
     guid: 4feb99a56ba6a0e4aac4f2bd3cadccf2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Experimentation2/XREvaluationRightInteraction.unity
     guid: afae1a3ddec44b8489d0b8e4e2f51af1
   m_configObjects:

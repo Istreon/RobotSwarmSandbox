@@ -111,21 +111,84 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
+        List<Tuple<int, int>> [] tab = new List<Tuple<int, int>>[testedVisualisation.Count+1];
+
         
-        experimentalConditions = new List<Tuple<int, int>>();
         for(int v =0; v < testedVisualisation.Count +1; v++)
         {
+            List<Tuple<int,int>> listPart = new List<Tuple< int, int>> ();
             for (int c = 0; c < filePaths.Length; c++)
             {
-                experimentalConditions.Add(new Tuple<int, int>(c, v));
+                int vis = (v + c) % (testedVisualisation.Count + 1);
+                listPart.Add(new Tuple<int, int>(c, vis));
+            }
+            tab[v] = listPart;
+        }
+
+        /*
+        String disp = "";
+        Debug.Log(disp);
+
+        for (int i = 0; i < filePaths.Length; i++)
+        {
+            for (int j = 0; j < testedVisualisation.Count + 1; j++)
+            {
+                disp += tab[j][i].Item1 + ";";
+            }
+            Debug.Log(disp);
+            disp = "";
+        }
+        */
+
+        //Suffle
+        var rnd = new System.Random();
+        for (int i = 0; i < testedVisualisation.Count + 1 ; i++)
+        {
+            tab[i] = tab[i].OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
+        }
+
+        //Protection against too-close duplicates
+        int dist = 4;
+        for(int i=0;i< testedVisualisation.Count; i++)
+        {
+            for(int j=0;j<dist;j++)
+            {
+                for(int k=0;k<dist-j;k++)
+                {
+                    int posTab1 = tab[i].Count - 1 - j;
+                    if (tab[i][posTab1].Item1 == tab[i+1][k].Item1)
+                    {
+                        Tuple<int, int> temp = tab[i][posTab1];
+                        tab[i].RemoveAt(posTab1);
+                        tab[i].Insert(tab[i].Count/2, temp);
+                        j = -1;
+                        break;
+                    }
+                }
             }
         }
 
+        //Merge the independant lists
+        experimentalConditions = new List<Tuple<int, int>>();
+        for (int i = 0; i < testedVisualisation.Count + 1; i++)
+        {
+            experimentalConditions.AddRange(tab[i]);
+        }
+         
+        /*
 
-        //Shuffle the list of clip files
-        var rnd = new System.Random();
-        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
-        experimentalConditions = experimentalConditions.OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
+        disp = experimentalConditions.Count + " : ";
+        for (int i=0; i< experimentalConditions.Count; i++)
+        {
+            if (i % 24 == 0)
+            {
+                Debug.Log(disp);
+                disp = "";
+            }
+            disp += experimentalConditions[i].Item1 + ";";
+        }
+        Debug.Log(disp);
+        */
 
 
         //Obtenir l'ordre de chargement des clips
