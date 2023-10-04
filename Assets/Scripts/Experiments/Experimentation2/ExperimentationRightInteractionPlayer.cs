@@ -134,7 +134,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Result,Height\r";
+        string line = "Filename,Visualisation,Result,Height\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -241,7 +241,6 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
                 progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
                 answerMenu.SetActive(true);
                 clipPlayer.AllowDisplay(false);
-            
         }
         else
         {
@@ -339,8 +338,9 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         {
             //Get file name from file path
             string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+            int v = experimentalConditions[currentCondition].Item2;
             if (reverseAnswer) choice = !choice;
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, choice,participantHeight);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v, choice,participantHeight);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
         }
@@ -362,7 +362,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
+            line = cr.filename + "," + cr.visualisation + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
             sb.Append(line);
         }
 

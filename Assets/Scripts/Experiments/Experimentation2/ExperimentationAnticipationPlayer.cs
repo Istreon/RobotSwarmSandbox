@@ -102,7 +102,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Result,Height\r";
+        string line = "Filename,Visualisation,Result,Height\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -305,15 +305,10 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         if (!answered && clipPlayer.IsClipFinished())
         {
             //Get file name from file path
-            string s = filePaths[experimentalConditions[currentCondition].Item1];
-            int pos = s.IndexOf("/");
-            while (pos != -1)
-            {
-                s = s.Substring(pos + 1);
-                pos = s.IndexOf("/");
-            }
+            string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+            int v = experimentalConditions[currentCondition].Item2;
 
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, choice,participantHeight);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, v, choice,participantHeight);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
         }
@@ -335,7 +330,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename +  "," + cr.fracture + "," + cr.height.ToString().Replace(",",".") + "\r";
+            line = cr.filename +  "," + cr.visualisation + "," +  cr.fracture + "," + cr.height.ToString().Replace(",",".") + "\r";
             sb.Append(line);
         }
 
@@ -393,4 +388,17 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     }
 
     #endregion
+
+    private string GetFileName(string filePath)
+    {
+        //Get file name from file path
+        string s = filePath;
+        int pos = s.IndexOf("/");
+        while (pos != -1)
+        {
+            s = s.Substring(pos + 1);
+            pos = s.IndexOf("/");
+        }
+        return s;
+    }
 }

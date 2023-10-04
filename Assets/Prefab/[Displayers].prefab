@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 2243916484286544928}
   - component: {fileID: 3244079122399249631}
   m_Layer: 0
-  m_Name: Displayer_DominantForce
+  m_Name: Displayer_DominantForcePicto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,8 +323,8 @@ Transform:
   - {fileID: 7604744611388303106}
   - {fileID: 3011660264423598822}
   - {fileID: 6252761061912480356}
+  - {fileID: 5896699525186233817}
   - {fileID: 2243916484286544928}
-  - {fileID: 1229511982093768611}
   - {fileID: 2784342130767210717}
   - {fileID: 3304907143864135691}
   m_Father: {fileID: 0}
@@ -521,7 +521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 290d1b3d09fdad749898033c8428372b, type: 2}
---- !u!1 &7911952722076772394
+--- !u!1 &5647476398193609976
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -529,22 +529,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1229511982093768611}
-  - component: {fileID: 1376885499870814851}
+  - component: {fileID: 5896699525186233817}
+  - component: {fileID: 241118031145814296}
   m_Layer: 0
-  m_Name: Displayer_DominantForce_Alt
+  m_Name: Displayer_DominantForce
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1229511982093768611
+--- !u!4 &5896699525186233817
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7911952722076772394}
+  m_GameObject: {fileID: 5647476398193609976}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.01, z: 0}
@@ -553,18 +553,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6106774681745779282}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1376885499870814851
+--- !u!114 &241118031145814296
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7911952722076772394}
+  m_GameObject: {fileID: 5647476398193609976}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d63aa46a89f70a845a3b49c6deb7ebde, type: 3}
+  m_Script: {fileID: 11500000, guid: 2e7080f28af373945ac7d200e94b417b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  analysedForces: 010000000200000003000000
+  correspondingColors:
+  - {r: 1, g: 0.061129723, b: 0, a: 0}
+  - {r: 0, g: 0.42967272, b: 1, a: 0}
+  - {r: 0.56307507, g: 1, b: 0.013207495, a: 0}
   picto: {fileID: 6017616102786692989, guid: d54438a7983d2f24dafae58105a5b013, type: 3}
   pictoIsolated: {fileID: 6717148404158158828, guid: f8db824965f507c4c9314dbd7591113e, type: 3}
   pictoHeight: 0.1
