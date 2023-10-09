@@ -7,6 +7,9 @@ public class DisplayerDominantForce : Displayer
 {
     #region Serialized fields
     [SerializeField]
+    private bool showDominantForceDirection = false;
+
+    [SerializeField]
     private List<BehaviourManager.ForceType> analysedForces;
 
     [SerializeField]
@@ -14,9 +17,6 @@ public class DisplayerDominantForce : Displayer
 
     [SerializeField]
     private GameObject picto;
-
-    [SerializeField]
-    private GameObject pictoIsolated;
 
     [SerializeField]
     private float pictoHeight = 0.1f;
@@ -100,6 +100,8 @@ public class DisplayerDominantForce : Displayer
 
             g.GetComponentInChildren<Renderer>().material.color = Color.white;
 
+            Vector3 dir = a.GetAcceleration();
+
             //Find the dominant force and change the colour of the arrow accordingly
             for (int i = 0; i< analysedForces.Count; i++)
             {
@@ -114,15 +116,21 @@ public class DisplayerDominantForce : Displayer
                 {
                     float angle = Vector3.Angle(summedForces[i], a.GetAcceleration());
 
-                    if (angle < 90) g.GetComponentInChildren<Renderer>().material.color = gradients[i].Evaluate((90 - angle) / 90);
-                    else g.GetComponentInChildren<Renderer>().material.color = Color.white;
+                    if (angle < 90)
+                    {
+                        g.GetComponentInChildren<Renderer>().material.color = gradients[i].Evaluate((90 - angle) / 90);
+                        if (showDominantForceDirection) dir = summedForces[i];
+                    }
+                    else
+                    {
+                        g.GetComponentInChildren<Renderer>().material.color = Color.white;
+                    }
 
                     break;
                 }
             }
 
-            Vector3 dir;
-            dir = a.GetAcceleration();
+
 
             g.transform.parent = this.transform;
 

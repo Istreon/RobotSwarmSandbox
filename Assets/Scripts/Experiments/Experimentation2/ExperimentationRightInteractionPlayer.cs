@@ -340,7 +340,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
             string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
             int v = experimentalConditions[currentCondition].Item2;
             if (reverseAnswer) choice = !choice;
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v, choice,participantHeight);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v, choice, Camera.main.transform.position.y);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
         }
