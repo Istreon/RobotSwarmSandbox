@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 6017616102786692989, guid: d54438a7983d2f24dafae58105a5b013, type: 3}
-  arrowHeight: 0.1
+  arrowHeight: 0.05
 --- !u!1 &2381370683984168952
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,7 +193,55 @@ MonoBehaviour:
   pictoIsolated: {fileID: 6717148404158158828, guid: f8db824965f507c4c9314dbd7591113e, type: 3}
   toleranceThreshold: 0.1
   angleThreshold: 0
-  pictoHeight: 0.1
+  pictoHeight: 0.05
+--- !u!1 &2809663089746279313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1475761764227621813}
+  - component: {fileID: 6646548052592607132}
+  m_Layer: 0
+  m_Name: Displayer_RelativeMovementAlt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1475761764227621813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2809663089746279313}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6106774681745779282}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6646548052592607132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2809663089746279313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51b5a70130379084f8c5e55e6078d1ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 6017616102786692989, guid: d54438a7983d2f24dafae58105a5b013, type: 3}
+  arrowHeight: 0.05
+  maxSize: 1
+  minSize: 0.1
 --- !u!1 &3060639624082399617
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,6 +367,7 @@ Transform:
   - {fileID: 1200242337040382851}
   - {fileID: 2613176514246926075}
   - {fileID: 4675132572365731683}
+  - {fileID: 1475761764227621813}
   - {fileID: 6334114793010722881}
   - {fileID: 7604744611388303106}
   - {fileID: 3011660264423598822}
@@ -565,14 +614,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e7080f28af373945ac7d200e94b417b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showDominantForceDirection: 0
+  showDominantForceDirection: 1
   analysedForces: 010000000200000003000000
   correspondingColors:
   - {r: 1, g: 0.061129723, b: 0, a: 0}
   - {r: 0, g: 0.42967272, b: 1, a: 0}
   - {r: 0.56307507, g: 1, b: 0.013207495, a: 0}
   picto: {fileID: 6017616102786692989, guid: d54438a7983d2f24dafae58105a5b013, type: 3}
-  pictoHeight: 0.1
+  pictoHeight: 0.05
 --- !u!1 &8321795694162459209
 GameObject:
   m_ObjectHideFlags: 0
