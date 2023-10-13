@@ -262,7 +262,10 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
             {
                 r = experimentalConditions[currentCondition].Item3;
             }
-            
+            r = Experiment2Tools.GetCorrespondingRotation(r);
+
+
+
 
             Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, v,r, choice, Camera.main.transform.position.y);
             Debug.Log(res.filename + "    " + res.fracture);

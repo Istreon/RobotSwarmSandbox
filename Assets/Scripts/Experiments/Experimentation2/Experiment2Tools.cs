@@ -92,6 +92,7 @@ public class Experiment2Tools
         return s;
     }
 
+
     public static void RotateDisplayers(GameObject g,int val)
     {
         switch(val)
@@ -115,6 +116,24 @@ public class Experiment2Tools
             default:
                 Debug.LogError("Valeur anormale");
                 break;
+        }
+    }
+
+    public static int GetCorrespondingRotation(int val)
+    {
+        switch (val)
+        {
+            case 0:
+                return 0;
+            case 1:
+                return 90;
+            case 2:
+                return 180;
+            case 3:
+                return 270;
+            default:
+                Debug.LogError("Valeur anormale");
+                return -1;
         }
     }
 }
