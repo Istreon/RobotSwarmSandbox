@@ -11,9 +11,8 @@ public class DisplayerRelativeMovementAlt : Displayer
     private float arrowHeight = 0.1f;
 
     [SerializeField]
-    private float maxSize = 1.0f;
-    [SerializeField]
-    private float minSize = 0.1f;
+    [Range(0.0f,180.0f)]
+    private float sensitivity = 60.0f;
     #endregion
 
     #region Private fields
@@ -30,7 +29,7 @@ public class DisplayerRelativeMovementAlt : Displayer
 
         // Blend alpha from opaque at 0% to transparent at 100%
         var alphas = new GradientAlphaKey[2];
-        alphas[0] = new GradientAlphaKey(0.0f, 0.0f);
+        alphas[0] = new GradientAlphaKey(1.0f, 0.0f);
         alphas[1] = new GradientAlphaKey(1.0f, 1.0f);
 
 
@@ -38,7 +37,7 @@ public class DisplayerRelativeMovementAlt : Displayer
         gradient = new Gradient();
 
         var colors = new GradientColorKey[2];
-        colors[0] = new GradientColorKey(Color.magenta, 0.0f);
+        colors[0] = new GradientColorKey(Color.white, 0.0f);
         colors[1] = new GradientColorKey(Color.magenta, 1.0f);
         gradient.SetKeys(colors, alphas);
 
@@ -51,8 +50,6 @@ public class DisplayerRelativeMovementAlt : Displayer
         ClearVisual();
 
         List<List<AgentData>> clusters =  SwarmTools.GetClusters(swarmData);
-
-        float step = maxSize - minSize;
 
         foreach (List<AgentData> c in clusters)
         {
@@ -69,12 +66,12 @@ public class DisplayerRelativeMovementAlt : Displayer
 
                 float angle = Vector3.Angle(a.GetSpeed(), meanSwarmSpeed);
 
-                float ratio = (angle) / 90.0f;
+                float ratio = (angle) / sensitivity;
                 if (ratio > 1.0f) ratio = 1.0f; 
 
                 GameObject g = Instantiate(prefab);
 
-                //g.GetComponentInChildren<Renderer>().material.color = gradient.Evaluate(ratio);
+                g.GetComponentInChildren<Renderer>().material.color = gradient.Evaluate(ratio);
 
                 g.transform.parent = this.transform;
 
@@ -83,9 +80,6 @@ public class DisplayerRelativeMovementAlt : Displayer
                 float agentDirection_YAxis = 180 - (Mathf.Acos(dir.normalized.x) * 180.0f / Mathf.PI);
                 if (dir.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
                 g.transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
-
-                float size = minSize + step * ratio;
-                g.transform.localScale = new Vector3(size, size, size);
 
                 arrows.Add(g);
             }

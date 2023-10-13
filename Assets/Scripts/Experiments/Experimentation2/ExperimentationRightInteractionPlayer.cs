@@ -40,6 +40,12 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
 
     [SerializeField]
     private List<Displayer> testedVisualisation;
+
+    [SerializeField]
+    private bool allowRotation = true;
+
+    [SerializeField]
+    private GameObject displayers;
     #endregion
 
     #region Private fields
@@ -52,7 +58,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
 
     Thread backgroundThread;
 
-    List<Tuple<int, int>> experimentalConditions; //Tuple<idClip, idVisu> = an experimental condition, with a clip and the associated visualisation
+    List<Tuple<int, int,int>> experimentalConditions; //Tuple<idClip, idVisu> = an experimental condition, with a clip and the associated visualisation
 
     List<int> loadOrder;
 
@@ -103,7 +109,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         List<string> fileToKeep = new List<string>();
         foreach(string f in filePaths)
         {
-            String s = GetFileName(f);
+            String s = Experiment2Tools.GetFileName(f);
 
             bool usedFile = false;
             foreach(Tuple<string,string, string> data in dataTask2)
@@ -142,62 +148,13 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
             Debug.LogError("There is no ClipPlayer in the scene.", this);
         }
 
-        //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
 
-        //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
-        List<Tuple<int, int>>[] tab = new List<Tuple<int, int>>[testedVisualisation.Count + 1];
-
-
-        for (int v = 0; v < testedVisualisation.Count + 1; v++)
-        {
-            List<Tuple<int, int>> listPart = new List<Tuple<int, int>>();
-            for (int c = 0; c < filePaths.Length; c++)
-            {
-                int vis = (v + c) % (testedVisualisation.Count + 1);
-                listPart.Add(new Tuple<int, int>(c, vis));
-            }
-            tab[v] = listPart;
-        }
-
-        //Suffle
-        var rnd = new System.Random();
-        for (int i = 0; i < testedVisualisation.Count + 1; i++)
-        {
-            tab[i] = tab[i].OrderBy(item => rnd.Next()).ToList<Tuple<int, int>>();
-        }
-
-        //Protection against too-close duplicates
-        int dist = 4;
-        for (int i = 0; i < testedVisualisation.Count; i++)
-        {
-            for (int j = 0; j < dist; j++)
-            {
-                for (int k = 0; k < dist - j; k++)
-                {
-                    int posTab1 = tab[i].Count - 1 - j;
-                    if (tab[i][posTab1].Item1 == tab[i + 1][k].Item1)
-                    {
-                        Tuple<int, int> temp = tab[i][posTab1];
-                        tab[i].RemoveAt(posTab1);
-                        tab[i].Insert(tab[i].Count / 2, temp);
-                        j = -1;
-                        break;
-                    }
-                }
-            }
-        }
-
-        //Merge the independant lists
-        experimentalConditions = new List<Tuple<int, int>>();
-        for (int i = 0; i < testedVisualisation.Count + 1; i++)
-        {
-            experimentalConditions.AddRange(tab[i]);
-        }
+        experimentalConditions = Experiment2Tools.CreateExperimentalConditions(filePaths.Length, testedVisualisation.Count + 1);
 
 
         //Obtenir l'ordre de chargement des clips
         this.loadOrder = new List<int>();
-        foreach (Tuple<int,int> cond in experimentalConditions)
+        foreach (Tuple<int,int,int> cond in experimentalConditions)
         {
             int clipId = cond.Item1;
             if(!loadOrder.Contains(clipId))
@@ -290,7 +247,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
                 }
                 clipPlayer.SetUsedDisplayers(newDisplay);
 
-                string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+                string s = Experiment2Tools.GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
                 Tuple<string, string, string> dataAnswer = new Tuple<string, string, string>("","","");
                 foreach (Tuple<string,string,string> data in dataTask2)
                 {
@@ -300,7 +257,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
                         break;
                     }
                 }
-            Debug.Log(dataAnswer.Item1 + dataAnswer.Item2 + dataAnswer.Item3);
+                Debug.Log(dataAnswer.Item1 + dataAnswer.Item2 + dataAnswer.Item3);
                 int val = (int)UnityEngine.Random.Range(1, 100);
                 if (val % 2 == 0)
                     reverseAnswer = false;
@@ -324,6 +281,17 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
                 Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
 
 
+                if (allowRotation)
+                {
+                    Experiment2Tools.RotateDisplayers(displayers, experimentalConditions[currentCondition].Item3);
+                }
+                    
+                    else
+                {
+                    Experiment2Tools.RotateDisplayers(displayers, 0);
+                }
+                    
+
                 clipPlayer.Invoke("Play",1.0f);
                 answered = false;
             }
@@ -337,10 +305,15 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         if (!answered && clipPlayer.IsClipFinished())
         {
             //Get file name from file path
-            string s = GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+            string s = Experiment2Tools.GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
             int v = experimentalConditions[currentCondition].Item2;
             if (reverseAnswer) choice = !choice;
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v, choice, Camera.main.transform.position.y);
+            int r = 0;
+            if (allowRotation)
+            {
+                r = experimentalConditions[currentCondition].Item3;
+            }
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v,r, choice, Camera.main.transform.position.y);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
         }
@@ -362,7 +335,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename + "," + cr.visualisation + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
+            line = cr.filename + "," + cr.visualisation + "," + cr.rotation + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
             sb.Append(line);
         }
 
@@ -446,16 +419,4 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         }
     }
 
-    private string GetFileName(string filePath)
-    {
-        //Get file name from file path
-        string s = filePath;
-        int pos = s.IndexOf("/");
-        while (pos != -1)
-        {
-            s = s.Substring(pos + 1);
-            pos = s.IndexOf("/");
-        }
-        return s;
-    }
 }

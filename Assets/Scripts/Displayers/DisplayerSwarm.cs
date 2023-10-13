@@ -222,8 +222,8 @@ public class DisplayerSwarm : Displayer
             for (int i = 0; i < (numberOfAgents - numberOfActors); i++)
             {
                 GameObject newAgent = GameObject.Instantiate(actorPrefab);
-                newAgent.transform.position = Vector3.zero;
-                newAgent.transform.rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 359.0f), 0.0f);
+                newAgent.transform.localPosition = Vector3.zero;
+                newAgent.transform.localRotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0.0f, 359.0f), 0.0f);
                 newAgent.transform.parent = this.transform;
                 actors.Add(newAgent);
             }
@@ -256,7 +256,7 @@ public class DisplayerSwarm : Displayer
     {
         float agentDirection_YAxis = 180 - (Mathf.Acos(direction.normalized.x) * 180.0f / Mathf.PI);
         if (direction.z < 0.0f) agentDirection_YAxis = agentDirection_YAxis * -1;
-        actors[actorId].transform.rotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
+        actors[actorId].transform.localRotation = Quaternion.Euler(0.0f, agentDirection_YAxis, 0.0f);
     }
 
     private void UpdateActorPosition(int actorId, Vector3 position)
