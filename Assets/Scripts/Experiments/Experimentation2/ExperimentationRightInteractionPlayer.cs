@@ -140,7 +140,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Visualisation,Result,Height\r";
+        string line = "Filename,Visualisation,Rotation,Result,Height\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -225,76 +225,82 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
     private void NextClip()
     {
 
-            if (currentCondition >= experimentalConditions.Count - 1)
-            {
-                //Display finish menu
-                finishMenu.SetActive(true);
-                SaveResult();
+        if (currentCondition >= experimentalConditions.Count - 1)
+        {
+            //Display finish menu
+            finishMenu.SetActive(true);
+            SaveResult();
     
-                Debug.Log("Experimentation finished");
+            Debug.Log("Experimentation finished");
+        }
+        else
+        {
+            currentCondition++;
+
+            clipPlayer.AllowDisplay(true);
+            //Changing display
+            List<Displayer> newDisplay = new List<Displayer>();
+            newDisplay.Add(defaultVisualisation);
+            if (experimentalConditions[currentCondition].Item2 != 0)
+            {
+                newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
+            }
+            clipPlayer.SetUsedDisplayers(newDisplay);
+
+            string s = Experiment2Tools.GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
+            Tuple<string, string, string> dataAnswer = new Tuple<string, string, string>("","","");
+            foreach (Tuple<string,string,string> data in dataTask2)
+            {
+                if (String.Equals(data.Item1, s))
+                {
+                    dataAnswer = data;
+                    break;
+                }
+            }
+            Debug.Log(dataAnswer.Item1 + dataAnswer.Item2 + dataAnswer.Item3);
+            int val = (int)UnityEngine.Random.Range(1, 100);
+            if (val % 2 == 0)
+                reverseAnswer = false;
+            else
+                reverseAnswer = true;
+                
+            if(reverseAnswer)
+            {
+                button1.GetComponentInChildren<Text>().text = dataAnswer.Item3.ToString();
+                button2.GetComponentInChildren<Text>().text = dataAnswer.Item2.ToString();
             }
             else
             {
-                currentCondition++;
-
-                clipPlayer.AllowDisplay(true);
-                //Changing display
-                List<Displayer> newDisplay = new List<Displayer>();
-                newDisplay.Add(defaultVisualisation);
-                if (experimentalConditions[currentCondition].Item2 != 0)
-                {
-                    newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
-                }
-                clipPlayer.SetUsedDisplayers(newDisplay);
-
-                string s = Experiment2Tools.GetFileName(filePaths[experimentalConditions[currentCondition].Item1]);
-                Tuple<string, string, string> dataAnswer = new Tuple<string, string, string>("","","");
-                foreach (Tuple<string,string,string> data in dataTask2)
-                {
-                    if (String.Equals(data.Item1, s))
-                    {
-                        dataAnswer = data;
-                        break;
-                    }
-                }
-                Debug.Log(dataAnswer.Item1 + dataAnswer.Item2 + dataAnswer.Item3);
-                int val = (int)UnityEngine.Random.Range(1, 100);
-                if (val % 2 == 0)
-                    reverseAnswer = false;
-                else
-                    reverseAnswer = true;
-                
-                if(reverseAnswer)
-                {
-                    button1.GetComponentInChildren<Text>().text = dataAnswer.Item3.ToString();
-                    button2.GetComponentInChildren<Text>().text = dataAnswer.Item2.ToString();
-                }
-                else
-                {
-                    button1.GetComponentInChildren<Text>().text = dataAnswer.Item2.ToString();
-                    button2.GetComponentInChildren<Text>().text = dataAnswer.Item3.ToString();
-                }
-
-
-                //Changing clip
-                clipPlayer.SetClip(clips[experimentalConditions[currentCondition].Item1]);
-                Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
-
-
-                if (allowRotation)
-                {
-                    Experiment2Tools.RotateDisplayers(displayers, experimentalConditions[currentCondition].Item3);
-                }
-                    
-                    else
-                {
-                    Experiment2Tools.RotateDisplayers(displayers, 0);
-                }
-                    
-
-                clipPlayer.Invoke("Play",1.0f);
-                answered = false;
+                button1.GetComponentInChildren<Text>().text = dataAnswer.Item2.ToString();
+                button2.GetComponentInChildren<Text>().text = dataAnswer.Item3.ToString();
             }
+
+            //Mirror clip
+            SwarmClip c = clips[experimentalConditions[currentCondition].Item1];
+            if (experimentalConditions[currentCondition].Item3 ==1)
+            {
+                c = ClipTools.MirrorClip(c,true,false);
+            }
+
+           //Changing clip
+            clipPlayer.SetClip(c);
+            Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
+
+            /*
+            if (allowRotation)
+            {
+                //Experiment2Tools.RotateDisplayers(displayers, experimentalConditions[currentCondition].Item3);
+            }
+                    
+            else
+            {
+                //Experiment2Tools.RotateDisplayers(displayers, 0);
+            }*/
+                    
+
+            clipPlayer.Invoke("Play",1.0f);
+            answered = false;
+        }
         
     }
 
@@ -313,7 +319,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
             {
                 r = experimentalConditions[currentCondition].Item3;
             }
-            r = Experiment2Tools.GetCorrespondingRotation(r);
+            //r = Experiment2Tools.GetCorrespondingRotation(r);
 
             Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v,r, choice, Camera.main.transform.position.y);
             Debug.Log(res.filename + "    " + res.fracture);

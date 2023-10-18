@@ -110,6 +110,11 @@ public class AgentData
     public void SetSpeed(Vector3 speed)
     {
         this.speed = speed;
+    }    
+    
+    public void SetAcceleration(Vector3 acceleration)
+    {
+        this.acceleration = acceleration;
     }
 
     public void SetForces(List<Vector3> newforces)

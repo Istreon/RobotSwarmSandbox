@@ -1861,6 +1861,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2375784754156019879, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2406608777858740291, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_Text
       value: "Comment \xE9viter la fragmentation de l'essaim ?"
@@ -1876,6 +1880,10 @@ PrefabInstance:
     - target: {fileID: 2451131976722074675, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ExperimentationRightInteractionPlayer, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458601192108127151, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2472676925945223503, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1985,6 +1993,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ExperimentationRightInteractionPlayer, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 5002733994491131105, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5999614863318815405, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2043,6 +2055,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7382519540780549427, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7581229369576811448, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7606336409436664953, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}

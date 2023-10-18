@@ -2338,6 +2338,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19a924e450c56024795139acdbf54ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mirrorClipX: 0
+  mirrorClipZ: 0
   clipPlayer: {fileID: 1557432351}
   buttonsIfClipLoaded: {fileID: 1861730347}
   saveButton: {fileID: 2049981063}

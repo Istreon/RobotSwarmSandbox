@@ -11,14 +11,27 @@ public class Experiment2Tools
         //Créer une liste d'identifiant qui font références aux clips qui vont être chargés
         List<Tuple<int, int,int>>[] tab = new List<Tuple<int, int,int>>[nbVisualisation]; //IdClip, IdVisu, IdRotation
 
+
+        //Shuffle visu order
+        int[] idVisu = new int[nbVisualisation];
+      
+        for(int i = 0; i<nbVisualisation; i++)
+        {
+            idVisu[i] = i;
+        }
+
+        var rnd = new System.Random();
+        idVisu = idVisu.ToList<int>().OrderBy(item => rnd.Next()).ToArray<int>();
+
+
         int offSet = UnityEngine.Random.Range(0, nbVisualisation);
         for (int v = 0; v < nbVisualisation; v++)
         {
             List<Tuple<int, int,int>> listPart = new List<Tuple<int, int,int>>();
             for (int c = 0; c < nbClips; c++)
             {
-                int vis = (v + c) % (nbVisualisation);
-                int rot = (v + c + offSet) % 4; //TO DO
+                int vis = idVisu[(v + c) % (nbVisualisation)];
+                int rot = (v + c + offSet) % 2; //TO DO
                 listPart.Add(new Tuple<int, int,int>(c, vis,rot));
             }
             tab[v] = listPart;
@@ -31,16 +44,13 @@ public class Experiment2Tools
         {
             for (int j = 0; j < nbVisualisation; j++)
             {
-                disp += tab[j][i].Item3 + ";";
+                disp += tab[j][i].Item2 + ";";
             }
             Debug.Log(disp);
             disp = "";
         }
         
-        //Suffle
-        var rnd = new System.Random();
-        //Shuffle blocks
-        tab = tab.ToList<List<Tuple<int, int,int>>>().OrderBy(item => rnd.Next()).ToList<List<Tuple<int, int,int>>>().ToArray<List<Tuple<int,int, int>>>();
+
         //Suffle within blocks
         for (int i = 0; i < nbVisualisation; i++)
         {

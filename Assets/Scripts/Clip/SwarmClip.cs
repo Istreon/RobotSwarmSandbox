@@ -19,5 +19,17 @@ public class SwarmClip
     {
         return frames;
     }
+
+    public SwarmClip Clone()
+    {
+        List<SwarmData> framesClone = new List<SwarmData>();
+
+        foreach(SwarmData f in this.frames)
+        {
+            framesClone.Add(f.Clone());
+        }
+
+        return new SwarmClip(framesClone);
+    }
     #endregion
 }

@@ -10,6 +10,12 @@ public class ClipEditor : MonoBehaviour
 {
     #region Serialized fields
     [SerializeField]
+    private bool mirrorClipX = false;
+
+    [SerializeField]
+    private bool mirrorClipZ = false;
+
+    [SerializeField]
     private ClipPlayer clipPlayer;
 
     [SerializeField]
@@ -203,6 +209,7 @@ public class ClipEditor : MonoBehaviour
                 if (loaded)
                 {
                     Debug.Log("Clip loaded");
+                    if (mirrorClipX || mirrorClipZ) clip = ClipTools.MirrorClip(clip, mirrorClipX, mirrorClipZ);
                     clipPlayer.SetClip(clip);
                 }
             }

@@ -109,7 +109,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Visualisation,Result,Height\r";
+        string line = "Filename,Visualisation,Rotation,Result,Height\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -118,21 +118,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         experimentalConditions = Experiment2Tools.CreateExperimentalConditions(filePaths.Length, testedVisualisation.Count + 1);
-         
-        /*
-
-        disp = experimentalConditions.Count + " : ";
-        for (int i=0; i< experimentalConditions.Count; i++)
-        {
-            if (i % 24 == 0)
-            {
-                Debug.Log(disp);
-                disp = "";
-            }
-            disp += experimentalConditions[i].Item1 + ";";
-        }
-        Debug.Log(disp);
-        */
+      
 
 
         //Obtenir l'ordre de chargement des clips
@@ -210,40 +196,48 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     private void NextClip()
     {
 
-            if (currentCondition >= experimentalConditions.Count - 1)
+        if (currentCondition >= experimentalConditions.Count - 1)
+        {
+            //Display finish menu
+            finishMenu.SetActive(true);
+            SaveResult();
+            Debug.Log("Experimentation finished");
+        }
+        else
+        {
+            currentCondition++;
+
+            clipPlayer.AllowDisplay(true);
+            //Changing display
+            List<Displayer> newDisplay = new List<Displayer>();
+            newDisplay.Add(defaultVisualisation);
+            if (experimentalConditions[currentCondition].Item2 != 0)
             {
-                //Display finish menu
-                finishMenu.SetActive(true);
-                SaveResult();
-                Debug.Log("Experimentation finished");
+                newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
             }
+            clipPlayer.SetUsedDisplayers(newDisplay);
+
+
+            //Mirror clip
+            SwarmClip c = clips[experimentalConditions[currentCondition].Item1];
+            if (experimentalConditions[currentCondition].Item3 == 1)
+            {
+                c = ClipTools.MirrorClip(c, true, false);
+            }
+
+            //Changing clip
+            clipPlayer.SetClip(c);
+            Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
+
+            /*
+            if(allowRotation)
+                Experiment2Tools.RotateDisplayers(displayers, experimentalConditions[currentCondition].Item3);
             else
-            {
-                currentCondition++;
-
-                clipPlayer.AllowDisplay(true);
-                //Changing display
-                List<Displayer> newDisplay = new List<Displayer>();
-                newDisplay.Add(defaultVisualisation);
-                if (experimentalConditions[currentCondition].Item2 != 0)
-                {
-                    newDisplay.Add(testedVisualisation[experimentalConditions[currentCondition].Item2 - 1]);
-                }
-                clipPlayer.SetUsedDisplayers(newDisplay);
-                
-                //Changing clip
-                clipPlayer.SetClip(clips[experimentalConditions[currentCondition].Item1]);
-
-                Debug.Log("Next clip : " + (experimentalConditions[currentCondition].Item1) + " and visu number : "+ (experimentalConditions[currentCondition].Item2));
-
-                if(allowRotation)
-                    Experiment2Tools.RotateDisplayers(displayers, experimentalConditions[currentCondition].Item3);
-                else
-                    Experiment2Tools.RotateDisplayers(displayers, 0);
-
-                clipPlayer.Invoke("Play",1.0f);
-                answered = false;
-            }
+                Experiment2Tools.RotateDisplayers(displayers, 0);
+            */
+            clipPlayer.Invoke("Play",1.0f);
+            answered = false;
+        }
         
     }
 
@@ -262,7 +256,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
             {
                 r = experimentalConditions[currentCondition].Item3;
             }
-            r = Experiment2Tools.GetCorrespondingRotation(r);
+            //r = Experiment2Tools.GetCorrespondingRotation(r);
 
 
 
