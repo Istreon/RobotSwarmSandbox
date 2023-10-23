@@ -1861,6 +1861,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1915827056663629746, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
+      propertyPath: m_Text
+      value: Phase 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2375784754156019879, guid: e23af3c8da50eab4b9082f3e626162fd, type: 3}
       propertyPath: m_Enabled
       value: 1

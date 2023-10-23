@@ -74,6 +74,8 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
     float participantHeight = 0.0f;
 
+    float passedTime = 0.0f;
+
     StringBuilder sb = new StringBuilder();
     #endregion
 
@@ -109,7 +111,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Visualisation,Rotation,Result,Height\r";
+        string line = "Filename,Visualisation,Rotation,Result,Height,AnswerTime\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -161,13 +163,15 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (clipPlayer.IsClipFinished() && currentCondition != -1 && !resultSaved) //If the current clip ended
         {
 
-                //Display answering menu
-                progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
-                answerMenu.SetActive(true);
-                clipPlayer.AllowDisplay(false);
+            //Display answering menu
+            progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
+            answerMenu.SetActive(true);
+            passedTime += Time.deltaTime;
+            clipPlayer.AllowDisplay(false);
             
         }
         else
@@ -261,9 +265,10 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
 
 
 
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, v,r, choice, Camera.main.transform.position.y);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s, v,r, choice, Camera.main.transform.position.y,passedTime);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
+            passedTime = 0.0f;
         }
         answered = true;
         NextClip();
@@ -283,7 +288,7 @@ public class ExperimentationAnticipationPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename +  "," + cr.visualisation + "," + cr.rotation + "," +  cr.fracture + "," + cr.height.ToString().Replace(",",".") + "\r";
+            line = cr.filename +  "," + cr.visualisation + "," + cr.rotation + "," +  cr.fracture + "," + cr.height.ToString().Replace(",",".") + ","  + cr.answerTime.ToString().Replace(",", ".") + "\r";
             sb.Append(line);
         }
 

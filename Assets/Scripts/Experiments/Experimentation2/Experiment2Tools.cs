@@ -31,7 +31,8 @@ public class Experiment2Tools
             for (int c = 0; c < nbClips; c++)
             {
                 int vis = idVisu[(v + c) % (nbVisualisation)];
-                int rot = (v + c + offSet) % 2; //TO DO
+                //int rot = (v + c + offSet) % 2; //TO DO
+                int rot = (v + offSet) % 2; //TO DO
                 listPart.Add(new Tuple<int, int,int>(c, vis,rot));
             }
             tab[v] = listPart;
@@ -44,7 +45,7 @@ public class Experiment2Tools
         {
             for (int j = 0; j < nbVisualisation; j++)
             {
-                disp += tab[j][i].Item2 + ";";
+                disp += tab[j][i].Item3 + ";";
             }
             Debug.Log(disp);
             disp = "";

@@ -81,6 +81,8 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
 
     float participantHeight = 0.0f;
 
+    float passedTime = 0.0f;
+
     StringBuilder sb = new StringBuilder();
 
     private bool reverseAnswer = false;
@@ -140,7 +142,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         }
 
         //Prepare csv result file
-        string line = "Filename,Visualisation,Rotation,Result,Height\r";
+        string line = "Filename,Visualisation,Rotation,Result,Height,AnswerTime\r";
         sb.Append(line);
 
         if (clipPlayer == null)
@@ -192,11 +194,13 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (clipPlayer.IsClipFinished() && currentCondition != -1 && !resultSaved) //If the current clip ended
         {
                 //Display answering menu
                 progressionSlider.value = (float)(currentCondition + 1) / (float)experimentalConditions.Count;
                 answerMenu.SetActive(true);
+                passedTime += Time.deltaTime;
                 clipPlayer.AllowDisplay(false);
         }
         else
@@ -300,6 +304,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
 
             clipPlayer.Invoke("Play",1.0f);
             answered = false;
+            passedTime = 0.0f;
         }
         
     }
@@ -321,9 +326,11 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
             }
             //r = Experiment2Tools.GetCorrespondingRotation(r);
 
-            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v,r, choice, Camera.main.transform.position.y);
+            Exp2AnticipationAnswer res = new Exp2AnticipationAnswer(s,v,r, choice, Camera.main.transform.position.y,passedTime);
+            Debug.Log("Time " + passedTime);
             Debug.Log(res.filename + "    " + res.fracture);
             experimentationResult.AddClipResult(res);
+            passedTime = 0.0f;
         }
         answered = true;
         NextClip();
@@ -343,7 +350,7 @@ public class ExperimentationRightInteractionPlayer : MonoBehaviour
         foreach (Exp2AnticipationAnswer cr in experimentationResult.results)
         {
             string line;
-            line = cr.filename + "," + cr.visualisation + "," + cr.rotation + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "\r";
+            line = cr.filename + "," + cr.visualisation + "," + cr.rotation + "," + cr.fracture + "," + cr.height.ToString().Replace(",", ".") + "," + cr.answerTime.ToString().Replace(",", ".") +"\r";
             sb.Append(line);
         }
 
