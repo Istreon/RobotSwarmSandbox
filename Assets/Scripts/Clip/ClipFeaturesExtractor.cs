@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ClipFeaturesExtractor : MonoBehaviour
 {
-    string filePath = "/RecordedClips/"; //The folder containing clip files
+    string filePath = "/Clips/"; //The folder containing clip files
 
     private List<SwarmClip> clips = new List<SwarmClip>();
 
@@ -27,13 +27,16 @@ public class ClipFeaturesExtractor : MonoBehaviour
 
         //Prepare csv result file
         string line = "Filename;" +
-            "NbFrames;" +
-            "FractureFrame;" +
-            "MeanTowardsCenterOfMass;" +
-            "MeanEffectiveGroupMotion;" +
-            "MeanOrder;" +
-            "StandardDeviationOfKnnDirection;"+
-            "FinalExpansionDistance\r";
+            "Duration;" +
+            "FinalExpansionDistance;"+
+            "ExpansionSpeed;"+
+            "MeanStandardDeviationOfKnnDirection;"+
+            "AverageDistanceTravelledByAgentsPerSecond;" +
+            "ChangeOfAgentsLinks;" +
+            "ConvexHulArea; " +
+            "MaxSpeed;" +
+            "FieldOfVision;" +
+            "PerceptionRange\r";
         sb.Append(line);
 
         //Load all clip
@@ -67,15 +70,18 @@ public class ClipFeaturesExtractor : MonoBehaviour
             {
                 s = s.Substring(pos + 1);
                 pos = s.IndexOf("/");
-            } 
-            line =  s + ";" 
-                + c.GetFrames().Count + ";" 
-                + fractureFrame + ";" 
-                + ClipMetrics.MeanTowardsCenterOfMass(c) + ";" 
-                + ClipMetrics.MeanEffectiveGroupMotion(c) + ";"
-                + ClipMetrics.MeanOrder(c) + ";" 
+            }
+            line = s + ";"
+                + (c.GetFrames().Count * Time.fixedDeltaTime) + ";"
+                + SwarmMetrics.TotalDistance(c.GetFrames()[c.GetFrames().Count - 1]) + ";"
+                + GetExpansionSpeed(c) + ";"
                 + ClipMetrics.MeanStandardDeviationOfKnnDirection(c) + ";"
-                + SwarmMetrics.TotalDistance(c.GetFrames()[c.GetFrames().Count - 1]) + "\r";
+                + AverageDistanceTravelledByAgentsPerSecond(c) + ";"
+                + ChangeOfAgentsLinks(c) + ";"
+                + SwarmTools.GetConvexHulArea(c.GetFrames()[c.GetFrames().Count - 1]) + ";"
+                + (c.GetFrames()[0].GetParameters().GetMaxSpeed()) + ";"
+                + (360 - c.GetFrames()[0].GetParameters().GetBlindSpotSize()) + ";"
+                + (c.GetFrames()[0].GetParameters().GetFieldOfViewSize())  + "\r";
             sb.Append(line);
          
             currentClip++;
@@ -94,6 +100,77 @@ public class ClipFeaturesExtractor : MonoBehaviour
     }
 
     
+    private float GetExpansionSpeed(SwarmClip c)
+    {
+        float delay = c.GetFrames().Count * Time.fixedDeltaTime;
+        float finalDistance = SwarmMetrics.TotalDistance(c.GetFrames()[c.GetFrames().Count - 1]);
+        float startDistance = SwarmMetrics.TotalDistance(c.GetFrames()[0]);
+
+        float speed = (finalDistance - startDistance) / delay;
+
+        return speed;
+    }
+
+    private float AverageDistanceTravelledByAgentsPerSecond(SwarmClip c)
+    {
+        float meanDistance = 0;
+        List<SwarmData> swarms = c.GetFrames();
+
+        for(int i=0;i<swarms.Count-1;i++)
+        {
+            int agentCount = swarms[i].GetAgentsData().Count;
+
+            float totalDistance = 0;
+            for(int j=0;j<agentCount;j++)
+            {
+                totalDistance += Vector3.Distance(swarms[i].GetAgentsData()[j].GetPosition(), swarms[i+1].GetAgentsData()[j].GetPosition());
+            }
+            meanDistance += totalDistance / agentCount;
+        }
+
+        meanDistance = meanDistance/ ((c.GetFrames().Count-1) * Time.fixedDeltaTime);
+
+        return meanDistance;
+
+    }
+
+
+    private float ChangeOfAgentsLinks (SwarmClip c)
+    {
+        //TO DO
+        List<SwarmData> swarms = c.GetFrames();
+        float meanChanges = 0.0f;
+        for (int i = 0; i < swarms.Count - 1; i++)
+        {
+            int agentCount = swarms[i].GetAgentsData().Count;
+
+            float totalChanges = 0.0f;
+            for (int j = 0; j < agentCount; j++)
+            {
+                List<int> neighbours = SwarmTools.GetNeighboursIDs(swarms[i].GetAgentsData()[j], swarms[i].GetAgentsData(), swarms[i].GetParameters().GetFieldOfViewSize(), swarms[i].GetParameters().GetBlindSpotSize());
+
+                List<int> nextNeighbours = SwarmTools.GetNeighboursIDs(swarms[i+1].GetAgentsData()[j], swarms[i+1].GetAgentsData(), swarms[i+1].GetParameters().GetFieldOfViewSize(), swarms[i+1].GetParameters().GetBlindSpotSize());
+
+                int count = 0;
+                foreach(int id in neighbours)
+                {
+                    if(nextNeighbours.Contains(id))
+                    {
+                        count++;
+                    }
+                }
+
+                totalChanges += neighbours.Count + nextNeighbours.Count - (2 * count);
+
+            }
+            meanChanges += totalChanges / agentCount;
+
+        }
+        meanChanges = meanChanges / ((c.GetFrames().Count - 1) * Time.fixedDeltaTime);
+
+        return meanChanges;
+    }
+
 
 
 

@@ -28,7 +28,7 @@ public class DisplayerExternalEnvelope : Displayer
     {
         ClearVisual();
 
-        List<List<Vector3>> convexHuls = GetConvexHul(swarmData);
+        List<List<Vector3>> convexHuls = SwarmTools.GetConvexHul(swarmData);
 
         foreach(List<Vector3> pile in convexHuls)
         {
@@ -69,90 +69,5 @@ public class DisplayerExternalEnvelope : Displayer
 
     #endregion
 
-    #region Methods - Convex hul
-    private List<List<Vector3>> GetConvexHul(SwarmData swarmData)
-    {
-        List<List<Vector3>> convexHuls = new List<List<Vector3>>();
-        List<List<AgentData>> clusters = SwarmTools.GetClusters(swarmData);
-
-        foreach (List<AgentData> c in clusters)
-        {
-            if (c.Count < 3) continue;
-            List<Vector3> positions = new List<Vector3>();
-
-            foreach (AgentData g in c)
-            {
-                positions.Add(g.GetPosition());
-            }
-
-            //Calcul du point pivot
-            float ordinate = float.MaxValue;
-            float abcissa = float.MaxValue;
-            Vector3 pivot = Vector3.zero;
-            foreach (Vector3 p in positions)
-            {
-                if (p.z < ordinate || (p.z == ordinate && p.x < abcissa))
-                {
-                    pivot = p;
-                    ordinate = pivot.z;
-                    abcissa = pivot.x;
-                }
-            }
-            positions.Remove(pivot);
-
-            //Calcul des angles pour tri
-            List<float> angles = new List<float>();
-            Vector3 abissaAxe = new Vector3(1, 0, 0);
-            foreach (Vector3 p in positions)
-            {
-                Vector3 temp = p - pivot;
-                angles.Add(Vector3.Angle(temp, abissaAxe));
-            }
-
-            //Tri des points
-            for (int i = 1; i < positions.Count; i++)
-            {
-                for (int j = 0; j < positions.Count - i; j++)
-                {
-                    if (angles[j] > angles[j + 1])
-                    {
-                        float temp = angles[j + 1];
-                        angles[j + 1] = angles[j];
-                        angles[j] = temp;
-
-                        Vector3 tempPos = positions[j + 1];
-                        positions[j + 1] = positions[j];
-                        positions[j] = tempPos;
-                    }
-                }
-            }
-            angles.Clear();
-            positions.Insert(0, pivot);
-
-            //Itérations
-            List<Vector3> pile = new List<Vector3>();
-            pile.Add(positions[0]);
-            pile.Add(positions[1]);
-
-            for (int i = 2; i < positions.Count; i++)
-            {
-                while ((pile.Count >= 2) && VectorialProduct(pile[pile.Count - 2], pile[pile.Count - 1], positions[i]) <= 0 || pile[pile.Count - 1] == positions[i])
-                {
-                    pile.RemoveAt(pile.Count - 1);
-                }
-                pile.Add(positions[i]);
-            }
-
-            convexHuls.Add(pile);
-        }
-        return convexHuls;
-    }
-
-
-
-    private float VectorialProduct(Vector3 a, Vector3 b, Vector3 c)
-    {
-        return ((b.x - a.x) * (c.z - a.z) - (c.x - a.x) * (b.z - a.z));
-    }
-    #endregion
+    
 }

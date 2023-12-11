@@ -100,6 +100,35 @@ public class SwarmTools
         return neighbours;
     }
 
+
+    /// <summary>
+    /// Detect all neighbours of an agent based on its perception, and return their position in the list.
+    /// A neighbour here mean that the agent perceived, or is perceived by the neighbour.
+    /// </summary>
+    /// <param name="agent"> A <see cref="AgentData"/> representing the agent searching its neighbours.</param>
+    /// <param name="agentList"> A <see cref="List{T}"/>  of all the agent, containing the possible neighbours.</param>
+    /// <param name="fieldOfViewSize"> A <see cref="float"/> value representing the distance of perception of the agent.</param>
+    /// <param name="blindSpotSize"> A <see cref="float"/> value representing the blind angle behind the agent where neigbours are not perceived.</param>
+    /// <returns> The <see cref="List{T}"/> of the position of agents in the agents list.</returns>
+    public static List<int> GetNeighboursIDs(AgentData agent, List<AgentData> agentList, float fieldOfViewSize, float blindSpotSize)
+    {
+        //Create a list that will store the perceived agent
+        List<int> neighboursIDs = new List<int>();
+
+        //Compare current agent with all agents
+        for (int i=0; i<agentList.Count; i++)
+        {
+            //Check if the current agent is compared with itself
+            if (System.Object.ReferenceEquals(agentList[i], agent)) continue;
+
+            if (Linked(agent, agentList[i], fieldOfViewSize, blindSpotSize))
+            {
+                neighboursIDs.Add(i);
+            }
+        }
+        return neighboursIDs;
+    }
+
     #endregion
 
     #region Methods - Agents links
@@ -774,6 +803,147 @@ public class SwarmTools
             }
         }
         return minAgent;
+    }
+    #endregion
+
+    #region Methods - Convex hul
+
+    /// <summary>
+    /// Get the convex hul of each cluster. 
+    /// </summary>
+    /// <param name="swarmData">The analysed swarm</param>
+    /// <returns>The list of each cluster's convex hul.</returns>
+    public static List<List<Vector3>> GetConvexHul(SwarmData swarmData)
+    {
+        List<List<Vector3>> convexHuls = new List<List<Vector3>>();
+        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
+
+        foreach (List<AgentData> c in clusters)
+        {
+            if (c.Count < 3) continue;
+            List<Vector3> positions = new List<Vector3>();
+
+            foreach (AgentData g in c)
+            {
+                positions.Add(g.GetPosition());
+            }
+
+            //Calcul du point pivot
+            float ordinate = float.MaxValue;
+            float abcissa = float.MaxValue;
+            Vector3 pivot = Vector3.zero;
+            foreach (Vector3 p in positions)
+            {
+                if (p.z < ordinate || (p.z == ordinate && p.x < abcissa))
+                {
+                    pivot = p;
+                    ordinate = pivot.z;
+                    abcissa = pivot.x;
+                }
+            }
+            positions.Remove(pivot);
+
+            //Calcul des angles pour tri
+            List<float> angles = new List<float>();
+            Vector3 abissaAxe = new Vector3(1, 0, 0);
+            foreach (Vector3 p in positions)
+            {
+                Vector3 temp = p - pivot;
+                angles.Add(Vector3.Angle(temp, abissaAxe));
+            }
+
+            //Tri des points
+            for (int i = 1; i < positions.Count; i++)
+            {
+                for (int j = 0; j < positions.Count - i; j++)
+                {
+                    if (angles[j] > angles[j + 1])
+                    {
+                        float temp = angles[j + 1];
+                        angles[j + 1] = angles[j];
+                        angles[j] = temp;
+
+                        Vector3 tempPos = positions[j + 1];
+                        positions[j + 1] = positions[j];
+                        positions[j] = tempPos;
+                    }
+                }
+            }
+            angles.Clear();
+            positions.Insert(0, pivot);
+
+            //Itérations
+            List<Vector3> pile = new List<Vector3>();
+            pile.Add(positions[0]);
+            pile.Add(positions[1]);
+
+            for (int i = 2; i < positions.Count; i++)
+            {
+                while ((pile.Count >= 2) && VectorialProduct(pile[pile.Count - 2], pile[pile.Count - 1], positions[i]) <= 0 || pile[pile.Count - 1] == positions[i])
+                {
+                    pile.RemoveAt(pile.Count - 1);
+                }
+                pile.Add(positions[i]);
+            }
+
+            convexHuls.Add(pile);
+        }
+        return convexHuls;
+    }
+
+
+    /// <summary>
+    /// Compute the area of the convex hul of the biggest cluster of the swarm.
+    /// </summary>
+    /// <param name="swarmData">The analysed swarm</param>
+    /// <returns>The area of the convex hul of the biggest cluster.</returns>
+    public static float GetConvexHulArea(SwarmData swarm)
+    {
+        //Get convex huls of the swarm
+        List<List<Vector3>> convexHuls = SwarmTools.GetConvexHul(swarm);
+
+        //Keep only the convex hul of the biggest cluster
+        List<Vector3> convexHul = convexHuls[0];
+
+        //Compute the mean position of the vertices composing the convex hull
+        Vector3 pointC = Vector3.zero;
+
+        foreach (Vector3 v in convexHul)
+        {
+            pointC += v;
+        }
+
+        pointC /= convexHul.Count;
+
+
+        float totalArea = 0.0f;
+
+        //Split the convex hull into multiple triangles to compute triangles area independently using Héron formula
+        for (int i = 0; i < convexHul.Count; i++)
+        {
+            Vector3 pointA = convexHul[i];
+            int j = (i + 1) % convexHul.Count;
+            Vector3 pointB = convexHul[j];
+
+            float a = Vector3.Distance(pointA, pointB);
+            float b = Vector3.Distance(pointC, pointB);
+            float c = Vector3.Distance(pointA, pointC);
+
+            float d = (a + b + c) / 2.0f;
+
+            float A = Mathf.Sqrt(d * (d - a) * (d - b) * (d - c));
+
+            totalArea += A;
+        }
+
+        return totalArea;
+    }
+
+
+
+    public static float VectorialProduct(Vector3 a, Vector3 b, Vector3 c)
+    {
+        return ((b.x - a.x) * (c.z - a.z) - (c.x - a.x) * (b.z - a.z));
     }
     #endregion
 }
