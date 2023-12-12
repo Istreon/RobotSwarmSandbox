@@ -122,4 +122,67 @@ public class EditorParametersInterface : MonoBehaviour
         this.repulsionZoneSize = parameters.GetRepulsionZoneSize();
         this.distanceBetweenAgents = parameters.GetDistanceBetweenAgents();
     }
+
+
+    #region Methods - Setter
+    public void SetCohesionIntensity(float intensity)
+    {
+        this.cohesionIntensity = intensity;
+    }
+
+    public void SetAlignmentIntensity(float intensity)
+    {
+        this.alignmentIntensity = intensity;
+    }
+
+    public void SetSeparatonIntensity(float intensity)
+    {
+        this.separationIntensity = intensity;
+    }
+
+    public void SetFieldOfViewSize(float intensity)
+    {
+        this.fieldOfViewSize = intensity;
+    }
+
+    public void SetBlindSpotSize(float intensity)
+    {
+        this.blindSpotSize = intensity;
+    }
+
+    public void SetRandomMovementIntensity(float intensity)
+    {
+        this.randomMovementIntensity = intensity;
+    }
+
+    public void SetMaxSpeed(float intensity)
+    {
+        this.maxSpeed = intensity;
+    }
+
+
+    public void SetFrictionIntensity(float intensity) { 
+        this.frictionIntensity = intensity;
+    }
+    #endregion
+
+    #region Methods - Getter
+    //Setter pour l'attribut CohesionIntensity
+    public float GetCohesionIntensity() {  return this.cohesionIntensity; }
+
+    public float GetAlignmentIntensity() { return this.alignmentIntensity; }
+
+    public float GetSeparationIntensity() { return this.separationIntensity; }
+
+    public float GetFieldOfViewSize() { return this.fieldOfViewSize; }
+
+    public float GetBlindSpotSize() { return this.blindSpotSize; }
+
+    public float GetRandomMovementIntensity() { return this.randomMovementIntensity; }
+
+    public float GetMaxSpeed() { return this.maxSpeed; }
+
+    public float GetFrictionIntensity() { return this.frictionIntensity; }
+
+    #endregion
 }

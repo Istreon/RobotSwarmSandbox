@@ -5,10 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ClipEditorScene.unity
     guid: 7be73522dc23a274a861e7ccf7296ed5
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SimulationScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Experimentation2/XREvaluationRightInteraction.unity
     guid: afae1a3ddec44b8489d0b8e4e2f51af1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/WebVersionScene.unity
     guid: d2bc947c70ec01d4e8441081181e0166
   m_configObjects:
