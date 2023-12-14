@@ -769,11 +769,19 @@ public class SwarmTools
     #endregion
 
     #region Methods - KNN
+    /// <summary>
+    /// Get the KNN of an agent. If more neighbours are asked than the number of agents, it return the agents.
+    /// </summary>
+    /// <param name="agent">Agent for which we are looking for the KNN</param>
+    /// <param name="l">The list of agents</param>
+    /// <param name="n">Number of nearest neighbours searched</param>
+    /// <returns>Return the KNN of the specified agent</returns>
     public static List<AgentData> KNN(AgentData agent, List<AgentData> l, int n)
     {
         List<AgentData> agents = new List<AgentData>(l);
         List<AgentData> knn = new List<AgentData>();
 
+        //Check if there are enough agents
         if (agents.Count < n) n = agents.Count;
 
         for (int i = 0; i < n; i++)
@@ -786,6 +794,12 @@ public class SwarmTools
         return knn;
     }
 
+    /// <summary>
+    /// Get the nearest agent of an agent from a list.
+    /// </summary>
+    /// <param name="agent">Agent for which we are looking for the nearest agent</param>
+    /// <param name="l">The list of agents</param>
+    /// <returns>Return the nearest neighbour</returns>
     public static AgentData NearestAgent(AgentData agent, List<AgentData> l)
     {
         float min = float.MaxValue;
@@ -945,5 +959,285 @@ public class SwarmTools
     {
         return ((b.x - a.x) * (c.z - a.z) - (c.x - a.x) * (b.z - a.z));
     }
+    #endregion
+
+    #region Methods - Distance intra cluster
+    public static float MeanKNNDistanceBiggerCluster(SwarmData swarmData, int k)
+    {
+        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
+
+        float dist = MeanKNNDistance(clusters[0], k);
+
+        return dist;
+    }
+
+    public static float MeanKNNDistance(List<AgentData> cluster, int k)
+    {
+        float meanDist = 0.0f;
+        List<float> distances = new List<float>();
+
+        foreach (AgentData g in cluster)
+        {
+            distances.AddRange(GetKNNDistances(cluster, g, k));
+        }
+
+        foreach (float d in distances)
+        {
+            meanDist += d;
+        }
+
+        meanDist /= distances.Count;
+
+        return meanDist;
+    }
+
+    /// <summary>
+    /// Calculate the k nearest distances from the agent set in parameter, to the other agents from the list set in paramter.
+    /// </summary>
+    /// <param name="cluster"> The set of agents from which the k nearest distances of the agent set in parameter will be calculated. </param>
+    /// <param name="agent"> The agent reference to calculate the distances.</param>
+    /// <param name="k">The maximum number of distances returned. </param>
+    /// <returns>The k nearest distances to other agents, possibly less if there is not enough other agents.</returns>
+    private static List<float> GetKNNDistances(List<AgentData> cluster, AgentData agent, int k)
+    {
+        //Compute every distance from parameter agent to other agents
+        List<float> distances = new List<float>();
+
+        //Compare current agent with all agents
+        foreach (AgentData g in cluster)
+        {
+            //Check if the current agent is compared with itself
+            if (System.Object.ReferenceEquals(g, agent)) continue;
+
+            //Compute distance
+            float dist = Vector3.Distance(g.GetPosition(), agent.GetPosition());
+
+            distances.Add(dist);
+        }
+
+
+        //Sort list
+        distances.Sort(new ListTools.GFG());
+
+
+        //Get the knn
+        List<float> knnDistances = new List<float>();
+
+        if (distances.Count < k) k = distances.Count;
+        for (int i = 0; i < k; i++)
+        {
+            knnDistances.Add(distances[i]);
+        }
+
+        return knnDistances;
+    }
+
+    #endregion
+
+    #region Methods - Distance inter cluster
+
+
+    public static float GetSignificantDistanceBetweenClusters(SwarmData swarmData)
+    {
+        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
+
+        //If there is not enough cluster, exit
+        if (clusters.Count < 2) return -1;
+
+        float significantDistance = -1;
+
+        List<List<List<AgentData>>> superList = new List<List<List<AgentData>>>();
+        //Creer des superlist des cluster
+        foreach (List<AgentData> c in clusters)
+        {
+            List<List<AgentData>> temp = new List<List<AgentData>>();
+            temp.Add(c);
+            superList.Add(temp);
+        }
+
+        //Tant que le nombre de superlist est supérieur à 2
+        while (superList.Count > 2)
+        {
+            //Calculer la distance plus petite entre deux clusters
+            float minDist = float.MaxValue;
+            List<List<AgentData>> minCs1 = null;
+            List<List<AgentData>> minCs2 = null;
+
+            for (int i = 0; i < superList.Count; i++)
+            {
+                List<List<AgentData>> cs1 = superList[i];
+                for (int j = i; j < superList.Count; j++)
+                {
+                    if (i == j) continue;
+
+                    List<List<AgentData>> cs2 = superList[j];
+
+                    float dist = MinDistanceBetweenTwoClusterSets(cs1, cs2);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        minCs1 = cs1;
+                        minCs2 = cs2;
+                    }
+                }
+            }
+
+            //Fusionner les superlists des clusters concernés
+            minCs1.AddRange(minCs2);
+            //Supprimer de la liste le cluster fusionné
+            superList.Remove(minCs2);
+        }
+
+        //Normalement ici, il ne reste que deux clusters
+        //Calculer la min dist entre les deux
+        significantDistance = MinDistanceBetweenTwoClusterSets(superList[0], superList[1]);
+        //la retourner
+
+
+        return significantDistance;
+    }
+
+    private static float MinDistanceBetweenTwoClusterSets(List<List<AgentData>> clusterSet1, List<List<AgentData>> clusterSet2)
+    {
+        float minDist = float.MaxValue;
+        foreach (List<AgentData> c1 in clusterSet1)
+        {
+            foreach (List<AgentData> c2 in clusterSet2)
+            {
+                float dist = MinDistanceBetweenTwoClusters(c1, c2);
+                if (dist < minDist)
+                    minDist = dist;
+            }
+        }
+        return minDist;
+    }
+
+
+    /// <summary>
+    /// Compute the min distance between two cluster, and return it.
+    /// </summary>
+    /// <param name="cluster1">The first cluster</param>
+    /// <param name="cluster2">The other cluster</param>
+    /// <returns>The min distance between the two clusters set in parameter.</returns>
+    private static float MinDistanceBetweenTwoClusters(List<AgentData> cluster1, List<AgentData> cluster2)
+    {
+        float minDist = float.MaxValue;
+
+        foreach (AgentData l1 in cluster1)
+        {
+            foreach (AgentData l2 in cluster2)
+            {
+                float dist = Vector3.Distance(l1.GetPosition(), l2.GetPosition());
+                if (dist < minDist)
+                    minDist = dist;
+            }
+        }
+        return minDist;
+    }
+    #endregion
+
+    #region Methods - Densities Grid
+
+    public static Tuple<int[,], float> GetDensitiesUsingKNNWithinConvexArea(SwarmData swarmData)
+    {
+        Tuple<int[,], float> t = GetDensitiesUsingKNN(swarmData);
+        int[,] densities = t.Item1;
+        float zoneSize = t.Item2;
+        List<List<Vector3>> convexHuls = SwarmTools.GetConvexHul(swarmData);
+
+        Vector2 outsidePoint = new Vector2(-1, -1);
+
+        for (int i = 0; i < densities.GetLength(0); i++)
+        {
+            for (int j = 0; j < densities.GetLength(1); j++)
+            {
+                if (densities[i, j] > 0) continue;
+
+                float x = i * zoneSize + zoneSize / 2.0f;
+                float z = j * zoneSize + zoneSize / 2.0f;
+
+                Vector2 center = new Vector2(x, z);
+
+                bool inside = false;
+
+                foreach (List<Vector3> hul in convexHuls)
+                {
+                    int nb = 0;
+
+                    for (int k = 0; k < hul.Count; k++)
+                    {
+                        int k2 = (k + 1) % hul.Count;
+
+                        Vector2 p1 = new Vector2(hul[k].x, hul[k].z);
+                        Vector2 p2 = new Vector2(hul[k2].x, hul[k2].z);
+
+                        if (GeometryTools.LineSegmentsIntersect(center, outsidePoint, p1, p2)) nb++;
+                    }
+
+                    if (nb % 2 == 1)
+                    {
+                        inside = true;
+                        break;
+                    }
+
+                }
+
+                if (!inside) densities[i, j] = -1;
+            }
+        }
+
+        return new Tuple<int[,], float>(densities, zoneSize);
+    }
+
+
+    public static Tuple<int[,], float> GetDensitiesUsingKNN(SwarmData swarmData)
+    {
+        float dist = MeanKNNDistanceBiggerCluster(swarmData, 2);
+        int[,] densities = GetDensities(swarmData, dist);
+
+        return new Tuple<int[,], float>(densities, dist);
+    }
+
+    public static int[,] GetDensities(SwarmData swarmData, float zoneSize = 0.5f)
+    {
+        int nbX = (int)(swarmData.GetParameters().GetMapSizeX() / zoneSize) + 1;
+        int nbZ = (int)(swarmData.GetParameters().GetMapSizeZ() / zoneSize) + 1;
+
+        int[,] densities = new int[nbX, nbZ];
+
+        for (int i = 0; i < nbX; i++)
+        {
+            for (int j = 0; j < nbZ; j++)
+            {
+                densities[i, j] = 0;
+            }
+        }
+
+        List<AgentData> agents = swarmData.GetAgentsData();
+
+        foreach (AgentData agent in agents)
+        {
+            int x = (int)(agent.GetPosition().x / zoneSize);
+            int z = (int)(agent.GetPosition().z / zoneSize);
+
+            if (x >= nbX) Debug.Log("X supérieur : " + x + " & " + nbX);
+            if (z >= nbZ) Debug.Log("Z supérieur : " + z + " & " + nbZ);
+
+            densities[x, z]++;
+        }
+
+        return densities;
+    }
+
+    #endregion
+
+    #region Methods - Concave hul
+    // Duckham, M., Kulik, L., Worboys, M.F., Galton, A. (2008)
+    // Efficient generation of simple polygons for characterizing the shape of a set of points in the plane.
+    // Pattern Recognition v41, 3224-3236
+
+    //https://en.wikipedia.org/wiki/Delaunay_triangulation
+
+    //https://en.wikipedia.org/wiki/Delaunay_tessellation_field_estimator
     #endregion
 }

@@ -34,6 +34,11 @@ public class ClipFeaturesExtractor : MonoBehaviour
             "AverageDistanceTravelledByAgentsPerSecond;" +
             "ChangeOfAgentsLinks;" +
             "ConvexHulArea; " +
+            "MeanEmptySpaces(1s); " +
+            "CohesionIntensity; " +
+            "SeparationIntensity; " +
+            "AlignmentIntensity; " +
+            "RandomIntensity; " +
             "MaxSpeed;" +
             "FieldOfVision;" +
             "PerceptionRange\r";
@@ -79,6 +84,11 @@ public class ClipFeaturesExtractor : MonoBehaviour
                 + AverageDistanceTravelledByAgentsPerSecond(c) + ";"
                 + ChangeOfAgentsLinks(c) + ";"
                 + SwarmTools.GetConvexHulArea(c.GetFrames()[c.GetFrames().Count - 1]) + ";"
+                + ClipMetrics.GetMeanEmptySpacesWithinLastNSecond(c, 1.0f) + ";"
+                + (c.GetFrames()[0].GetParameters().GetCohesionIntensity()) + ";"
+                + (c.GetFrames()[0].GetParameters().GetSeparationIntensity()) + ";"
+                + (c.GetFrames()[0].GetParameters().GetAlignmentIntensity()) + ";"
+                + (c.GetFrames()[0].GetParameters().GetRandomMovementIntensity()) + ";"
                 + (c.GetFrames()[0].GetParameters().GetMaxSpeed()) + ";"
                 + (360 - c.GetFrames()[0].GetParameters().GetBlindSpotSize()) + ";"
                 + (c.GetFrames()[0].GetParameters().GetFieldOfViewSize())  + "\r";

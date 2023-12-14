@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.AffordanceSystem.Receiver.Primitives;
 
 public class ClipMetrics
 {
@@ -113,8 +114,8 @@ public class ClipMetrics
     #region Methods - Expansion score
     public static float ExpansionScore(SwarmClip c)
     {
-        float startValue = SwarmMetrics.MeanKNNDistanceBiggerCluster(c.GetFrames()[0], 3);
-        float endValue = SwarmMetrics.MeanKNNDistanceBiggerCluster(c.GetFrames()[c.GetFrames().Count - 1], 3);
+        float startValue = SwarmTools.MeanKNNDistanceBiggerCluster(c.GetFrames()[0], 3);
+        float endValue = SwarmTools.MeanKNNDistanceBiggerCluster(c.GetFrames()[c.GetFrames().Count - 1], 3);
 
         float res = (endValue / startValue);
 
@@ -159,5 +160,28 @@ public class ClipMetrics
 
         return ListTools.Mean(stdKnnDir);
      }
+    #endregion
+
+    #region - Empty spaces
+
+    public static float GetMeanEmptySpacesWithinLastNSecond(SwarmClip c, float seconds)
+    {
+        int nbFrames = (int)(seconds / Time.fixedDeltaTime);
+
+        if(c.GetFrames().Count<nbFrames) nbFrames = c.GetFrames().Count;
+
+        int start = (c.GetFrames().Count - nbFrames);
+
+        int total = 0;
+        for (int i = start;i<c.GetFrames().Count;i++ )
+        {
+            total += SwarmMetrics.GetNumberOfEmptySpace(c.GetFrames()[i]);
+        }
+
+        float res = total/ nbFrames;
+
+        return res;
+    }
+
     #endregion
 }

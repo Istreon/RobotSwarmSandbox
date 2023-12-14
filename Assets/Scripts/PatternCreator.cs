@@ -127,7 +127,7 @@ public class PatternCreator : MonoBehaviour
                 int count = 0;
                 foreach (Vector2 v in patternVertices)
                 {
-                    if (lineSegmentsIntersect(lineOneA, lineOneB, lineTwoA, v)) count++;
+                    if (GeometryTools.LineSegmentsIntersect(lineOneA, lineOneB, lineTwoA, v)) count++;
                     lineTwoA = v;
                 }
                 if (count % 2 == 1) vectorFieldState[i, j] = true;
@@ -338,16 +338,6 @@ public class PatternCreator : MonoBehaviour
         patternRenderer.Clear();
     }
 
-
-
-
-
-
-    //Original script methods from : https://www.reddit.com/r/gamedev/comments/7ww4yx/whats_the_easiest_way_to_check_if_two_line/
-    private bool lineSegmentsIntersect(Vector2 lineOneA, Vector2 lineOneB, Vector2 lineTwoA, Vector2 lineTwoB) 
-    { 
-        return (((lineTwoB.y - lineOneA.y) * (lineTwoA.x - lineOneA.x) > (lineTwoA.y - lineOneA.y) * (lineTwoB.x - lineOneA.x)) != ((lineTwoB.y - lineOneB.y) * (lineTwoA.x - lineOneB.x) > (lineTwoA.y - lineOneB.y) * (lineTwoB.x - lineOneB.x)) && ((lineTwoA.y - lineOneA.y) * (lineOneB.x - lineOneA.x) > (lineOneB.y - lineOneA.y) * (lineTwoA.x - lineOneA.x)) != ((lineTwoB.y - lineOneA.y) * (lineOneB.x - lineOneA.x) > (lineOneB.y - lineOneA.y) * (lineTwoB.x - lineOneA.x))); 
-    }
 
     public Vector2 GetEnvironmentalForce(Vector2 position)
     {

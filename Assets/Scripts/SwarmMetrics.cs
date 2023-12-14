@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -294,193 +295,49 @@ public class SwarmMetrics
     }
     #endregion
 
-    #region Methods - Distance intra cluster
-    public static float MeanKNNDistanceBiggerCluster(SwarmData swarmData, int k)
-    {
-        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
-
-        float dist = MeanKNNDistance(clusters[0], k);
-
-        return dist;
-    }
-
-    public static float MeanKNNDistance(List<AgentData> cluster, int k)
-    {
-        float meanDist = 0.0f;
-        List<float> distances = new List<float>();
-
-        foreach (AgentData g in cluster)
-        {
-            distances.AddRange(GetKNNDistances(cluster, g, k));
-        }
-
-        foreach (float d in distances)
-        {
-            meanDist += d;
-        }
-
-        meanDist /= distances.Count;
-
-        return meanDist;
-    }
-
-    /// <summary>
-    /// Calculate the k nearest distances from the agent set in parameter, to the other agents from the list set in paramter.
-    /// </summary>
-    /// <param name="cluster"> The set of agents from which the k nearest distances of the agent set in parameter will be calculated. </param>
-    /// <param name="agent"> The agent reference to calculate the distances.</param>
-    /// <param name="k">The maximum number of distances returned. </param>
-    /// <returns>The k nearest distances to other agents, possibly less if there is not enough other agents.</returns>
-    private static List<float> GetKNNDistances(List<AgentData> cluster, AgentData agent, int k)
-    {
-        //Compute every distance from parameter agent to other agents
-        List<float> distances = new List<float>();
-
-        //Compare current agent with all agents
-        foreach (AgentData g in cluster)
-        {
-            //Check if the current agent is compared with itself
-            if (System.Object.ReferenceEquals(g, agent)) continue;
-
-            //Compute distance
-            float dist = Vector3.Distance(g.GetPosition(), agent.GetPosition());
-
-            distances.Add(dist);
-        }
-
-
-        //Sort list
-        distances.Sort(new ListTools.GFG());
-
-
-        //Get the knn
-        List<float> knnDistances = new List<float>();
-
-        if (distances.Count < k) k = distances.Count;
-        for (int i = 0; i < k; i++)
-        {
-            knnDistances.Add(distances[i]);
-        }
-
-        return knnDistances;
-    }
-
-    #endregion
-
-    #region Methods - Distance inter cluster
-
-
-    public static float GetSignificantDistanceBetweenClusters(SwarmData swarmData)
-    {
-        List<List<AgentData>> clusters = SwarmTools.GetOrderedClusters(swarmData);
-
-        //If there is not enough cluster, exit
-        if (clusters.Count < 2) return -1;
-
-        float significantDistance = -1;
-
-        List<List<List<AgentData>>> superList = new List<List<List<AgentData>>>();
-        //Creer des superlist des cluster
-        foreach (List<AgentData> c in clusters)
-        {
-            List<List<AgentData>> temp = new List<List<AgentData>>();
-            temp.Add(c);
-            superList.Add(temp);
-        }
-
-        //Tant que le nombre de superlist est supérieur à 2
-        while (superList.Count > 2)
-        {
-            //Calculer la distance plus petite entre deux clusters
-            float minDist = float.MaxValue;
-            List<List<AgentData>> minCs1 = null;
-            List<List<AgentData>> minCs2 = null;
-
-            for (int i = 0; i < superList.Count; i++)
-            {
-                List<List<AgentData>> cs1 = superList[i];
-                for (int j = i; j < superList.Count; j++)
-                {
-                    if (i == j) continue;
-
-                    List<List<AgentData>> cs2 = superList[j];
-
-                    float dist = MinDistanceBetweenTwoClusterSets(cs1, cs2);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        minCs1 = cs1;
-                        minCs2 = cs2;
-                    }
-                }
-            }
-
-            //Fusionner les superlists des clusters concernés
-            minCs1.AddRange(minCs2);
-            //Supprimer de la liste le cluster fusionné
-            superList.Remove(minCs2);
-        }
-
-        //Normalement ici, il ne reste que deux clusters
-        //Calculer la min dist entre les deux
-        significantDistance = MinDistanceBetweenTwoClusterSets(superList[0], superList[1]);
-        //la retourner
-
-
-        return significantDistance;
-    }
-
-    private static float MinDistanceBetweenTwoClusterSets(List<List<AgentData>> clusterSet1, List<List<AgentData>> clusterSet2)
-    {
-        float minDist = float.MaxValue;
-        foreach (List<AgentData> c1 in clusterSet1)
-        {
-            foreach (List<AgentData> c2 in clusterSet2)
-            {
-                float dist = MinDistanceBetweenTwoClusters(c1, c2);
-                if (dist < minDist)
-                    minDist = dist;
-            }
-        }
-        return minDist;
-    }
-
-
-    /// <summary>
-    /// Compute the min distance between two cluster, and return it.
-    /// </summary>
-    /// <param name="cluster1">The first cluster</param>
-    /// <param name="cluster2">The other cluster</param>
-    /// <returns>The min distance between the two clusters set in parameter.</returns>
-    private static float MinDistanceBetweenTwoClusters(List<AgentData> cluster1, List<AgentData> cluster2)
-    {
-        float minDist = float.MaxValue;
-
-        foreach (AgentData l1 in cluster1)
-        {
-            foreach (AgentData l2 in cluster2)
-            {
-                float dist = Vector3.Distance(l1.GetPosition(), l2.GetPosition());
-                if (dist < minDist)
-                    minDist = dist;
-            }
-        }
-        return minDist;
-    }
-    #endregion
-
     #region Methods - Fracture
 
     public static float FractureVisibilityScore(SwarmData swarmData)
     {
-        float meanDist = SwarmMetrics.MeanKNNDistanceBiggerCluster(swarmData, 3);
+        float meanDist = SwarmTools.MeanKNNDistanceBiggerCluster(swarmData, 3);
 
-        float dist = GetSignificantDistanceBetweenClusters(swarmData);
+        float dist = SwarmTools.GetSignificantDistanceBetweenClusters(swarmData);
         float ratio = dist / meanDist;
 
         return ratio;
     }
 
+    #endregion
+
+    #region Methods - Densities
+    //Calculer max taille trou
+    //Calculer taille moyenne des trous
+    //Calculer nombre moyen de trous
+    //Calculer nombre moyen de trous sur taille total de l'essaim
+    //Tout sur n seconds
+
+    /// <summary>
+    /// Get the number of empty spaces within the external enveloppe of the swarm using densities' grid.
+    /// </summary>
+    /// <param name="swarmData">The analysed swarm state</param>
+    /// <returns>Return the number of empty spaces</returns>
+    public static int GetNumberOfEmptySpace(SwarmData swarmData)
+    {
+        int total = 0;
+
+        Tuple<int[,], float> t = SwarmTools.GetDensitiesUsingKNNWithinConvexArea(swarmData);
+        int[,] densities = t.Item1;
+
+        for (int i = 0; i < densities.GetLength(0); i++)
+        {
+            for (int j = 0; j < densities.GetLength(1); j++)
+            {
+                if (densities[i, j] == 0) total++;
+            }
+        }
+
+        return total;
+    }
     #endregion
 
 }
