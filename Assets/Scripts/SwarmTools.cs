@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+//using System.Numerics;
+
+//using System.Numerics;
 using UnityEngine;
 
 public class SwarmTools
@@ -12,7 +15,7 @@ public class SwarmTools
     /// <param name="potentialNeighbour"> The agent potentially perceived.</param>
     /// <param name="fieldOfViewSize">The distance of perception of the agent.</param>
     /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived.</param>
-    /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
+    /// <returns> A <see cref="bool"/> value set ï¿½ True if the agent if perceived by the other agent. False ohterwise.</returns>
     private static bool Perceive(AgentData agent, AgentData potentialNeighbour, float fieldOfViewSize, float blindSpotSize)
     {
         //Check whether the potential neighbour is close enough (at a distance shorter than the perception distance).
@@ -37,7 +40,7 @@ public class SwarmTools
     /// <param name="agent2"> The second agent tested.</param>
     /// <param name="fieldOfViewSize">The distance of perception of both agent. If different, use <see cref="Perceive(AgentData, AgentData, float, float)"/> instead </param>
     /// <param name="blindSpotSize">The blind angle behind the agent where neigbours are not perceived. If different, use <see cref="Perceive(AgentData, AgentData, float, float)"/> instead</param>
-    /// <returns> A <see cref="bool"/> value set à True if the agent if perceived by the other agent. False ohterwise.</returns>
+    /// <returns> A <see cref="bool"/> value set ï¿½ True if the agent if perceived by the other agent. False ohterwise.</returns>
     public static bool Linked(AgentData agent1, AgentData agent2, float fieldOfViewSize, float blindSpotSize)
     {
         return (Perceive(agent1, agent2, fieldOfViewSize, blindSpotSize) || Perceive(agent2, agent1, fieldOfViewSize, blindSpotSize));
@@ -174,7 +177,7 @@ public class SwarmTools
 
     #region Methods - Clusters (connected components)
     /// <summary>
-    /// From a swarm, get the différent groups based on agent perception and graph theory.
+    /// From a swarm, get the diffï¿½rent groups based on agent perception and graph theory.
     /// An agent belong to only one cluster.
     /// </summary>
     /// <returns> A <see cref="List{T}"/> of clusters represented by a <see cref="List{T}"/> of <see cref="AgentData"/>.</returns>
@@ -544,7 +547,7 @@ public class SwarmTools
         }
 
         int count = leaves.Count + branches.Count + trunk.Count;
-        if (count != agents.Count) Debug.LogError("Cette méthode duplique ou oublie des agents!");
+        if (count != agents.Count) Debug.LogError("Cette mï¿½thode duplique ou oublie des agents!");
 
         return res;
 
@@ -886,7 +889,7 @@ public class SwarmTools
             angles.Clear();
             positions.Insert(0, pivot);
 
-            //Itérations
+            //Itï¿½rations
             List<Vector3> pile = new List<Vector3>();
             pile.Add(positions[0]);
             pile.Add(positions[1]);
@@ -932,7 +935,7 @@ public class SwarmTools
 
         float totalArea = 0.0f;
 
-        //Split the convex hull into multiple triangles to compute triangles area independently using Héron formula
+        //Split the convex hull into multiple triangles to compute triangles area independently using Hï¿½ron formula
         for (int i = 0; i < convexHul.Count; i++)
         {
             Vector3 pointA = convexHul[i];
@@ -1055,7 +1058,7 @@ public class SwarmTools
             superList.Add(temp);
         }
 
-        //Tant que le nombre de superlist est supérieur à 2
+        //Tant que le nombre de superlist est supï¿½rieur ï¿½ 2
         while (superList.Count > 2)
         {
             //Calculer la distance plus petite entre deux clusters
@@ -1082,9 +1085,9 @@ public class SwarmTools
                 }
             }
 
-            //Fusionner les superlists des clusters concernés
+            //Fusionner les superlists des clusters concernï¿½s
             minCs1.AddRange(minCs2);
-            //Supprimer de la liste le cluster fusionné
+            //Supprimer de la liste le cluster fusionnï¿½
             superList.Remove(minCs2);
         }
 
@@ -1220,8 +1223,8 @@ public class SwarmTools
             int x = (int)(agent.GetPosition().x / zoneSize);
             int z = (int)(agent.GetPosition().z / zoneSize);
 
-            if (x >= nbX) Debug.Log("X supérieur : " + x + " & " + nbX);
-            if (z >= nbZ) Debug.Log("Z supérieur : " + z + " & " + nbZ);
+            if (x >= nbX) Debug.Log("X supï¿½rieur : " + x + " & " + nbX);
+            if (z >= nbZ) Debug.Log("Z supï¿½rieur : " + z + " & " + nbZ);
 
             densities[x, z]++;
         }
@@ -1231,13 +1234,164 @@ public class SwarmTools
 
     #endregion
 
+
+    #region - Delaunay Triangulation
+
+    public static List<Tuple<AgentData, AgentData, AgentData>> GetDelaunayTriangulation(SwarmData swarm)
+    {
+        //Obtain the super triangle ABC
+        float xmin = float.MaxValue;
+        float zmin = float.MaxValue;
+        float xmax = float.MinValue;
+        float zmax = float.MinValue;
+
+        foreach (AgentData a in swarm.GetAgentsData())
+        {
+            if (a.GetPosition().x < xmin) xmin = a.GetPosition().x;
+
+            if (a.GetPosition().z < zmin) zmin = a.GetPosition().z;
+
+            if (a.GetPosition().x > xmax) xmax = a.GetPosition().x;
+
+            if (a.GetPosition().z > zmax) zmax = a.GetPosition().z;
+        }
+        Vector2 max = new Vector2(xmax, zmax);
+        Vector2 min = new Vector2(xmin, zmin);
+        float padding = Vector2.Distance(min, max)+1;
+
+        Vector3 A = new Vector3(xmin - padding, 0, zmin - padding);
+        Vector3 B = new Vector3(xmax + padding, 0, zmin - padding);
+        Vector3 C = new Vector3(((xmin + xmax) / 2), 0, zmax + padding);
+
+        AgentData agentA = new AgentData(A, A);
+        AgentData agentB = new AgentData(B, B);
+        AgentData agentC = new AgentData(C, C);
+
+        Tuple<AgentData, AgentData, AgentData> superTriangle = new Tuple<AgentData, AgentData, AgentData>(agentA, agentB, agentC);
+
+        List<Tuple<AgentData, AgentData, AgentData>> triangles = new List<Tuple<AgentData, AgentData, AgentData>>();
+
+        triangles.Add(superTriangle);
+
+        //Adding the agents one by one
+
+        foreach (AgentData a in swarm.GetAgentsData())
+        {
+            bool ok = false;
+
+            float count = 0;
+
+            List< Tuple < AgentData, AgentData, AgentData >> taggedTriangles = new List<Tuple<AgentData, AgentData, AgentData>>();
+
+            foreach (Tuple<AgentData, AgentData, AgentData> t in triangles)
+            {
+                if(PointInsideTriangle(a.GetPosition(), t.Item1.GetPosition(), t.Item2.GetPosition(), t.Item3.GetPosition()))
+                {                    
+                    taggedTriangles.Add(t);
+
+                    count++;
+                    ok = true;
+                }
+            }
+
+            //Removing tagged triangles and adding the new ones
+            foreach(Tuple<AgentData, AgentData, AgentData> t in taggedTriangles)
+            {
+                Tuple<AgentData, AgentData, AgentData> t1 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item1, t.Item2);
+                Tuple<AgentData, AgentData, AgentData> t2 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item2, t.Item3);
+                Tuple<AgentData, AgentData, AgentData> t3 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item3, t.Item1);
+
+                triangles.Add(t1);
+                triangles.Add(t2);
+                triangles.Add(t3);
+
+                triangles.Remove(t);
+            }
+
+            Debug.Log("NbTriangles = "+triangles.Count);
+
+            if(count>1) { Debug.Log("Un point peu Ãªtre dans plusieurs triangles, nb :" + count); }
+
+            if (!ok) Debug.LogError("The point has not found an enclosing triangle.");
+        }
+
+
+        //Remove the false agents representing the super triangle
+        /*
+        List<Tuple<AgentData, AgentData, AgentData>> lastTriangles = new List<Tuple<AgentData, AgentData, AgentData>>();
+        foreach (Tuple<AgentData, AgentData, AgentData> t in triangles)
+        {
+            if(System.Object.ReferenceEquals(t.Item1, agentA) || System.Object.ReferenceEquals(t.Item1, agentB) || System.Object.ReferenceEquals(t.Item1, agentC)) { lastTriangles.Add(t);}
+            if(System.Object.ReferenceEquals(t.Item2, agentA) || System.Object.ReferenceEquals(t.Item2, agentB) || System.Object.ReferenceEquals(t.Item2, agentC)) { lastTriangles.Add(t);}
+            if(System.Object.ReferenceEquals(t.Item3, agentA) || System.Object.ReferenceEquals(t.Item3, agentB) || System.Object.ReferenceEquals(t.Item3, agentC)) { lastTriangles.Add(t);}
+        }
+
+        foreach (Tuple<AgentData, AgentData, AgentData> t in lastTriangles)
+        { 
+
+            triangles.Remove(t);
+        }
+        */
+        return triangles;
+    }
+
+    public static bool PointInsideTriangle(Vector3 point, Vector3 A, Vector3 B, Vector3 C)
+    {
+        Vector3 AB = B - A;
+        Vector3 AM = point - A;
+        Vector3 AC = C - A;
+        Vector3 BA = A - B;
+        Vector3 BM = point - B;
+        Vector3 BC = C - B;
+        Vector3 CA = A - C;
+        Vector3 CM = point - C;
+        Vector3 CB = B - C;
+
+
+        float condA = Vector3.Dot(Vector3.Cross(AB, AM), Vector3.Cross(AM, AC));
+
+        if (condA < 0) { return false; }
+
+
+        float condB = Vector3.Dot(Vector3.Cross(BA, BM), Vector3.Cross(BM, BC));
+
+        if (condB < 0) { return false; }
+
+
+        float condC = Vector3.Dot(Vector3.Cross(CA, CM), Vector3.Cross(CM, CB));
+
+        if (condC < 0) { return false; }
+
+        return true;
+    }
+
+    #endregion
+
     #region Methods - Concave hul
     // Duckham, M., Kulik, L., Worboys, M.F., Galton, A. (2008)
     // Efficient generation of simple polygons for characterizing the shape of a set of points in the plane.
     // Pattern Recognition v41, 3224-3236
 
+    //https://link.springer.com/chapter/10.1007/978-3-642-21593-3_19#preview
+
+
+    // Sharvit, D., Chan, J., Tek, H., & Kimia, B. B. (1998). 
+    //Symmetry-based indexing of image databases. 
+    //Journal of Visual Communication and Image Representation, 9(4), 366-380.
+
+
     //https://en.wikipedia.org/wiki/Delaunay_triangulation
 
     //https://en.wikipedia.org/wiki/Delaunay_tessellation_field_estimator
+
+
+    //https://journals.sagepub.com/doi/10.1177/2041669519897681
+    //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4978768/
+
+    //https://link.springer.com/article/10.1007/s11042-015-2605-6
+
+    //https://www.hindawi.com/journals/cin/2015/708759/
+    //https://jov.arvojournals.org/article.aspx?articleid=2778465
+
     #endregion
 }
