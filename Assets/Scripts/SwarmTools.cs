@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-//using System.Numerics;
-
-//using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SwarmTools
 {
@@ -1237,14 +1236,27 @@ public class SwarmTools
 
     #region - Delaunay Triangulation
 
+    /// <summary>
+    /// Bowyer–Watson algorithm : https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm
+    /// </summary>
+    /// <param name="swarm"></param>
+    /// <returns></returns>
     public static List<Tuple<AgentData, AgentData, AgentData>> GetDelaunayTriangulation(SwarmData swarm)
     {
-        //Obtain the super triangle ABC
+        //Create the list that will contains all the triangles of the triangulation
+        List<Tuple<AgentData, AgentData, AgentData>> triangles = new List<Tuple<AgentData, AgentData, AgentData>>();
+
+
+        //------------------------------------------------------
+        //Generate the super triangle ABC containing all agents
+        //------------------------------------------------------
+
         float xmin = float.MaxValue;
         float zmin = float.MaxValue;
         float xmax = float.MinValue;
         float zmax = float.MinValue;
 
+        //Get the min bounding box coordinates of the swarm
         foreach (AgentData a in swarm.GetAgentsData())
         {
             if (a.GetPosition().x < xmin) xmin = a.GetPosition().x;
@@ -1255,115 +1267,200 @@ public class SwarmTools
 
             if (a.GetPosition().z > zmax) zmax = a.GetPosition().z;
         }
+
+        //Create 2 points, respectively the corner top right and bottom left
         Vector2 max = new Vector2(xmax, zmax);
         Vector2 min = new Vector2(xmin, zmin);
-        float padding = Vector2.Distance(min, max)+1;
 
+        //Use the diagonal of the bounding box to define the padding
+        float padding = (Vector2.Distance(min, max)+1)*4; //It may be a bit big :p
+
+        //Compute the three vertex of the super triangle
         Vector3 A = new Vector3(xmin - padding, 0, zmin - padding);
         Vector3 B = new Vector3(xmax + padding, 0, zmin - padding);
         Vector3 C = new Vector3(((xmin + xmax) / 2), 0, zmax + padding);
 
+        //Create 3 agents representing the vertex of the super triangle
         AgentData agentA = new AgentData(A, A);
         AgentData agentB = new AgentData(B, B);
         AgentData agentC = new AgentData(C, C);
 
+        //Create the super triangle using the 3 newly created agents
         Tuple<AgentData, AgentData, AgentData> superTriangle = new Tuple<AgentData, AgentData, AgentData>(agentA, agentB, agentC);
 
-        List<Tuple<AgentData, AgentData, AgentData>> triangles = new List<Tuple<AgentData, AgentData, AgentData>>();
-
+        //Add the super triangle in the list of triangles
         triangles.Add(superTriangle);
 
-        //Adding the agents one by one
+        //---------------------
+        //Add agents one by one
+        //---------------------
 
+        //For each agent of the swarm
         foreach (AgentData a in swarm.GetAgentsData())
         {
             bool ok = false;
 
-            float count = 0;
-
+            //Create a list that will contains the triangles whose circumscribed circles contains the agent
             List< Tuple < AgentData, AgentData, AgentData >> taggedTriangles = new List<Tuple<AgentData, AgentData, AgentData>>();
 
+            //------------------------------------------------------
+            //Check which triangles contain the agent and mark them.
+            //------------------------------------------------------
             foreach (Tuple<AgentData, AgentData, AgentData> t in triangles)
             {
-                if(PointInsideTriangle(a.GetPosition(), t.Item1.GetPosition(), t.Item2.GetPosition(), t.Item3.GetPosition()))
-                {                    
+                //Check if the agent lies in the triangle's circumsribed circle
+                if(GeometryTools.PointInTheCircumscribedCircle(a.GetPosition(), t.Item1.GetPosition(), t.Item2.GetPosition(), t.Item3.GetPosition()))
+                {            
+                    //Marked the triangle if it contains the agent
                     taggedTriangles.Add(t);
 
-                    count++;
                     ok = true;
                 }
             }
 
-            //Removing tagged triangles and adding the new ones
-            foreach(Tuple<AgentData, AgentData, AgentData> t in taggedTriangles)
+            //----------------------------------------------------
+            //Remove marked triangles and add the new ones if they 
+            //don't share an edge with another triangle
+            //----------------------------------------------------
+            foreach (Tuple<AgentData, AgentData, AgentData> t in taggedTriangles)
             {
-                Tuple<AgentData, AgentData, AgentData> t1 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item1, t.Item2);
-                Tuple<AgentData, AgentData, AgentData> t2 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item2, t.Item3);
-                Tuple<AgentData, AgentData, AgentData> t3 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item3, t.Item1);
+                //When an agent is added into a triangle, 3 new triangles will be created
+                //But a new triangle is created only if it don't share an edge with another marked triangle
 
-                triangles.Add(t1);
-                triangles.Add(t2);
-                triangles.Add(t3);
+                //---------------------------
+                //Test for the first triangle
+                //---------------------------
 
+                Tuple<AgentData, AgentData> edge = new Tuple<AgentData, AgentData>(t.Item1, t.Item2);
+                bool test = false;
+                foreach (Tuple<AgentData, AgentData, AgentData> tr in taggedTriangles)
+                {
+                    //Test whether the 2 triangles are the same one
+                    if (System.Object.ReferenceEquals(t, tr)) continue;
+
+                    //Check if the triangle contains the edege
+                    if (TriangleContainsEdge(tr, edge))
+                    {
+                        test = true;
+                        break;
+                    }
+                }
+                if (!test)
+                {
+                    Tuple<AgentData, AgentData, AgentData> t1 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item1, t.Item2);
+                    triangles.Add(t1);
+                }
+
+                //----------------------------
+                //Test for the second triangle
+                //----------------------------
+
+                edge = new Tuple<AgentData, AgentData>(t.Item2, t.Item3);
+                test = false;
+                foreach (Tuple<AgentData, AgentData, AgentData> tr in taggedTriangles)
+                {
+                    //Test whether the 2 triangles are the same one
+                    if (System.Object.ReferenceEquals(t, tr)) continue;
+
+                    //Check if the triangle contains the edege
+                    if (TriangleContainsEdge(tr, edge))
+                    {
+                        test = true;
+                        break;
+                    }
+                }
+                if (!test)
+                {
+                    Tuple<AgentData, AgentData, AgentData> t2 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item2, t.Item3); 
+                    triangles.Add(t2);
+                }
+
+                //---------------------------
+                //Test for the third triangle
+                //---------------------------
+
+                edge = new Tuple<AgentData, AgentData>(t.Item3, t.Item1);
+                test = false;
+                foreach (Tuple<AgentData, AgentData, AgentData> tr in taggedTriangles)
+                {
+                    //Test whether the 2 triangles are the same one
+                    if (System.Object.ReferenceEquals(t, tr)) continue;
+
+                    //Check if the triangle contains the edege
+                    if (TriangleContainsEdge(tr, edge))
+                    {
+                        test = true;
+                        break;
+                    }
+                }
+                if (!test)
+                {
+                    Tuple<AgentData, AgentData, AgentData> t3 = new Tuple<AgentData, AgentData, AgentData>(a, t.Item3, t.Item1);
+                    triangles.Add(t3);
+                }
+
+                //Delete the triangle in any case
                 triangles.Remove(t);
             }
 
-            Debug.Log("NbTriangles = "+triangles.Count);
-
-            if(count>1) { Debug.Log("Un point peu être dans plusieurs triangles, nb :" + count); }
-
-            if (!ok) Debug.LogError("The point has not found an enclosing triangle.");
+            //All agents must have an enclosing triangle
+            if (!ok) Debug.LogError("The agent has not found an enclosing triangle.");
         }
 
+        //-------------------------------------------------------------
+        //Remove the vertices of the super triangle and their triangles
+        //-------------------------------------------------------------
 
-        //Remove the false agents representing the super triangle
-        /*
+        //This list contains the triangles that will be deleted
         List<Tuple<AgentData, AgentData, AgentData>> lastTriangles = new List<Tuple<AgentData, AgentData, AgentData>>();
+
+        //Check for each triangle if they contain one of the vertices of the super triangle
         foreach (Tuple<AgentData, AgentData, AgentData> t in triangles)
         {
-            if(System.Object.ReferenceEquals(t.Item1, agentA) || System.Object.ReferenceEquals(t.Item1, agentB) || System.Object.ReferenceEquals(t.Item1, agentC)) { lastTriangles.Add(t);}
-            if(System.Object.ReferenceEquals(t.Item2, agentA) || System.Object.ReferenceEquals(t.Item2, agentB) || System.Object.ReferenceEquals(t.Item2, agentC)) { lastTriangles.Add(t);}
-            if(System.Object.ReferenceEquals(t.Item3, agentA) || System.Object.ReferenceEquals(t.Item3, agentB) || System.Object.ReferenceEquals(t.Item3, agentC)) { lastTriangles.Add(t);}
+            if (t.Item1.GetPosition() == A || t.Item1.GetPosition() == B || t.Item1.GetPosition() == C) { lastTriangles.Add(t); }
+            if (t.Item2.GetPosition() == A || t.Item2.GetPosition() == B || t.Item2.GetPosition() == C) { lastTriangles.Add(t); }
+            if (t.Item3.GetPosition() == A || t.Item3.GetPosition() == B || t.Item3.GetPosition() == C) { lastTriangles.Add(t); }
         }
 
+        //Remove the triangles marked
         foreach (Tuple<AgentData, AgentData, AgentData> t in lastTriangles)
         { 
-
             triangles.Remove(t);
         }
-        */
+        
+
+        //Return the triangles of the triangulation
         return triangles;
     }
 
-    public static bool PointInsideTriangle(Vector3 point, Vector3 A, Vector3 B, Vector3 C)
+    /// <summary>
+    /// This method checks whether the triangle contains the proposed edge. 
+    /// It does not take into account the order of the vertices.
+    /// </summary>
+    /// <param name="triangle"> The triangle that may contains the edge or not.</param>
+    /// <param name="edge"> The tested edge.</param>
+    /// <returns>True if the triangle contains the edge, false otherwise.</returns>
+    public static bool TriangleContainsEdge(Tuple<AgentData, AgentData, AgentData> triangle, Tuple<AgentData, AgentData> edge)
     {
-        Vector3 AB = B - A;
-        Vector3 AM = point - A;
-        Vector3 AC = C - A;
-        Vector3 BA = A - B;
-        Vector3 BM = point - B;
-        Vector3 BC = C - B;
-        Vector3 CA = A - C;
-        Vector3 CM = point - C;
-        Vector3 CB = B - C;
+        //Test the first edge of the triangle
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item1) && System.Object.ReferenceEquals(edge.Item2, triangle.Item2)) return true;
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item2) && System.Object.ReferenceEquals(edge.Item2, triangle.Item1)) return true;
+
+        //Test the second edge of the triangle
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item2) && System.Object.ReferenceEquals(edge.Item2, triangle.Item3)) return true;
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item3) && System.Object.ReferenceEquals(edge.Item2, triangle.Item2)) return true;
+
+        //Test the third edge of the triangle
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item3) && System.Object.ReferenceEquals(edge.Item2, triangle.Item1)) return true;
+        if (System.Object.ReferenceEquals(edge.Item1, triangle.Item1) && System.Object.ReferenceEquals(edge.Item2, triangle.Item3)) return true;
 
 
-        float condA = Vector3.Dot(Vector3.Cross(AB, AM), Vector3.Cross(AM, AC));
-
-        if (condA < 0) { return false; }
-
-
-        float condB = Vector3.Dot(Vector3.Cross(BA, BM), Vector3.Cross(BM, BC));
-
-        if (condB < 0) { return false; }
-
-
-        float condC = Vector3.Dot(Vector3.Cross(CA, CM), Vector3.Cross(CM, CB));
-
-        if (condC < 0) { return false; }
-
-        return true;
+        return false;
     }
+
+
+
+    
 
     #endregion
 
