@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,18 +31,13 @@ public class GeometryTools
     /// <returns>True if the point lies in the circle, false otherwise.</returns>
     public static bool PointInTheCircumscribedCircle(Vector3 point, Vector3 A, Vector3 B, Vector3 C)
     {
-        //Calcul of the value used in the two next formulas
-        float d = (A.x - C.x) * (B.z - C.z) - (B.x - C.x) * (A.z - C.z);
+        //Get the circumcenter of the triangle
+        Vector3 circumcenter = GetTriangleCircumcenter(A, B, C);
 
-        //Calcul of the x coordinate of the circumcenter
-        float h = (((A.x - C.x) * (A.x + C.x) + (A.z - C.z) * (A.z + C.z)) / 2.0f * (B.z - C.z)
-            - ((B.x - C.x) * (B.x + C.x) + (B.z - C.z) * (B.z + C.z)) / 2.0f * (A.z - C.z)) / d;
+        float h = circumcenter.x;
+        float k = circumcenter.z;
 
-        //Calcul of the z coordinate of the circumcenter
-        float k = (((B.x - C.x) * (B.x + C.x) + (B.z - C.z) * (B.z + C.z)) / 2.0f * (A.x - C.x)
-            - ((A.x - C.x) * (A.x + C.x) + (A.z - C.z) * (A.z + C.z)) / 2.0f * (B.x - C.x)) / d;
-
-        //Calcul of the radius of the circle (squared)
+        //Calcul of the circumradius (squared)
         float rx = (h - A.x);
         float rz = (k - A.z);
         float rSquared = rx * rx + rz * rz;
@@ -54,6 +50,31 @@ public class GeometryTools
 
         //Check if the distance is less than the radius
         return distSquared < rSquared;
+    }
+
+    /// <summary>
+    /// This method compute the circumcenter of the triangle defined by A, B and C.
+    /// It takes vectors3 as parameters, but the calculations are only performed on the x and z coordinates, as the analysis is performed on a plane.
+    /// The formulas used are taken from : https://ics.uci.edu/~eppstein/junkyard/circumcenter.html (the second proposition)
+    /// </summary>
+    /// <param name="A"> First vertex of the triangle. </param>
+    /// <param name="B"> Second vertex of the triangle. </param>
+    /// <param name="C"> Third vertex of the triangle. </param>
+    /// <returns>The two coordinates of the circumcenter of the triangle.</returns>
+    public static Vector3 GetTriangleCircumcenter(Vector3 A, Vector3 B, Vector3 C)
+    {
+        //Calcul of the value used in the two next formulas
+        float d = (A.x - C.x) * (B.z - C.z) - (B.x - C.x) * (A.z - C.z);
+
+        //Calcul of the x coordinate of the circumcenter
+        float h = (((A.x - C.x) * (A.x + C.x) + (A.z - C.z) * (A.z + C.z)) / 2.0f * (B.z - C.z)
+            - ((B.x - C.x) * (B.x + C.x) + (B.z - C.z) * (B.z + C.z)) / 2.0f * (A.z - C.z)) / d;
+
+        //Calcul of the z coordinate of the circumcenter
+        float k = (((B.x - C.x) * (B.x + C.x) + (B.z - C.z) * (B.z + C.z)) / 2.0f * (A.x - C.x)
+            - ((A.x - C.x) * (A.x + C.x) + (A.z - C.z) * (A.z + C.z)) / 2.0f * (B.x - C.x)) / d;
+
+        return new Vector3(h,0.0f, k);
     }
 
 
@@ -93,5 +114,32 @@ public class GeometryTools
         if (condC < 0) { return false; }
 
         return true;
+    }
+
+
+    /// <summary>
+    /// This methods compute the area of the given triangle defined by A,B and C.
+    /// It use the algo proposed in this website: https://atechdaily.com/posts/Algorithm-and-FLowchart-for-Area-of-Triangle
+    /// </summary>
+    /// <param name="A">First vertex of the triangle.</param>
+    /// <param name="B">Second vertex of the triangle.</param>
+    /// <param name="C">Third vertex of the triangle.</param>
+    /// <returns>The area of the triangle.</returns>
+    public static float GetTriangleArea(Vector3 A, Vector3 B, Vector3 C)
+    {
+        float side1 = Vector3.Magnitude(A - B);
+        float side2 = Vector3.Magnitude(B - C);
+        float side3 = Vector3.Magnitude(C - A);
+
+        float s = (side1 + side2 + side3) / 2.0f;
+
+        float area = Mathf.Sqrt(s * (s - side1) * (s - side2) * (s - side3));
+
+        return area;
+    }
+
+    public static Vector3 GetTriangleGravityCenter(Vector3 A, Vector3 B, Vector3 C)
+    {
+        return (A + B + C) / 3.0f;
     }
 }
