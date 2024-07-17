@@ -120,6 +120,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &65529935 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 241118031145814296, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
+  m_PrefabInstance: {fileID: 2768054523654977252}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7080f28af373945ac7d200e94b417b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &173933240
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,8 +167,9 @@ MonoBehaviour:
   parametersInterface: {fileID: 173933245}
   displayers: {fileID: 840431973}
   usedDisplayers:
-  - {fileID: 843391746}
+  - {fileID: 2768054523654977254}
   - {fileID: 1422870313}
+  - {fileID: 65529935}
 --- !u!4 &173933244
 Transform:
   m_ObjectHideFlags: 0
@@ -187,8 +199,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agentBehaviour: 1
   agentMovement: 0
-  mapSizeX: 7
-  mapSizeZ: 7
+  mapSizeX: 15
+  mapSizeZ: 15
   fieldOfViewSize: 1
   blindSpotSize: 30
   maxSpeed: 0.1
@@ -594,17 +606,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6106774681745779282, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
   m_PrefabInstance: {fileID: 2768054523654977252}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &843391746 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6603678648199130850, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
-  m_PrefabInstance: {fileID: 2768054523654977252}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1274b4103092de24abe5fe18bb1ee1a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &853864002
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,8 +716,8 @@ Camera:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -766,7 +767,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 3.5, y: 7, z: 3.5}
+  m_LocalPosition: {x: 7.5, y: 15, z: 7.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1628,6 +1629,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2919969378166467952, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
+      propertyPath: displayType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3502333210265931007, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
       propertyPath: m_Name
       value: '[Displayers]'
@@ -1677,6 +1682,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
+--- !u!114 &2768054523654977254 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2919969378166467952, guid: 5e4f842bf4d55b74890d9c6395c42879, type: 3}
+  m_PrefabInstance: {fileID: 2768054523654977252}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1274b4103092de24abe5fe18bb1ee1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
