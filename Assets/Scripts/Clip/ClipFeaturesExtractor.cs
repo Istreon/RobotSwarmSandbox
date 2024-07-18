@@ -31,6 +31,9 @@ public class ClipFeaturesExtractor : MonoBehaviour
             "FinalExpansionDistance;"+
             "ExpansionSpeed;"+
             "MeanStandardDeviationOfKnnDirection;"+
+            "MeanEffectiveGroupMotion;" +
+            "MeanKNNOrder;" +
+            "MeanTowardsCenterOfMass;" +
             "AverageDistanceTravelledByAgentsPerSecond;" +
             "ChangeOfAgentsLinks;" +
             "ConvexHulArea; " +
@@ -81,6 +84,9 @@ public class ClipFeaturesExtractor : MonoBehaviour
                 + SwarmMetrics.TotalDistance(c.GetFrames()[c.GetFrames().Count - 1]) + ";"
                 + GetExpansionSpeed(c) + ";"
                 + ClipMetrics.MeanStandardDeviationOfKnnDirection(c) + ";"
+                + ClipMetrics.MeanEffectiveGroupMotion(c) + ";"
+                + ClipMetrics.MeanKNNOrder(c,3) + ";"
+                + ClipMetrics.MeanTowardsCenterOfMass(c) + ";"
                 + AverageDistanceTravelledByAgentsPerSecond(c) + ";"
                 + ChangeOfAgentsLinks(c) + ";"
                 + SwarmTools.GetConvexHulArea(c.GetFrames()[c.GetFrames().Count - 1]) + ";"

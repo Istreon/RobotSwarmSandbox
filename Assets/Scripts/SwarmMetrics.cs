@@ -274,6 +274,34 @@ public class SwarmMetrics
 
         return ListTools.StandardDeviation(directionDiff);
     }
+
+
+    public static float KNNOrder(SwarmData swarmData,int k)
+    {
+        List<AgentData> agents = swarmData.GetAgentsData();
+        int n = agents.Count;
+        float total = 0;
+
+        foreach (AgentData a in agents)
+        {
+            List<AgentData> knn = SwarmTools.KNN(a, agents, k);
+            Vector3 b = a.GetSpeed().normalized;
+            foreach (AgentData i in knn)
+            {
+                Vector3 speed = i.GetSpeed();
+                Vector3 direction = speed.normalized;
+                b += direction;   
+            }
+            float psi = Vector3.Magnitude(b) / ((float)(knn.Count+1));
+            total += psi;
+        }
+
+        total = total / n;
+        return total;
+
+
+
+    }
     #endregion
 
     #region Methods - Neighbourhood

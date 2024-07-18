@@ -71,6 +71,17 @@ public class ClipMetrics
         return ListTools.Mean(orders);
     }
 
+    public static float MeanKNNOrder(SwarmClip c,int k)
+    {
+        List<float> orders = new List<float>();
+        foreach (SwarmData s in c.GetFrames())
+        {
+            orders.Add(SwarmMetrics.KNNOrder(s,k));
+        }
+
+        return ListTools.Mean(orders);
+    }
+
     public static float MedianOrder(SwarmClip c)
     {
         List<float> orders = new List<float>();
